@@ -36,17 +36,17 @@ export default function HomePage() {
   const popularItems = [
     {
       name: translate('Orange Chicken'),
-      image: '/images/orange-chicken.jpg',
+      image: '/images/entrees/the_original_orange_chicken.png',
       price: 11.99,
     },
     {
       name: translate('Beijing Beef'),
-      image: '/images/beijing-beef.jpg',
+      image: '/images/entrees/beijing_beef.png',
       price: 12.99,
     },
     {
       name: translate('Chow Mein'),
-      image: '/images/chow-mein.jpg',
+      image: '/images/sides/chow_mein.png',
       price: 4.99,
     },
   ];

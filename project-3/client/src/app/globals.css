@@ -1,0 +1,92 @@
+/* client/src/app/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Panda Express Brand Colors */
+  --panda-red: #ED1C24;
+  --panda-dark-red: #C41017;
+  --panda-black: #000000;
+  --panda-gold: #C4A484;
+  --panda-light-gold: #D4B494;
+  --panda-cream: #FFF8DC;
+  --panda-white: #FFFFFF;
+  --panda-gray: #F5F5F5;
+}
+
+@layer base {
+  body {
+    @apply bg-[var(--panda-white)] text-[var(--panda-black)] min-h-screen;
+  }
+
+  h1 {
+    @apply text-3xl font-bold text-[var(--panda-black)] mb-4;
+  }
+
+  h2 {
+    @apply text-2xl font-bold text-[var(--panda-black)] mb-3;
+  }
+
+  h3 {
+    @apply text-xl font-bold text-[var(--panda-black)] mb-2;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-[var(--panda-red)] hover:bg-[var(--panda-dark-red)] 
+           text-white font-semibold px-4 py-2 rounded-md 
+           transition-colors duration-200;
+  }
+
+  .btn-secondary {
+    @apply bg-[var(--panda-gold)] hover:bg-[var(--panda-light-gold)] 
+           text-black font-semibold px-4 py-2 rounded-md 
+           transition-colors duration-200;
+  }
+
+  .card {
+    @apply bg-white rounded-lg shadow-md p-6 
+           border-t-4 border-[var(--panda-red)];
+  }
+
+  .input-field {
+    @apply border border-gray-300 rounded-md px-3 py-2 w-full
+           focus:outline-none focus:ring-2 focus:ring-[var(--panda-red)] 
+           focus:border-transparent;
+  }
+
+  .nav-link {
+    @apply text-[var(--panda-black)] hover:text-[var(--panda-red)] 
+           transition-colors duration-200;
+  }
+
+  .nav-active {
+    @apply text-[var(--panda-red)] font-semibold;
+  }
+
+  .table-container {
+    @apply overflow-x-auto rounded-lg shadow border;
+  }
+
+  .table-header {
+    @apply bg-[var(--panda-red)] text-white 
+           px-6 py-3 text-left text-xs uppercase tracking-wider;
+  }
+
+  .table-cell {
+    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
+  }
+
+  .dashboard-card {
+    @apply bg-white rounded-lg shadow-md p-6 
+           border-t-4 border-[var(--panda-red)]
+           hover:shadow-lg transition-shadow duration-200;
+  }
+
+  .menu-item-card {
+    @apply bg-white rounded-lg shadow-md overflow-hidden
+           hover:shadow-lg transition-shadow duration-200;
+  }
+}

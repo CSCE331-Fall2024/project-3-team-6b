@@ -104,6 +104,39 @@ export default function HomePage() {
         </div>
       </div>
 
+
+      {/* New Seasonal Item: Moon Cakes Section */}
+      <div className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center mb-8">
+            {translate('New Seasonal Item: Moon Cakes')}
+          </h2>
+          <div className="flex flex-col md:flex-row items-center justify-center space-y-8 md:space-y-0 md:space-x-8">
+            <div className="relative h-64 w-64">
+              <Image
+                src="/images/moon-cake.jpg"
+                alt={translate('Moon Cakes')}
+                fill
+                className="object-cover rounded-lg shadow-md"
+              />
+            </div>
+            <div className="text-center md:text-left">
+              <h3 className="text-2xl font-semibold mb-4">{translate('Celebrate the Mid-Autumn Festival')}</h3>
+              <p className="text-gray-600 mb-6">
+                {translate('Indulge in the rich and delicate flavors of traditional moon cakes, available for a limited time.')}
+              </p>
+              <Link
+                href="/menu"
+                className="btn-primary px-6 py-3 flex items-center space-x-2 hover:scale-105 transition-transform duration-200"
+              >
+                <span>{translate('Order Now')}</span>
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Features Section */}
       <div className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

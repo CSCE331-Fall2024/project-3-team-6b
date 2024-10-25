@@ -4,7 +4,7 @@ export interface MenuItem {
     name: string;
     description: string;
     price: number;
-    category: 'entree' | 'side' | 'drink' | 'combo';
+    category: 'entree' | 'side' | 'drink' | 'appetizer' | 'combo';
     imageUrl: string;
     available: boolean;
   }

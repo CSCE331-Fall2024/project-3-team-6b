@@ -90,3 +90,37 @@
            hover:shadow-lg transition-shadow duration-200;
   }
 }
+
+/* Text shadow for better readability over video */
+.text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .text-shadow-lg {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  }
+  
+  /* Optional: Add a subtle animation for the video when it starts */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 0.7; /* Matches the opacity-70 class */
+    }
+  }
+  
+  .hero-video-fade {
+    animation: fadeIn 1.5s ease-in-out;
+  }
+  
+  /* Optional: Reduce motion if user prefers */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-video-fade {
+      animation: none;
+    }
+  }
+
+  .text-shadow-lg {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }

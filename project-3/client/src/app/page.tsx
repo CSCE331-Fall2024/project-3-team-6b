@@ -1,6 +1,7 @@
 // client/src/app/page.tsx
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useLanguage } from '../context/LanguageContext';
@@ -8,6 +9,11 @@ import { ArrowRight, Clock, ShoppingBag, Utensils } from 'lucide-react';
 
 export default function HomePage() {
   const { translate } = useLanguage();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const features = [
     {
@@ -48,23 +54,49 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="relative h-[70vh] bg-black">
-        <Image
-          src="/images/hero-image.jpg"
-          alt="Delicious Panda Express Food"
-          fill
-          className="object-cover opacity-70"
-        />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
+      <div className="relative h-[70vh] bg-black overflow-hidden">
+        {/* Video Background - Only rendered on client side */}
+        {isClient && (
+          <div className="absolute inset-0">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover opacity-70"
+            >
+              <source src="/images/hero-video.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+            <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+          </div>
+        )}
+        
+        {/* Static Background for Server - Hidden when video loads */}
+        {!isClient && (
+          <div className="absolute inset-0">
+            <Image
+              src="/images/hero-image.jpg"
+              alt="Background"
+              fill
+              className="object-cover opacity-70"
+              priority
+            />
+            <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+          </div>
+        )}
+
+        {/* Content */}
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-white text-center px-4">
+        <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white text-shadow-lg">
             {translate('Welcome to Panda Express')}
-          </h1>
-          <p className="text-xl md:text-2xl mb-8">
+            </h1>
+          <p className="text-xl md:text-2xl mb-8 text-shadow">
             {translate('Experience the bold flavors of American Chinese cuisine')}
           </p>
           <Link
             href="/menu"
-            className="btn-primary text-lg px-8 py-3 flex items-center space-x-2"
+            className="btn-primary text-lg px-8 py-3 flex items-center space-x-2 hover:scale-105 transition-transform duration-200"
           >
             <span>{translate('Start Your Order')}</span>
             <ArrowRight className="h-5 w-5" />

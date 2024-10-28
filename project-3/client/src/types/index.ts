@@ -26,6 +26,7 @@ export interface MenuItem {
     status: 'pending' | 'preparing' | 'ready' | 'completed' | 'cancelled';
     cashierId: string;
     createdAt: string;
+    tip?: number;
   }
   
   export interface User {

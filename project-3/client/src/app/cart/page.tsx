@@ -516,17 +516,12 @@ const MenuPage: React.FC = () => {
         <div className="w-full md:w-3/4">
           <div className="flex justify-center space-x-4 mb-8">
             {/* Category buttons */}
-            <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={orderBowl}>
-                  Bowl
-                </button>
-                <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={orderPlate}>
-                  Plate
-                </button>
-                <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={orderBiggerPlate}>
-                  Bigger Plate
-                </button>
+            
                 <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('all')}>
-                  A La Carte
+                  All Items
+                </button>
+                <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('entree')}>
+                  Entrees
                 </button>
                 <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('side')}>
                   Sides
@@ -538,27 +533,43 @@ const MenuPage: React.FC = () => {
                 <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('drink')}>
                   Drinks
                 </button>
+                <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('combo')}>
+                  Combos
+                </button>
+
                 
             
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filteredItems.map(item => (
-              <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                <img src={item.imageUrl} alt={item.name} className="w-full h-48 object-cover" />
-                <div className="p-4">
-                  <h3 className="text-lg font-bold">{item.name}</h3>
-                  <p className="text-gray-500 mb-2">{item.description}</p>
-                  <p className="text-[var(--panda-red)] font-bold">${item.price.toFixed(2)}</p>
-                  <button
-                    className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md mt-2 w-full"
-                    onClick={() => addToCart(item)}
-                  >
-                    Add to Cart
-                  </button>
-                </div>
-              </div>
-            ))}
+          {filteredItems.map(item => (
+  <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+    <img src={item.imageUrl} alt={item.name} className="w-full h-48 object-cover" />
+    <div className="p-4">
+      <h3 className="text-lg font-bold">{item.name}</h3>
+      <p className="text-gray-500 mb-2">{item.description}</p>
+      <p className="text-[var(--panda-red)] font-bold">${item.price.toFixed(2)}</p>
+      <button
+        className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md mt-2 w-full"
+        onClick={() => {
+          if (item.name === 'Bowl') {
+            orderBowl();
+          } else if (item.name === 'Plate') {
+            orderPlate();
+          } else if (item.name === 'Bigger Plate') {
+            orderBiggerPlate();
+          } else {
+            addToCart(item);
+          }
+        }}
+      >
+        {item.category === 'combo' ? 'Create' : 'Add to Cart'}
+      </button>
+    </div>
+  </div>
+))}
+
+
           </div>
         </div>
 

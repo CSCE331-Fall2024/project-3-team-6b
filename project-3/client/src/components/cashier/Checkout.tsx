@@ -17,8 +17,10 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
   
   const [activeDraftId, setActiveDraftId] = useState<string | null>(null);
   const [selectedTipPercent, setSelectedTipPercent] = useState<number | null>(null);
+  const [selectedSplit, setSelectedSplit] = useState<number | null>(null); // State for split bill
   const [customTipAmount, setCustomTipAmount] = useState<string>('');
-  
+  const [completedSplits, setCompletedSplits] = useState<number>(0); // State to track completed parts of split
+
   const currentItems = draftOrders.find(d => d.id === activeDraftId)?.items || [];
   
   const TAX_RATE = 0.0825;
@@ -28,12 +30,17 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
     const newDraft = {
       id: `draft-${Date.now()}`,
       items: [],
-      createdAt: new Date()
+      createdAt: new Date(),
     };
+    
     setDraftOrders(prev => [...prev, newDraft]);
     setActiveDraftId(newDraft.id);
+    
+    // Reset both tip and split bill selections when a new draft is created
     setSelectedTipPercent(null);
     setCustomTipAmount('');
+    setSelectedSplit(null); // Reset split bill on new draft
+    setCompletedSplits(0); // Reset completed split count
   };
 
   const addItem = (menuItem: MenuItem) => {
@@ -46,7 +53,7 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
           quantity: 1,
           price: menuItem.price
         }],
-        createdAt: new Date()
+        createdAt: new Date(),
       };
       setDraftOrders([newDraft]);
       setActiveDraftId(newDraft.id);
@@ -104,12 +111,17 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
 
   const handleTipPercentSelect = (percent: number) => {
     setSelectedTipPercent(percent);
-    setCustomTipAmount('');
+    setCustomTipAmount(''); // Reset custom tip amount when a percentage is selected
   };
 
   const handleCustomTipChange = (value: string) => {
     setCustomTipAmount(value);
-    setSelectedTipPercent(null);
+    setSelectedTipPercent(null); // Clear percentage tip when custom tip is entered
+  };
+
+  const handleSplitSelect = (num: number) => {
+    setSelectedSplit(num); // Set selected split bill option
+    setCompletedSplits(0); // Reset completed split count when split selection changes
   };
 
   const calculateTotals = (items: OrderItem[]) => {
@@ -130,20 +142,28 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
     return { subtotal, tax, tipAmount, total };
   };
 
-  const handleCheckout = () => {
-    const { subtotal, tax, tipAmount, total } = calculateTotals(currentItems);
-    onCreateOrder({
-      items: currentItems,
-      subtotal,
-      tax,
-      tip: tipAmount,
-      total,
-      status: 'pending'
-    });
-    setDraftOrders(prev => prev.filter(d => d.id !== activeDraftId));
-    setActiveDraftId(null);
-    setSelectedTipPercent(null);
-    setCustomTipAmount('');
+  const handleCheckout = (index: number) => {
+    // If it's the last split, complete the entire order
+    if (index === (selectedSplit || 1) - 1) {
+      const { subtotal, tax, tipAmount, total } = calculateTotals(currentItems);
+      onCreateOrder({
+        items: currentItems,
+        subtotal,
+        tax,
+        tip: tipAmount,
+        total,
+        status: 'pending'
+      });
+      setDraftOrders(prev => prev.filter(d => d.id !== activeDraftId));
+      setActiveDraftId(null);
+      setSelectedTipPercent(null);
+      setCustomTipAmount('');
+      setSelectedSplit(null); // Reset split selection on checkout
+      setCompletedSplits(0); // Reset completed split count
+    } else {
+      // Increment the completedSplits count to disable the current button
+      setCompletedSplits(prev => prev + 1);
+    }
   };
 
   return (
@@ -259,6 +279,25 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
                 </div>
               </div>
 
+              <div className="border-t pt-4 mb-4">
+                <h3 className="font-semibold mb-2">Split Bill</h3>
+                <div className="flex gap-2 mb-3">
+                  {[1, 2, 3, 4].map((num) => (
+                    <button
+                      key={num}
+                      onClick={() => handleSplitSelect(num)}
+                      className={`flex-1 py-2 px-3 rounded-lg text-sm ${
+                        selectedSplit === num
+                          ? 'bg-[var(--panda-red)] text-white'
+                          : 'bg-gray-100 hover:bg-gray-200'
+                      }`}
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="border-t pt-4 space-y-2">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
@@ -276,13 +315,25 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
                   <span>Total</span>
                   <span>${calculateTotals(currentItems).total.toFixed(2)}</span>
                 </div>
+
+                {/* Render "Complete Order" buttons based on selectedSplit */}
+                <div className="space-y-4 mt-6">
+                  {Array(selectedSplit || 1).fill(null).map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleCheckout(index)}
+                      className={`w-full px-4 py-2 rounded-lg transition-colors ${
+                        index < completedSplits
+                          ? 'bg-gray-300 cursor-not-allowed'
+                          : 'bg-[var(--panda-red)] text-white hover:bg-[var(--panda-dark-red)]'
+                      }`}
+                      disabled={index < completedSplits} // Disable buttons that have been clicked
+                    >
+                      Complete Order {selectedSplit && selectedSplit > 1 ? `(${index + 1}/${selectedSplit})` : ''}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <button
-                onClick={handleCheckout}
-                className="w-full mt-6 px-4 py-2 bg-[var(--panda-red)] text-white rounded-lg hover:bg-[var(--panda-dark-red)] transition-colors"
-              >
-                Complete Order
-              </button>
             </>
           ) : (
             <p className="text-gray-500">

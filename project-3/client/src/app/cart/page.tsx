@@ -8,6 +8,33 @@ import { MenuItem } from '@/types';
 
 const menuItems: MenuItem[] = [
     {
+        id: '41',
+        name: 'Bowl',
+        description: '1 Side & 1 Entree',
+        price: 8.30,
+        category: 'combo',
+        imageUrl: '/images/combos/bowl.png',
+        available: true,
+      },
+      {
+        id: '42',
+        name: 'Plate',
+        description: '1 Side & 2 Entrees',
+        price: 9.80,
+        category: 'combo',
+        imageUrl: '/images/combos/plate.png',
+        available: true,
+      },
+      {
+        id: '43',
+        name: 'Bigger Plate',
+        description: '1 Side & 3 Entrees',
+        price: 11.30,
+        category: 'combo',
+        imageUrl: '/images/combos/biggerPlate.png',
+        available: true,
+      },
+    {
       id: '1',
       name: 'Orange Chicken',
       description: 'Crispy chicken wok-tossed in a sweet and spicy orange sauce',
@@ -367,39 +394,13 @@ const menuItems: MenuItem[] = [
       imageUrl: '/images/drinks/sprite.png',
       available: true,
     },
-    {
-      id: '41',
-      name: 'Bowl',
-      description: '1 Side & 1 Entree',
-      price: 8.30,
-      category: 'combo',
-      imageUrl: '/images/combos/bowl.png',
-      available: true,
-    },
-    {
-      id: '42',
-      name: 'Plate',
-      description: '1 Side & 2 Entrees',
-      price: 9.80,
-      category: 'combo',
-      imageUrl: '/images/combos/plate.png',
-      available: true,
-    },
-    {
-      id: '43',
-      name: 'Bigger Plate',
-      description: '1 Side & 3 Entrees',
-      price: 11.30,
-      category: 'combo',
-      imageUrl: '/images/combos/biggerPlate.png',
-      available: true,
-    }
+    
   ];
 
 
 
 const MenuPage: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('combo');
   const [cartItems, setCartItems] = useState<MenuItem[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [modalItem, setModalItem] = useState<MenuItem | null>(null);
@@ -516,10 +517,10 @@ const MenuPage: React.FC = () => {
         <div className="w-full md:w-3/4">
           <div className="flex justify-center space-x-4 mb-8">
             {/* Category buttons */}
-            
-                <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('all')}>
-                  All Items
+            <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('combo')}>
+                  Combos
                 </button>
+                
                 <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('entree')}>
                   Entrees
                 </button>
@@ -529,13 +530,13 @@ const MenuPage: React.FC = () => {
                 <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('appetizer')}>
                 Appetizers
                 </button>
-                
                 <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('drink')}>
                   Drinks
                 </button>
-                <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('combo')}>
-                  Combos
+                <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('all')}>
+                  All Items
                 </button>
+                
 
                 
             

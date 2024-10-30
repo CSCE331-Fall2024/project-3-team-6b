@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { api } from '@/lib/api';
+import api  from '@/lib/api';
 
 interface SalesChartProps {
   dateRange: string;

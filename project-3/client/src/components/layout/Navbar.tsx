@@ -17,7 +17,7 @@ export default function Navbar() {
   const navLinks = [
     { href: '/menu', label: translate('Menu') },
     { href: '/cart', label: translate('Cart') },
-    { href: '/order-status', label: translate('Order Status') },
+    { href: '/order-status', label: translate('Accessibility') },
   ];
 
   return (

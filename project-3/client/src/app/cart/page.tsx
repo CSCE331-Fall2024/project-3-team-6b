@@ -8,6 +8,33 @@ import { MenuItem } from '@/types';
 
 const menuItems: MenuItem[] = [
     {
+        id: '41',
+        name: 'Bowl',
+        description: '1 Side & 1 Entree',
+        price: 8.30,
+        category: 'combo',
+        imageUrl: '/images/combos/bowl.png',
+        available: true,
+      },
+      {
+        id: '42',
+        name: 'Plate',
+        description: '1 Side & 2 Entrees',
+        price: 9.80,
+        category: 'combo',
+        imageUrl: '/images/combos/plate.png',
+        available: true,
+      },
+      {
+        id: '43',
+        name: 'Bigger Plate',
+        description: '1 Side & 3 Entrees',
+        price: 11.30,
+        category: 'combo',
+        imageUrl: '/images/combos/biggerPlate.png',
+        available: true,
+      },
+    {
       id: '1',
       name: 'Orange Chicken',
       description: 'Crispy chicken wok-tossed in a sweet and spicy orange sauce',
@@ -367,39 +394,13 @@ const menuItems: MenuItem[] = [
       imageUrl: '/images/drinks/sprite.png',
       available: true,
     },
-    {
-      id: '41',
-      name: 'Bowl',
-      description: '1 Side & 1 Entree',
-      price: 8.30,
-      category: 'combo',
-      imageUrl: '/images/combos/bowl.png',
-      available: true,
-    },
-    {
-      id: '42',
-      name: 'Plate',
-      description: '1 Side & 2 Entrees',
-      price: 9.80,
-      category: 'combo',
-      imageUrl: '/images/combos/plate.png',
-      available: true,
-    },
-    {
-      id: '43',
-      name: 'Bigger Plate',
-      description: '1 Side & 3 Entrees',
-      price: 11.30,
-      category: 'combo',
-      imageUrl: '/images/combos/biggerPlate.png',
-      available: true,
-    }
+    
   ];
 
 
 
 const MenuPage: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('combo');
   const [cartItems, setCartItems] = useState<MenuItem[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [modalItem, setModalItem] = useState<MenuItem | null>(null);
@@ -419,8 +420,33 @@ const MenuPage: React.FC = () => {
 
   // Add item to cart
   const addToCart = (item: MenuItem) => {
-    setCartItems([...cartItems, item]);
+    if (item.category === 'combo') {
+        const comboItem = {
+          ...item,
+          selectedSide,
+          selectedEntrees,
+        };
+        setCartItems([...cartItems, comboItem]);
+      } else {
+        setCartItems([...cartItems, item]);
+      }
   };
+
+  const renderCartItemDetails = (item: MenuItem) => {
+    if (item.category === 'combo') {
+      return (
+        <div className="text-gray-600 text-sm mt-2">
+          <p><strong>Side:</strong> {item.selectedSide ? item.selectedSide.name : 'None'}</p>
+          <p><strong>Entrees:</strong> {item.selectedEntrees && item.selectedEntrees.length > 0
+            ? item.selectedEntrees.map(entree => entree.name).join(', ')
+            : 'None'}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+  
 
   // Remove item from cart
   const removeFromCart = (index: number) => {
@@ -507,6 +533,11 @@ const MenuPage: React.FC = () => {
     });
   };
 
+  const handleCheckout = () => {
+    console.log('Checking out with items:', cartItems);
+    console.log('Total amount:', total.toFixed(2));
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <h1 className="text-4xl font-bold text-center mb-8">Our Menu</h1>
@@ -516,10 +547,10 @@ const MenuPage: React.FC = () => {
         <div className="w-full md:w-3/4">
           <div className="flex justify-center space-x-4 mb-8">
             {/* Category buttons */}
-            
-                <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('all')}>
-                  All Items
+            <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('combo')}>
+                  Combos
                 </button>
+                
                 <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('entree')}>
                   Entrees
                 </button>
@@ -529,48 +560,53 @@ const MenuPage: React.FC = () => {
                 <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('appetizer')}>
                 Appetizers
                 </button>
-                
                 <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('drink')}>
                   Drinks
                 </button>
-                <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('combo')}>
-                  Combos
+                <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('all')}>
+                  All Items
                 </button>
+                
 
                 
             
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {filteredItems.map(item => (
-  <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-    <img src={item.imageUrl} alt={item.name} className="w-full h-48 object-cover" />
-    <div className="p-4">
-      <h3 className="text-lg font-bold">{item.name}</h3>
-      <p className="text-gray-500 mb-2">{item.description}</p>
-      <p className="text-[var(--panda-red)] font-bold">${item.price.toFixed(2)}</p>
-      <button
-        className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md mt-2 w-full"
-        onClick={() => {
-          if (item.name === 'Bowl') {
-            orderBowl();
-          } else if (item.name === 'Plate') {
-            orderPlate();
-          } else if (item.name === 'Bigger Plate') {
-            orderBiggerPlate();
-          } else {
-            addToCart(item);
-          }
-        }}
-      >
-        {item.category === 'combo' ? 'Create' : 'Add to Cart'}
-      </button>
+  {filteredItems.map(item => (
+    <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full">
+      <img src={item.imageUrl} alt={item.name} className="w-full h-48 object-cover" />
+      <div className="p-4 flex flex-col flex-grow justify-between">
+        <div className="min-h-[100px]"> {/* Adjust min height as needed */}
+          <h3 className="text-lg font-bold">{item.name}</h3>
+          <p className="text-gray-500 mb-2">{item.description}</p> {/* Full text shown */}
+        </div>
+        <div>
+          <p className="text-[var(--panda-red)] font-bold">${item.price.toFixed(2)}</p>
+          <button
+            className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md mt-2 w-full"
+            onClick={() => {
+              if (item.name === 'Bowl') {
+                orderBowl();
+              } else if (item.name === 'Plate') {
+                orderPlate();
+              } else if (item.name === 'Bigger Plate') {
+                orderBiggerPlate();
+              } else {
+                addToCart(item);
+              }
+            }}
+          >
+            {item.category === 'combo' ? 'Create' : 'Add to Cart'}
+          </button>
+        </div>
+      </div>
     </div>
-  </div>
-))}
+  ))}
+</div>
 
 
-          </div>
+        
         </div>
 
         {/* Checkout column */}
@@ -583,6 +619,7 @@ const MenuPage: React.FC = () => {
                   <div>
                     <h3 className="text-md font-bold">{item.name}</h3>
                     <p className="text-gray-500">${item.price.toFixed(2)}</p>
+                    {renderCartItemDetails(item)}
                   </div>
                   <button
                     className="text-[var(--panda-red)] hover:text-red-600"
@@ -600,6 +637,12 @@ const MenuPage: React.FC = () => {
               </div>
             </div>
           </div>
+          <button
+              onClick={handleCheckout}
+              className="w-full bg-[var(--panda-red)] text-white px-4 py-2 rounded-md mt-4 hover:bg-red-700 transition-colors"
+            >
+              Checkout
+            </button>
         </div>
       </div>
 

@@ -95,7 +95,7 @@ export default function HomePage() {
             {translate('Experience the bold flavors of American Chinese cuisine')}
           </p>
           <Link
-            href="/menu"
+            href="/cart"
             className="btn-primary text-lg px-8 py-3 flex items-center space-x-2 hover:scale-105 transition-transform duration-200"
           >
             <span>{translate('Start Your Order')}</span>
@@ -126,7 +126,7 @@ export default function HomePage() {
                 {translate('Indulge in the rich and delicate flavors of traditional moon cakes, available for a limited time.')}
               </p>
               <Link
-                href="/menu"
+                href="/cart"
                 className="btn-primary px-6 py-3 flex items-center space-x-2 hover:scale-105 transition-transform duration-200"
               >
                 <span>{translate('Order Now')}</span>

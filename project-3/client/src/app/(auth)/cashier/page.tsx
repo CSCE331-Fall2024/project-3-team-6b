@@ -17,6 +17,33 @@ export default function CashierPage() {
     // Temporary data for testing
     const dummyData: MenuItem[] = [
       {
+        id: '41',
+        name: 'Bowl',
+        description: '1 Side & 1 Entree',
+        price: 8.30,
+        category: 'combo',
+        imageUrl: '/images/combos/bowl.png',
+        available: true,
+      },
+      {
+        id: '42',
+        name: 'Plate',
+        description: '1 Side & 2 Entrees',
+        price: 9.80,
+        category: 'combo',
+        imageUrl: '/images/combos/plate.png',
+        available: true,
+      },
+      {
+        id: '43',
+        name: 'Bigger Plate',
+        description: '1 Side & 3 Entrees',
+        price: 11.30,
+        category: 'combo',
+        imageUrl: '/images/combos/biggerPlate.png',
+        available: true,
+      },
+      {
         id: '1',
         name: 'Orange Chicken',
         description: 'Crispy chicken wok-tossed in a sweet and spicy orange sauce',
@@ -376,33 +403,7 @@ export default function CashierPage() {
         imageUrl: '/images/drinks/sprite.png',
         available: true,
       },
-      {
-        id: '41',
-        name: 'Bowl',
-        description: '1 Side & 1 Entree',
-        price: 8.30,
-        category: 'combo',
-        imageUrl: '/images/combos/bowl.png',
-        available: true,
-      },
-      {
-        id: '42',
-        name: 'Plate',
-        description: '1 Side & 2 Entrees',
-        price: 9.80,
-        category: 'combo',
-        imageUrl: '/images/combos/plate.png',
-        available: true,
-      },
-      {
-        id: '43',
-        name: 'Bigger Plate',
-        description: '1 Side & 3 Entrees',
-        price: 11.30,
-        category: 'combo',
-        imageUrl: '/images/combos/biggerPlate.png',
-        available: true,
-      }
+      
     ];
 
   useEffect(() => {

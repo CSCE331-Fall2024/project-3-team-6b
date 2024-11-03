@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
 import { MenuItem, Order, OrderItem } from '@/types';
-import { PlusCircle, Receipt } from 'lucide-react';
+import { PlusCircle, Receipt, CreditCard } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/cashier/dialog';
+
 
 interface CheckoutProps {
   menuItems: MenuItem[];
   onCreateOrder: (order: Partial<Order>) => void;
   activeOrder: Order | null;
+}
+
+interface ComboSelection {
+  entrees: MenuItem[];
+  side?: MenuItem;
+  maxEntrees: number;
 }
 
 export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutProps) {
@@ -20,12 +28,40 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
   const [selectedSplit, setSelectedSplit] = useState<number | null>(null); // State for split bill
   const [customTipAmount, setCustomTipAmount] = useState<string>('');
   const [completedSplits, setCompletedSplits] = useState<number>(0); // State to track completed parts of split
+  const [isComboModalOpen, setIsComboModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [currentPaymentAmount, setCurrentPaymentAmount] = useState<number>(0);
+  const [processingPayment, setProcessingPayment] = useState(false);
+
+  const [currentComboSelection, setCurrentComboSelection] = useState<ComboSelection>({
+    entrees: [],
+    maxEntrees: 1
+  });
+  const [selectedComboBase, setSelectedComboBase] = useState<MenuItem | null>(null);
+
 
   const currentItems = draftOrders.find(d => d.id === activeDraftId)?.items || [];
   
   const TAX_RATE = 0.0825;
   const TIP_PERCENTAGES = [15, 18, 20];
 
+  const entrees = menuItems.filter(item => item.category === 'entree');
+  const sides = menuItems.filter(item => item.category === 'side');
+
+  const getComboRequirements = (comboType: string): { maxEntrees: number, name: string } => {
+    switch (comboType.toLowerCase()) {
+      case 'bowl':
+        return { maxEntrees: 1, name: 'Bowl' };
+      case 'plate':
+        return { maxEntrees: 2, name: 'Plate' };
+      case 'bigger plate':
+        return { maxEntrees: 3, name: 'Bigger Plate' };
+      default:
+        return { maxEntrees: 1, name: 'Combo' };
+    }
+  };
+
+  
   const createNewDraft = () => {
     const newDraft = {
       id: `draft-${Date.now()}`,
@@ -43,7 +79,82 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
     setCompletedSplits(0); // Reset completed split count
   };
 
+  const handleComboClick = (comboItem: MenuItem) => {
+    const { maxEntrees } = getComboRequirements(comboItem.name);
+    setSelectedComboBase(comboItem);
+    setCurrentComboSelection({
+      entrees: [],
+      maxEntrees
+    });
+    setIsComboModalOpen(true);
+  };
+
+  const handleEntreeSelection = (entree: MenuItem) => {
+    setCurrentComboSelection(prev => {
+      const existingIndex = prev.entrees.findIndex(e => e.id === entree.id);
+      
+      if (existingIndex >= 0) {
+        // Remove the entree if it's already selected
+        return {
+          ...prev,
+          entrees: prev.entrees.filter((_, index) => index !== existingIndex)
+        };
+      }
+      
+      if (prev.entrees.length >= prev.maxEntrees) {
+        // Remove the first entree if we're at max capacity
+        return {
+          ...prev,
+          entrees: [...prev.entrees.slice(1), entree]
+        };
+      }
+      
+      // Add the new entree
+      return {
+        ...prev,
+        entrees: [...prev.entrees, entree]
+      };
+    });
+  };
+
+
+
+  const addComboToOrder = () => {
+    if (!activeDraftId || !selectedComboBase || 
+        currentComboSelection.entrees.length !== currentComboSelection.maxEntrees || 
+        !currentComboSelection.side) return;
+
+    const entreeNames = currentComboSelection.entrees.map(e => e.name).join(', ');
+    const comboName = `${selectedComboBase.name} (${entreeNames}, ${currentComboSelection.side.name})`;
+    
+    setDraftOrders(prev => prev.map(draft => {
+      if (draft.id !== activeDraftId) return draft;
+      
+      return {
+        ...draft,
+        items: [...draft.items, {
+          menuItemId: selectedComboBase.id,
+          name: comboName,
+          quantity: 1,
+          price: selectedComboBase.price
+        }]
+      };
+    }));
+
+    setIsComboModalOpen(false);
+    setCurrentComboSelection({ entrees: [], maxEntrees: 1 });
+    setSelectedComboBase(null);
+  };
+
+
+
+
   const addItem = (menuItem: MenuItem) => {
+    if (menuItem.category === 'combo') {
+      handleComboClick(menuItem);
+      return;
+    }
+
     if (!activeDraftId) {
       const newDraft = {
         id: `draft-${Date.now()}`,
@@ -59,6 +170,7 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
       setActiveDraftId(newDraft.id);
       return;
     }
+
 
     setDraftOrders(prev => prev.map(draft => {
       if (draft.id !== activeDraftId) return draft;
@@ -143,8 +255,23 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
   };
 
   const handleCheckout = (index: number) => {
+    const { total } = calculateTotals(currentItems);
+    const splitAmount = selectedSplit ? total / selectedSplit : total;
+    setCurrentPaymentAmount(splitAmount);
+    setIsPaymentModalOpen(true);
+  };
+
+  const processPayment = async () => {
+    setProcessingPayment(true);
+    
+    // Simulate payment processing
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    setProcessingPayment(false);
+    setIsPaymentModalOpen(false);
+
     // If it's the last split, complete the entire order
-    if (index === (selectedSplit || 1) - 1) {
+    if (completedSplits + 1 === (selectedSplit || 1)) {
       const { subtotal, tax, tipAmount, total } = calculateTotals(currentItems);
       onCreateOrder({
         items: currentItems,
@@ -158,13 +285,14 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
       setActiveDraftId(null);
       setSelectedTipPercent(null);
       setCustomTipAmount('');
-      setSelectedSplit(null); // Reset split selection on checkout
-      setCompletedSplits(0); // Reset completed split count
+      setSelectedSplit(null);
+      setCompletedSplits(0);
     } else {
-      // Increment the completedSplits count to disable the current button
       setCompletedSplits(prev => prev + 1);
     }
   };
+
+
 
   return (
     <div className="flex flex-col h-[calc(100vh-2rem)]">
@@ -316,7 +444,6 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
                   <span>${calculateTotals(currentItems).total.toFixed(2)}</span>
                 </div>
 
-                {/* Render "Complete Order" buttons based on selectedSplit */}
                 <div className="space-y-4 mt-6">
                   {Array(selectedSplit || 1).fill(null).map((_, index) => (
                     <button
@@ -327,7 +454,7 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
                           ? 'bg-gray-300 cursor-not-allowed'
                           : 'bg-[var(--panda-red)] text-white hover:bg-[var(--panda-dark-red)]'
                       }`}
-                      disabled={index < completedSplits} // Disable buttons that have been clicked
+                      disabled={index < completedSplits}
                     >
                       Complete Order {selectedSplit && selectedSplit > 1 ? `(${index + 1}/${selectedSplit})` : ''}
                     </button>
@@ -342,6 +469,112 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
           )}
         </div>
       </div>
+
+      <Dialog open={isComboModalOpen} onOpenChange={setIsComboModalOpen}>
+      <DialogContent className="sm:max-w-[500px] bg-white">
+        <DialogHeader>
+          <DialogTitle>Customize Your {selectedComboBase?.name}</DialogTitle>
+        </DialogHeader>
+        
+        <div className="mt-4">
+          <div className="mb-6">
+            <h3 className="font-semibold mb-2">
+              Select {currentComboSelection.maxEntrees > 1 ? `Entrees (${currentComboSelection.entrees.length}/${currentComboSelection.maxEntrees})` : 'Entree'}
+            </h3>
+            <div className="grid grid-cols-2 gap-2">
+              {entrees.map((entree) => (
+                <button
+                  key={entree.id}
+                  onClick={() => handleEntreeSelection(entree)}
+                  className={`p-2 rounded-lg text-left ${
+                    currentComboSelection.entrees.some(e => e.id === entree.id)
+                      ? 'bg-[var(--panda-red)] text-white'
+                      : 'bg-gray-100 hover:bg-gray-200'
+                  }`}
+                >
+                  {entree.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <h3 className="font-semibold mb-2">Select Side</h3>
+            <div className="grid grid-cols-2 gap-2">
+              {sides.map((side) => (
+                <button
+                  key={side.id}
+                  onClick={() => setCurrentComboSelection(prev => ({ ...prev, side }))}
+                  className={`p-2 rounded-lg text-left ${
+                    currentComboSelection.side?.id === side.id
+                      ? 'bg-[var(--panda-red)] text-white'
+                      : 'bg-gray-100 hover:bg-gray-200'
+                  }`}
+                >
+                  {side.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={addComboToOrder}
+            disabled={
+              currentComboSelection.entrees.length !== currentComboSelection.maxEntrees || 
+              !currentComboSelection.side
+            }
+            className="w-full px-4 py-2 rounded-lg bg-[var(--panda-red)] text-white hover:bg-[var(--panda-dark-red)] disabled:bg-gray-300 disabled:cursor-not-allowed"
+          >
+            Add to Order
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
+
+    <Dialog open={isPaymentModalOpen} onOpenChange={setIsPaymentModalOpen}>
+        <DialogContent className="sm:max-w-[400px] bg-white">
+          <DialogHeader>
+            <DialogTitle>Process Payment</DialogTitle>
+          </DialogHeader>
+          
+          <div className="mt-4">
+            <div className="text-center mb-6">
+              <CreditCard className="w-12 h-12 mx-auto mb-4 text-gray-600" />
+              <h3 className="text-2xl font-bold mb-2">
+                ${currentPaymentAmount.toFixed(2)}
+              </h3>
+              {selectedSplit && selectedSplit > 1 && (
+                <p className="text-sm text-gray-600">
+                  Split {completedSplits + 1} of {selectedSplit}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-4">
+              <button
+                onClick={processPayment}
+                disabled={processingPayment}
+                className="w-full px-4 py-3 rounded-lg bg-[var(--panda-red)] text-white hover:bg-[var(--panda-dark-red)] disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center"
+              >
+                {processingPayment ? (
+                  <span>Processing...</span>
+                ) : (
+                  <span>Process Payment</span>
+                )}
+              </button>
+
+              <button
+                onClick={() => setIsPaymentModalOpen(false)}
+                disabled={processingPayment}
+                className="w-full px-4 py-3 rounded-lg bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    
     </div>
   );
 }

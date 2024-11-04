@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import MenuGrid from '@/components/menu/MenuGrid';
 import { MenuItem } from '@/types';
-import { menuItems } from '@/utils/menuItems';
+import { menuItems as initialMenuItems } from '@/utils/menuItems';
 
 export default function MenuPage() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -16,7 +16,7 @@ export default function MenuPage() {
 
   useEffect(() => {
     // Simulating API call with dummy data
-    setMenuItems(menuItems);
+    setMenuItems(initialMenuItems);
     setIsLoading(false);
   }, []);
 

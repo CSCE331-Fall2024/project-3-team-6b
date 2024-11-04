@@ -11,6 +11,7 @@
   "dependencies": {
     "@heroicons/react": "^2.1.5",
     "@pinecone-database/pinecone": "^4.0.0",
+    "@radix-ui/react-dialog": "^1.1.2",
     "axios": "^1.7.7",
     "date-fns": "^4.1.0",
     "langchain": "^0.3.3",
@@ -20,7 +21,8 @@
     "pdf-parse": "^1.1.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "recharts": "^2.13.0"
+    "recharts": "^2.13.0",
+    "tailwind-merge": "^2.5.4"
   },
   "devDependencies": {
     "@types/date-fns": "^2.6.3",

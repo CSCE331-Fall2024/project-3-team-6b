@@ -3,13 +3,13 @@ const nextConfig = {
     output: 'standalone',
     images: {
       domains: ['api.placeholder.com'],
-      unoptimized: true,
       remotePatterns: [
         {
           protocol: 'https',
           hostname: '**',
         },
       ],
+      unoptimized: true,
     },
     typescript: {
       ignoreBuildErrors: true,

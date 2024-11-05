@@ -1,25 +1,15 @@
 {
     "version": 2,
-    "buildCommand": "cd client && npm install && npm run dev",
+    "buildCommand": "cd client && npm install && npm run build",
     "outputDirectory": "client/.next",
-    "builds": [
+    "installCommand": "cd client && npm install",
+    "rewrites": [
       {
-        "src": "client/package.json",
-        "use": "@vercel/next"
-      },
-      {
-        "src": "server/src/index.ts",
-        "use": "@vercel/node"
+        "source": "/api/(.*)",
+        "destination": "/api/$1"
       }
     ],
-    "routes": [
-      {
-        "src": "/api/(.*)",
-        "dest": "/server/src/index.ts"
-      },
-      {
-        "src": "/(.*)",
-        "dest": "/client/$1"
-      }
-    ]
+    "env": {
+      "NODE_ENV": "production"
+    }
   }

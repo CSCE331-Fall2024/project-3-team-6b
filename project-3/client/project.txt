@@ -1,0 +1,4210 @@
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\app\(auth)\admin\page.tsx
+
+'use client';
+
+import { useState } from 'react';
+
+export default function ManagerPage() {
+  const [message, setMessage] = useState<string | null>(null);
+
+  const handleButtonClick = (action: string) => {
+    setMessage(`You clicked "${action}"!`);
+    setTimeout(() => setMessage(null), 3000);
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <h1 className="text-3xl font-bold mb-8">Manager Dashboard</h1>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <button
+          className="dashboard-card p-4 bg-[var(--panda-red)] text-white rounded-lg shadow hover:bg-red-600"
+          onClick={() => handleButtonClick('View Sales Reports')}
+        >
+          View Sales Reports
+        </button>
+
+        <button
+          className="dashboard-card p-4 bg-green-500 text-white rounded-lg shadow hover:bg-green-600"
+          onClick={() => handleButtonClick('Restock Inventory')}
+        >
+          Restock Inventory
+        </button>
+
+        <button
+          className="dashboard-card p-4 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600"
+          onClick={() => handleButtonClick('Manage Staff')}
+        >
+          Manage Staff
+        </button>
+
+        <button
+          className="dashboard-card p-4 bg-purple-500 text-white rounded-lg shadow hover:bg-purple-600"
+          onClick={() => handleButtonClick('Adjust Pricing')}
+        >
+          Adjust Pricing
+        </button>
+
+        <button
+          className="dashboard-card p-4 bg-yellow-500 text-white rounded-lg shadow hover:bg-yellow-600"
+          onClick={() => handleButtonClick('Generate Financial Reports')}
+        >
+          Generate Financial Reports
+        </button>
+
+        <button
+          className="dashboard-card p-4 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600"
+          onClick={() => handleButtonClick('Update Menu Items')}
+        >
+          Update Menu Items
+        </button>
+      </div>
+
+      {message && (
+        <div className="mt-8 p-4 bg-green-100 text-green-800 rounded shadow">
+          {message}
+        </div>
+      )}
+    </div>
+  );
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\app\(auth)\cashier\page.tsx
+
+// client/src/app/(auth)/cashier/page.tsx
+'use client';
+
+import { useState, useEffect } from 'react';
+import OrderList from '@/components/cashier/OrderList';
+import EnhancedCheckout from '@/components/cashier/Checkout';
+import Checkout from '@/components/cashier/Checkout';
+import { MenuItem, Order } from '@/types';
+import api from "@/lib/api";
+
+export default function CashierPage() {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [activeOrder, setActiveOrder] = useState<Order | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+    // Temporary data for testing
+    const dummyData: MenuItem[] = [
+      {
+        id: '41',
+        name: 'Bowl',
+        description: '1 Side & 1 Entree',
+        price: 8.30,
+        category: 'combo',
+        imageUrl: '/images/combos/bowl.png',
+        available: true,
+      },
+      {
+        id: '42',
+        name: 'Plate',
+        description: '1 Side & 2 Entrees',
+        price: 9.80,
+        category: 'combo',
+        imageUrl: '/images/combos/plate.png',
+        available: true,
+      },
+      {
+        id: '43',
+        name: 'Bigger Plate',
+        description: '1 Side & 3 Entrees',
+        price: 11.30,
+        category: 'combo',
+        imageUrl: '/images/combos/biggerPlate.png',
+        available: true,
+      },
+      {
+        id: '1',
+        name: 'Orange Chicken',
+        description: 'Crispy chicken wok-tossed in a sweet and spicy orange sauce',
+        price: 5.00,
+        category: 'entree',
+        imageUrl: '/images/entrees/the_original_orange_chicken.png',
+        available: true,
+      },
+      {
+        id: '2',
+        name: 'Beijing Beef',
+        description: 'Crispy beef wok-tossed with bell peppers and onions',
+        price: 5.00,
+        category: 'entree',
+        imageUrl: '/images/entrees/beijing_beef.png',
+        available: true,
+      },
+      {
+        id: '3',
+        name: 'Black Pepper Chicken',
+        description: 'Marinated chicken, celery, and onions in a bold black pepper sauce',
+        price: 5.00,
+        category: 'entree',
+        imageUrl: '/images/entrees/black_pepper_chicken.png',
+        available: true,
+      },
+      {
+        id: '4',
+        name: 'Black Pepper Sirloin Steak',
+        description: 'Sirloin steak wok-seared with baby broccoli, onions, red bell peppers, and mushrooms in a savory black pepper sauce',
+        price: 6.00,
+        category: 'entree',
+        imageUrl: '/images/entrees/black_pepper_sirloin_steak.png',
+        available: true,
+      },
+      {
+        id: '5',
+        name: 'Broccoli Beef',
+        description: 'Tender beef and fresh broccoli in a ginger soy sauce',
+        price: 5.00,
+        category: 'entree',
+        imageUrl: '/images/entrees/broccoli_beef.png',
+        available: true,
+      },
+      {
+        id: '6',
+        name: 'Beijing Beef',
+        description: 'Crispy beef wok-tossed with bell peppers and onions',
+        price: 5.00,
+        category: 'entree',
+        imageUrl: '/images/entrees/beijing_beef.png',
+        available: true,
+      },
+      {
+        id: '7',
+        name: 'Grilled Teriyaki Chicken',
+        description: 'Grilled Chicken hand-sliced to order and served with teriyaki sauce',
+        price: 5.00,
+        category: 'entree',
+        imageUrl: '/images/entrees/grilled_teriyaki_chicken.png',
+        available: true,
+      },
+      {
+        id: '8',
+        name: 'Honey Sesame Chicken Breast',
+        description: 'Crispy strips of white-meat chicken with veggies ina mildly sweet sauce with organic honey',
+        price: 5.00,
+        category: 'entree',
+        imageUrl: '/images/entrees/honey_sesame_chicken_breast.png',
+        available: true,
+      },
+      {
+        id: '9',
+        name: 'Honey Walnut Shrimp',
+        description: 'Large tempura-battered shrimp, work-tossed in a honey sauce and topped with glazed walnuts',
+        price: 6.00,
+        category: 'entree',
+        imageUrl: '/images/entrees/honey_walnut_shrimp.png',
+        available: true,
+      },
+      {
+        id: '10',
+        name: 'Hot Ones Blazing Bourbon Chicken',
+        description: 'Crispy boneless chicken bites and veggies wok-tossed in an extra spicy and sweet bourbon sauce',
+        price: 5.00,
+        category: 'entree',
+        imageUrl: '/images/entrees/hot_ones_blazing_bourbon_chicken.png',
+        available: true,
+      },
+      {
+        id: '11',
+        name: 'Kung Pao Chicken',
+        description: 'A Sichuan-inspired dish with chicken, peanuts and vegetables, finished with chili pepppers',
+        price: 5.00,
+        category: 'entree',
+        imageUrl: '/images/entrees/kung_pao_chicken.png',
+        available: true,
+      },
+      {
+        id: '12',
+        name: 'Mushroom Chicken',
+        description: 'A delicate combination of chicken, mushrooms and zucchini wok-tossed with a light ginger soy sauce',
+        price: 5.00,
+        category: 'entree',
+        imageUrl: '/images/entrees/mushroom_chicken.png',
+        available: true,
+      },
+      {
+        id: '13',
+        name: 'String Bean Chicken Breast',
+        description: 'Chicken breast, string beans and onions wok-tossed in a mild ginger soy sauce',
+        price: 5.00,
+        category: 'entree',
+        imageUrl: '/images/entrees/string_bean_chicken_breast.png',
+        available: true,
+      },
+      {
+        id: '14',
+        name: 'SweetFire Chicken Breast',
+        description: 'Crispy, white-meat chicken, red bell peppers, onions and pineapples in a bright and sweet chili sauce',
+        price: 5.00,
+        category: 'entree',
+        imageUrl: '/images/entrees/sweetfire_chicken_breast.png',
+        available: true,
+      },
+      {
+        id: '15',
+        name: 'Chow Mein',
+        description: 'Stir-fried wheat noodles with onions and celery',
+        price: 5.00,
+        category: 'side',
+        imageUrl: '/images/sides/chow_mein.png',
+        available: true,
+      },
+      {
+        id: '16',
+        name: 'Fried Rice',
+        description: 'Prepared steamed white rice with soy sauce, eggs, peas, carrots and green onions',
+        price: 5.00,
+        category: 'side',
+        imageUrl: '/images/sides/fried_rice.png',
+        available: true,
+      },
+      {
+        id: '17',
+        name: 'Super Greens',
+        description: 'A healthful medley of broccoli, kale, and cabbage',
+        price: 5.00,
+        category: 'side',
+        imageUrl: '/images/sides/super_greens.png',
+        available: true,
+      },
+      {
+        id: '18',
+        name: 'White Steamed Rice',
+        description: 'White rice',
+        price: 5.00,
+        category: 'side',
+        imageUrl: '/images/sides/white_steamed_rice.png',
+        available: true,
+      },
+      {
+        id: '19',
+        name: 'Apple Pie Roll',
+        description: 'Juicy apples and fall spices in a crispy rolled pastry, finished with cinnamon sugar',
+        price: 2.80,
+        category: 'appetizer',
+        imageUrl: '/images/appetizers/apple_pie_roll.png',
+        available: true,
+      },
+      {
+        id: '20',
+        name: 'Chicken Egg Roll',
+        description: 'Cabbage, carrots, green onions and chicken in a crispy wonton wrapper',
+        price: 2.5,
+        category: 'appetizer',
+        imageUrl: '/images/appetizers/chicken_egg_roll.png',
+        available: true,
+      },
+      {
+        id: '21',
+        name: 'Cream Cheese Rangoon',
+        description: 'Wonton wrappers filled with cream cheese and served with sweet and sour sauce',
+        price: 3.00,
+        category: 'appetizer',
+        imageUrl: '/images/appetizers/cream_cheese_rangoon.png',
+        available: true,
+      },
+      {
+        id: '22',
+        name: 'Veggie Sprint Roll',
+        description: 'Cabbage, celery, carrots, green onions and Chinese noodles in a crispy wonton wrapper',
+        price: 2.00,
+        category: 'appetizer',
+        imageUrl: '/images/appetizers/veggie_spring_roll.png',
+        available: true,
+      },
+      {
+        id: '23',
+        name: 'Barqs Root Beer',
+        description: '',
+        price: 1.50,
+        category: 'drink',
+        imageUrl: '/images/drinks/barqs_root_beer.png',
+        available: true,
+      },
+      {
+        id: '24',
+        name: 'Coca Cola',
+        description: '',
+        price: 1.50,
+        category: 'drink',
+        imageUrl: '/images/drinks/coca_cola.png',
+        available: true,
+      },
+      {
+        id: '25',
+        name: 'Coca Cola Cherry',
+        description: '',
+        price: 1.50,
+        category: 'drink',
+        imageUrl: '/images/drinks/coke_mexico.png',
+        available: true,
+      },
+      {
+        id: '26',
+        name: 'Coke Zero',
+        description: '',
+        price: 1.50,
+        category: 'drink',
+        imageUrl: '/images/drinks/coke_zero.png',
+        available: true,
+      },
+      {
+        id: '27',
+        name: 'Dasani',
+        description: '',
+        price: 1.00,
+        category: 'drink',
+        imageUrl: '/images/drinks/dasani.png',
+        available: true,
+      },
+      {
+        id: '28',
+        name: 'Diet Coke',
+        description: '',
+        price: 1.98,
+        category: 'drink',
+        imageUrl: '/images/drinks/diet_coke.png',
+        available: true,
+      },
+      {
+        id: '29',
+        name: 'Dr Pepper',
+        description: '',
+        price: 1.99,
+        category: 'drink',
+        imageUrl: '/images/drinks/dr_pepper.png',
+        available: true,
+      },
+      {
+        id: '30',
+        name: 'Fanta',
+        description: '',
+        price: 1.50,
+        category: 'drink',
+        imageUrl: '/images/drinks/fanta_orange.png',
+        available: true,
+      },
+      {
+        id: '31',
+        name: 'Fuze Raspberry Iced Tea',
+        description: '',
+        price: 1.50,
+        category: 'drink',
+        imageUrl: '/images/drinks/fize_raspberry_iced_tea.png',
+        available: true,
+      },
+      {
+        id: '32',
+        name: 'Minute Maid Apple Juice',
+        description: '',
+        price: 1.50,
+        category: 'drink',
+        imageUrl: '/images/drinks/minute_maid_apple_juice.png',
+        available: true,
+      },
+      {
+        id: '33',
+        name: 'Minute Maid Lemonade',
+        description: '',
+        price: 1.50,
+        category: 'drink',
+        imageUrl: '/images/drinks/minute_maid_lemonade.png',
+        available: true,
+      },
+      {
+        id: '34',
+        name: 'Mango Tea',
+        description: '',
+        price: 2.00,
+        category: 'drink',
+        imageUrl: '/images/drinks/passion_mango_black_tea.png',
+        available: true,
+      },
+      {
+        id: '35',
+        name: 'Peach Lychee Refresher',
+        description: '',
+        price: 2.00,
+        category: 'drink',
+        imageUrl: '/images/drinks/peach_lychee_flavored_refresher.png',
+        available: true,
+      },
+      {
+        id: '36',
+        name: 'Pomegranate Pineapple Flavored Lemonade',
+        description: '',
+        price: 2.00,
+        category: 'drink',
+        imageUrl: '/images/drinks/pomegranite_pineapple_flavored_lemonade.png',
+        available: true,
+      },
+      {
+        id: '37',
+        name: 'Smartwater',
+        description: '',
+        price: 2.00,
+        category: 'drink',
+        imageUrl: '/images/drinks/smartwater.png',
+        available: true,
+      },
+      {
+        id: '38',
+        name: 'Sprite',
+        description: '',
+        price: 2.00,
+        category: 'drink',
+        imageUrl: '/images/drinks/sprite.png',
+        available: true,
+      },
+      {
+        id: '39',
+        name: 'Watermelon Mange Flavored Refresher',
+        description: '',
+        price: 2.00,
+        category: 'drink',
+        imageUrl: '/images/drinks/watermelon_mango_flavored_refresher.png',
+        available: true,
+      },
+      {
+        id: '40',
+        name: 'Sprite',
+        description: '',
+        price: 2.00,
+        category: 'drink',
+        imageUrl: '/images/drinks/sprite.png',
+        available: true,
+      },
+      
+    ];
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        /*const [ordersRes, menuRes] = await Promise.all([
+          api.get('/orders/active'),
+          api.get('/menu')
+        ]);
+
+        setOrders(ordersRes.data);
+        setMenuItems(menuRes.data); */
+        setMenuItems(dummyData);
+      } catch (error) {
+        console.error('Failed to fetch initial data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchInitialData();
+  }, []);
+
+  const handleCreateOrder = async (order: Partial<Order>) => {
+    try {
+      const response = await api.post('/orders', order);
+      setOrders(prev => [...prev, response.data]);
+      setActiveOrder(response.data);
+    } catch (error) {
+      console.error('Failed to create order:', error);
+    }
+  };
+
+  const handleUpdateOrderStatus = async (orderId: string, status: Order['status']) => {
+    try {
+      await api.put(`/orders/${orderId}/status`, { status });
+      setOrders(prev =>
+        prev.map(order =>
+          order.id === orderId ? { ...order, status } : order
+        )
+      );
+    } catch (error) {
+      console.error('Failed to update order status:', error);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--panda-red)]"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6">
+      <EnhancedCheckout
+        menuItems={menuItems}
+        onCreateOrder={handleCreateOrder}
+        activeOrder={null}
+      />
+    </div>
+  );
+
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\app\(auth)\login\page.tsx
+
+// client/src/app/(auth)/login/page.tsx
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { api } from '@/lib/api';
+
+interface LoginForm {
+  username: string;
+  password: string;
+}
+
+export default function LoginPage() {
+  const router = useRouter();
+  const [formData, setFormData] = useState<LoginForm>({
+    username: '',
+    password: '',
+  });
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const response = await api.post('/auth/login', formData);
+      localStorage.setItem('token', response.data.token);
+      
+      // Redirect based on role
+      if (response.data.role === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/cashier');
+      }
+    } catch (err) {
+      setError('Invalid credentials. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[var(--panda-gray)] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="flex justify-center">
+          <Image
+            src="/images/panda-logo.png"
+            alt="Panda Express Logo"
+            width={100}
+            height={100}
+            className="rounded-full"
+          />
+        </div>
+        <h2 className="mt-6 text-center text-3xl font-extrabold">
+          Sign in to your account
+        </h2>
+      </div>
+
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="card">
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            {error && (
+              <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
+                <p className="text-red-700">{error}</p>
+              </div>
+            )}
+            
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium">
+                Username
+              </label>
+              <input
+                id="username"
+                type="text"
+                required
+                className="input-field mt-1"
+                value={formData.username}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                required
+                className="input-field mt-1"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              />
+            </div>
+
+            <div>
+              <button 
+                type="submit" 
+                className="btn-primary w-full"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Signing in...' : 'Sign in'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\app\api\orders\route.ts
+
+// src/app/api/orders/route.ts
+
+import { NextResponse } from 'next/server';
+import { query } from '@/server/db/config';
+
+export async function POST(req: Request) {
+  try {
+    const order = await req.json();
+    
+    // Start a transaction
+    await query('BEGIN');
+    
+    try {
+      // First, insert the main order
+      const orderResult = await query(
+        `INSERT INTO orders (order_date, total_price, order_details) 
+         VALUES ($1, $2, $3) 
+         RETURNING order_id`,
+        [new Date(), order.total, JSON.stringify({
+          entree_side: order.items.filter(item => 
+            item.category === 'entree' || item.category === 'side'
+          ),
+          drink_table: order.items.filter(item => 
+            item.category === 'drink'
+          ),
+          appetizers: order.items.filter(item => 
+            item.category === 'appetizer'
+          ),
+          free_items: [] // Add any free items like utensils, napkins etc.
+        })]
+      );
+      
+      const orderId = orderResult.rows[0].order_id;
+      
+      // Insert order items with proper categorization
+      for (const item of order.items) {
+        let itemType: string;
+        
+        switch (item.category) {
+          case 'entree':
+          case 'side':
+            itemType = 'entree_side';
+            break;
+          case 'drink':
+            itemType = 'drink_table';
+            break;
+          case 'appetizer':
+            itemType = 'appetizers';
+            break;
+          default:
+            continue;
+        }
+        
+        // Insert into order_items table
+        await query(
+          `INSERT INTO order_items (order_id, item_id, item_type) 
+           VALUES ($1, $2, $3)`,
+          [orderId, item.menuItemId, itemType]
+        );
+        
+        // Update inventory (if needed)
+        await query(
+          `UPDATE ${itemType} 
+           SET inventory = inventory - $1 
+           WHERE id = $2`,
+          [item.quantity, item.menuItemId]
+        );
+      }
+      
+      // Add default free items (utensils, napkins, etc.)
+      const defaultFreeItems = [
+        { id: 9, name: 'Napkins', quantity: 2 },
+        { id: 2, name: 'Soy Sauce Packet', quantity: 1 },
+        { id: 5, name: 'Fortune Cookies', quantity: 1 }
+      ];
+      
+      for (const freeItem of defaultFreeItems) {
+        await query(
+          `INSERT INTO order_items (order_id, item_id, item_type) 
+           VALUES ($1, $2, 'free_items')`,
+          [orderId, freeItem.id]
+        );
+      }
+      
+      await query('COMMIT');
+      
+      return NextResponse.json({ 
+        success: true, 
+        orderId,
+        message: 'Order created successfully' 
+      });
+      
+    } catch (error) {
+      await query('ROLLBACK');
+      throw error;
+    }
+  } catch (error) {
+    console.error('Order creation error:', error);
+    return NextResponse.json(
+      { success: false, message: 'Failed to create order' },
+      { status: 500 }
+    );
+  }
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\app\cart\page.tsx
+
+'use client';
+
+import { menuItems } from '@/utils/menuItems';
+import { MenuItem } from '@/types';
+import React, { useState } from 'react';
+// Define the menu items
+
+
+const MenuPage: React.FC = () => {
+  const [selectedCategory, setSelectedCategory] = useState('combo');
+  const [cartItems, setCartItems] = useState<MenuItem[]>([]);
+  const [showModal, setShowModal] = useState(false);
+  const [modalItem, setModalItem] = useState<MenuItem | null>(null);
+  const [selectedSide, setSelectedSide] = useState<MenuItem | null>(null);
+  const [selectedEntrees, setSelectedEntrees] = useState<MenuItem[]>([]);
+  const [showSideModal, setShowSideModal] = useState(false);
+  const [showEntreeModal, setShowEntreeModal] = useState(false);
+
+  const sideItems = menuItems.filter(item => item.category === 'side');
+
+  const entreeItems = menuItems.filter(item => item.category === 'entree' || item.category === 'appetizer');
+
+  // Filter the menu items based on the selected category
+  const filteredItems = selectedCategory === 'all'
+    ? menuItems
+    : menuItems.filter(item => item.category === selectedCategory);
+
+  // Add item to cart
+  const addToCart = (item: MenuItem) => {
+    if (item.category === 'combo') {
+        const comboItem = {
+          ...item,
+          selectedSide,
+          selectedEntrees,
+        };
+        setCartItems([...cartItems, comboItem]);
+      } else {
+        setCartItems([...cartItems, item]);
+      }
+  };
+
+  const renderCartItemDetails = (item: MenuItem) => {
+    if (item.category === 'combo') {
+      return (
+        <div className="text-gray-600 text-sm mt-2">
+          <p><strong>Side:</strong> {item.selectedSide ? item.selectedSide.name : 'None'}</p>
+          <p><strong>Entrees:</strong> {item.selectedEntrees && item.selectedEntrees.length > 0
+            ? item.selectedEntrees.map(entree => entree.name).join(', ')
+            : 'None'}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+  
+
+  // Remove item from cart
+  const removeFromCart = (index: number) => {
+    const updatedItems = [...cartItems];
+    updatedItems.splice(index, 1);
+    setCartItems(updatedItems);
+  };
+
+  const handleSideSelect = (side: MenuItem) => {
+    setSelectedSide(side);
+    setShowSideModal(false);
+  };
+
+  const handleEntreeSelect = (entree: MenuItem) => {
+    if (modalItem?.name === 'Bowl' && selectedEntrees.length < 1) {
+      setSelectedEntrees([entree]);
+    } else if (modalItem?.name === 'Plate' && selectedEntrees.length < 2) {
+      setSelectedEntrees([...selectedEntrees, entree]);
+    } else if (modalItem?.name === 'Bigger Plate' && selectedEntrees.length < 3) {
+      setSelectedEntrees([...selectedEntrees, entree]);
+    }
+    
+    if (
+      (modalItem?.name === 'Bowl' && selectedEntrees.length === 0) ||
+      (modalItem?.name === 'Plate' && selectedEntrees.length === 1) ||
+      (modalItem?.name === 'Bigger Plate' && selectedEntrees.length === 2)
+    ) {
+      setShowEntreeModal(false);
+    }
+  };
+
+  // Calculate the total cost
+  const total = cartItems.reduce((acc, item) => acc + item.price, 0);
+
+  // Handle modal opening and closing
+  const openModal = (item: MenuItem) => {
+    setModalItem(item);
+    setSelectedSide(null);
+    setSelectedEntrees([]);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setModalItem(null);
+    setSelectedSide(null);
+    setSelectedEntrees([]);
+    setShowModal(false);
+  };
+
+  // Handle bowl, plate, and bigger plate orders
+  const orderBowl = () => {
+    openModal({
+      id: 'bowl',
+      name: 'Bowl',
+      description: '1 Side & 1 Entree',
+      price: 8.30,
+      category: 'combo',
+      imageUrl: '/images/combos/bowl.png',
+      available: true,
+    });
+  };
+
+  const orderPlate = () => {
+    openModal({
+      id: 'plate',
+      name: 'Plate',
+      description: '1 Side & 2 Entrees',
+      price: 9.80,
+      category: 'combo',
+      imageUrl: '/images/combos/plate.png',
+      available: true,
+    });
+  };
+
+  const orderBiggerPlate = () => {
+    openModal({
+      id: 'biggerPlate',
+      name: 'Bigger Plate',
+      description: '1 Side & 3 Entrees',
+      price: 11.30,
+      category: 'combo',
+      imageUrl: '/images/combos/biggerPlate.png',
+      available: true,
+    });
+  };
+
+  const handleCheckout = () => {
+    console.log('Checking out with items:', cartItems);
+    console.log('Total amount:', total.toFixed(2));
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <h1 className="text-4xl font-bold text-center mb-8">Our Menu</h1>
+
+      <div className="flex flex-col md:flex-row">
+        {/* Menu items grid */}
+        <div className="w-full md:w-3/4">
+          <div className="flex justify-center space-x-4 mb-8">
+            {/* Category buttons */}
+            <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('combo')}>
+                  Combos
+                </button>
+                
+                <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('entree')}>
+                  Entrees
+                </button>
+                <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('side')}>
+                  Sides
+                </button>
+                <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('appetizer')}>
+                Appetizers
+                </button>
+                <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('drink')}>
+                  Drinks
+                </button>
+                <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('all')}>
+                  All Items
+                </button>
+                
+
+                
+            
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+  {filteredItems.map(item => (
+    <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full">
+      <img src={item.imageUrl} alt={item.name} className="w-full h-48 object-cover" />
+      <div className="p-4 flex flex-col flex-grow justify-between">
+        <div className="min-h-[100px]"> {/* Adjust min height as needed */}
+          <h3 className="text-lg font-bold">{item.name}</h3>
+          <p className="text-gray-500 mb-2">{item.description}</p> {/* Full text shown */}
+        </div>
+        <div>
+          <p className="text-[var(--panda-red)] font-bold">${item.price.toFixed(2)}</p>
+          <button
+            className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md mt-2 w-full"
+            onClick={() => {
+              if (item.name === 'Bowl') {
+                orderBowl();
+              } else if (item.name === 'Plate') {
+                orderPlate();
+              } else if (item.name === 'Bigger Plate') {
+                orderBiggerPlate();
+              } else {
+                addToCart(item);
+              }
+            }}
+          >
+            {item.category === 'combo' ? 'Create' : 'Add to Cart'}
+          </button>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
+
+
+        
+        </div>
+
+        {/* Checkout column */}
+        <div className="w-full md:w-1/4 mt-8 md:mt-0 md:ml-8">
+          <div className="bg-white rounded-lg shadow-md p-4">
+            <h2 className="text-lg font-bold mb-4">Your Cart</h2>
+            <ul>
+              {cartItems.map((item, index) => (
+                <li key={item.id} className="flex justify-between items-center mb-2">
+                  <div>
+                    <h3 className="text-md font-bold">{item.name}</h3>
+                    <p className="text-gray-500">${item.price.toFixed(2)}</p>
+                    {renderCartItemDetails(item)}
+                  </div>
+                  <button
+                    className="text-[var(--panda-red)] hover:text-red-600"
+                    onClick={() => removeFromCart(index)}
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <div className="border-t pt-4 mt-4">
+              <p className="text-lg font-bold">Total: ${total.toFixed(2)}</p>
+              <div className="flex justify-between mt-4">
+                
+              </div>
+            </div>
+          </div>
+          <button
+              onClick={handleCheckout}
+              className="w-full bg-[var(--panda-red)] text-white px-4 py-2 rounded-md mt-4 hover:bg-red-700 transition-colors"
+            >
+              Checkout
+            </button>
+        </div>
+      </div>
+
+      {/* Modal for bowl, plate, and bigger plate orders */}
+      {showModal && modalItem && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75 z-50">
+          <div className="bg-white rounded-lg shadow-md p-8 max-w-md w-full">
+            <h2 className="text-lg font-bold mb-4">{modalItem.name}</h2>
+            <p className="text-gray-500 mb-4">{modalItem.description}</p>
+            <p className="text-[var(--panda-red)] font-bold mb-8">${modalItem.price.toFixed(2)}</p>
+            
+            
+
+            {/* Selected Side Section */}
+            <div className="mb-6">
+                <div className="flex justify-between items-center mb-3">
+                  <h4 className="text-lg font-semibold">Side</h4>
+                  {!selectedSide && (
+                    <button
+                      className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md text-sm"
+                      onClick={() => setShowSideModal(true)}
+                    >
+                      Choose Side
+                    </button>
+                  )}
+                </div>
+                {selectedSide ? (
+                  <div className="bg-gray-50 rounded-lg p-4 flex items-center">
+                    <img 
+                      src={selectedSide.imageUrl} 
+                      alt={selectedSide.name} 
+                      className="w-24 h-24 object-cover rounded-md"
+                    />
+                    <div className="ml-4 flex-grow">
+                      <h5 className="font-semibold">{selectedSide.name}</h5>
+                      <p className="text-gray-600 text-sm">{selectedSide.description}</p>
+                    </div>
+                    <button
+                      className="text-[var(--panda-red)] hover:text-red-700 text-sm"
+                      onClick={() => {
+                        setSelectedSide(null);
+                        setShowSideModal(true);
+                      }}
+                    >
+                      Change
+                    </button>
+                  </div>
+                ) : (
+                  <div className="bg-gray-50 rounded-lg p-4 text-gray-500 text-center">
+                    No side selected
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <h4 className="text-lg font-semibold">
+                    Entrees ({selectedEntrees.length}/
+                    {modalItem.name === 'Bowl' ? '1' : 
+                     modalItem.name === 'Plate' ? '2' : '3'})
+                  </h4>
+                  {selectedEntrees.length < (
+                    modalItem.name === 'Bowl' ? 1 : 
+                    modalItem.name === 'Plate' ? 2 : 3
+                  ) && (
+                    <button
+                      className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md text-sm"
+                      onClick={() => setShowEntreeModal(true)}
+                    >
+                      {selectedEntrees.length === 0 ? 'Choose Entrees' : 'Add Another Entree'}
+                    </button>
+                  )}
+                </div>
+                <div className="space-y-3">
+                  {selectedEntrees.length > 0 ? (
+                    selectedEntrees.map((entree, index) => (
+                      <div key={index} className="bg-gray-50 rounded-lg p-4 flex items-center">
+                        <img 
+                          src={entree.imageUrl} 
+                          alt={entree.name} 
+                          className="w-24 h-24 object-cover rounded-md"
+                        />
+                        <div className="ml-4 flex-grow">
+                          <h5 className="font-semibold">{entree.name}</h5>
+                          <p className="text-gray-600 text-sm">{entree.description}</p>
+                        </div>
+                        <button
+                          className="text-[var(--panda-red)] hover:text-red-700 text-sm"
+                          onClick={() => {
+                            setSelectedEntrees(selectedEntrees.filter((_, i) => i !== index));
+                            setShowEntreeModal(true);
+                          }}
+                        >
+                          Change
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="bg-gray-50 rounded-lg p-4 text-gray-500 text-center">
+                      No entrees selected
+                    </div>
+                  )}
+                </div>
+              </div>
+            
+
+            {/* Confirm/Cancel */}
+            <div className="flex justify-between mt-4">
+              <button
+                className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md"
+                onClick={() => {
+                  addToCart(modalItem);
+                  closeModal();
+                }}
+              >
+                Add to Cart
+              </button>
+              <button className="text-[var(--panda-red)] hover:text-red-600" onClick={closeModal}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+{showSideModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75 z-50">
+          <div className="bg-white rounded-lg shadow-md p-8 max-w-4xl w-full">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold">Choose a Side</h2>
+              <button 
+                className="text-gray-500 hover:text-gray-700"
+                onClick={() => setShowSideModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[60vh] overflow-y-auto">
+              {sideItems.map(item => (
+                <div 
+                  key={item.id} 
+                  className={`bg-white rounded-lg shadow-md overflow-hidden cursor-pointer border-2 
+                    ${selectedSide?.id === item.id ? 'border-[var(--panda-red)]' : 'border-transparent'}`}
+                  onClick={() => handleSideSelect(item)}
+                >
+                  <img src={item.imageUrl} alt={item.name} className="w-full h-48 object-cover" />
+                  <div className="p-4">
+                    <h3 className="text-lg font-bold">{item.name}</h3>
+                    <p className="text-gray-500 text-sm">{item.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Updated Entree Selection Modal */}
+      {showEntreeModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75 z-50">
+          <div className="bg-white rounded-lg shadow-md p-8 max-w-4xl w-full">
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h2 className="text-2xl font-bold">Choose your Entrees</h2>
+                <p className="text-gray-500">
+                  Selected: {selectedEntrees.length} / 
+                  {modalItem?.name === 'Bowl' ? '1' : 
+                    modalItem?.name === 'Plate' ? '2' : '3'}
+                </p>
+              </div>
+              <button 
+                className="text-gray-500 hover:text-gray-700"
+                onClick={() => setShowEntreeModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[60vh] overflow-y-auto">
+              {entreeItems.map(item => (
+                <div 
+                  key={item.id} 
+                  className={`bg-white rounded-lg shadow-md overflow-hidden cursor-pointer border-2 
+                    ${selectedEntrees.some(e => e.id === item.id) ? 'border-[var(--panda-red)]' : 'border-transparent'}`}
+                  onClick={() => handleEntreeSelect(item)}
+                >
+                  <img src={item.imageUrl} alt={item.name} className="w-full h-48 object-cover" />
+                  <div className="p-4">
+                    <h3 className="text-lg font-bold">{item.name}</h3>
+                    <p className="text-gray-500 text-sm">{item.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+};
+
+export default MenuPage;
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\app\menu\page.tsx
+
+// client/src/app/menu/page.tsx
+'use client';
+
+import { useEffect, useState } from 'react';
+import MenuGrid from '@/components/menu/MenuGrid';
+import { MenuItem } from '@/types';
+import { menuItems as initialMenuItems } from '@/utils/menuItems';
+
+export default function MenuPage() {
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Temporary data for testing
+  
+
+  useEffect(() => {
+    // Simulating API call with dummy data
+    setMenuItems(initialMenuItems);
+    setIsLoading(false);
+  }, []);
+
+  const categories = [
+    { id: 'all', name: 'All Items' },
+    { id: 'entree', name: 'Entrees' },
+    { id: 'side', name: 'Sides' },
+    { id: 'appetizer', name: 'Appetizers'},
+    { id: 'drink', name: 'Drinks' },
+    { id: 'combo', name: 'Combos' },
+  ];
+
+  const filteredItems = selectedCategory === 'all'
+    ? menuItems
+    : menuItems.filter(item => item.category === selectedCategory);
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <h1 className="text-4xl font-bold text-center mb-8">Our Menu</h1>
+      
+      <div className="flex justify-center space-x-4 mb-8">
+        {categories.map(category => (
+          <button
+            key={category.id}
+            onClick={() => setSelectedCategory(category.id)}
+            className={`px-4 py-2 rounded-md transition-colors duration-200 ${
+              selectedCategory === category.id
+                ? 'bg-[var(--panda-red)] text-white'
+                : 'bg-gray-100 hover:bg-gray-200'
+            }`}
+          >
+            {category.name}
+          </button>
+        ))}
+      </div>
+
+      {isLoading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--panda-red)]"></div>
+        </div>
+      ) : (
+        <MenuGrid items={filteredItems} />
+      )}
+    </div>
+  );
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\app\globals.css
+
+/* client/src/app/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Panda Express Brand Colors */
+  --panda-red: #ED1C24;
+  --panda-dark-red: #C41017;
+  --panda-black: #000000;
+  --panda-gold: #C4A484;
+  --panda-light-gold: #D4B494;
+  --panda-cream: #FFF8DC;
+  --panda-white: #FFFFFF;
+  --panda-gray: #F5F5F5;
+}
+
+@layer base {
+  body {
+    @apply bg-[var(--panda-white)] text-[var(--panda-black)] min-h-screen;
+  }
+
+  h1 {
+    @apply text-3xl font-bold text-[var(--panda-black)] mb-4;
+  }
+
+  h2 {
+    @apply text-2xl font-bold text-[var(--panda-black)] mb-3;
+  }
+
+  h3 {
+    @apply text-xl font-bold text-[var(--panda-black)] mb-2;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-[var(--panda-red)] hover:bg-[var(--panda-dark-red)] 
+           text-white font-semibold px-4 py-2 rounded-md 
+           transition-colors duration-200;
+  }
+
+  .btn-secondary {
+    @apply bg-[var(--panda-gold)] hover:bg-[var(--panda-light-gold)] 
+           text-black font-semibold px-4 py-2 rounded-md 
+           transition-colors duration-200;
+  }
+
+  .card {
+    @apply bg-white rounded-lg shadow-md p-6 
+           border-t-4 border-[var(--panda-red)];
+  }
+
+  .input-field {
+    @apply border border-gray-300 rounded-md px-3 py-2 w-full
+           focus:outline-none focus:ring-2 focus:ring-[var(--panda-red)] 
+           focus:border-transparent;
+  }
+
+  .nav-link {
+    @apply text-[var(--panda-black)] hover:text-[var(--panda-red)] 
+           transition-colors duration-200;
+  }
+
+  .nav-active {
+    @apply text-[var(--panda-red)] font-semibold;
+  }
+
+  .table-container {
+    @apply overflow-x-auto rounded-lg shadow border;
+  }
+
+  .table-header {
+    @apply bg-[var(--panda-red)] text-white 
+           px-6 py-3 text-left text-xs uppercase tracking-wider;
+  }
+
+  .table-cell {
+    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
+  }
+
+  .dashboard-card {
+    @apply bg-white rounded-lg shadow-md p-6 
+           border-t-4 border-[var(--panda-red)]
+           hover:shadow-lg transition-shadow duration-200;
+  }
+
+  .menu-item-card {
+    @apply bg-white rounded-lg shadow-md overflow-hidden
+           hover:shadow-lg transition-shadow duration-200;
+  }
+}
+
+/* Text shadow for better readability over video */
+.text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .text-shadow-lg {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  }
+  
+  /* Optional: Add a subtle animation for the video when it starts */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 0.7; /* Matches the opacity-70 class */
+    }
+  }
+  
+  .hero-video-fade {
+    animation: fadeIn 1.5s ease-in-out;
+  }
+  
+  /* Optional: Reduce motion if user prefers */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-video-fade {
+      animation: none;
+    }
+  }
+
+  .text-shadow-lg {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\app\layout.tsx
+
+// client/src/app/layout.tsx
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import { LanguageProvider } from '@/context/LanguageContext';
+import Navbar from '@/components/layout/Navbar';
+import AIChat from '@/components/chat/AIChat';
+import './globals.css';
+
+const inter = Inter({ subsets: ['latin'] });
+
+export const metadata: Metadata = {
+  title: 'Panda Express POS',
+  description: 'Point of Sale System for Panda Express',
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body className={inter.className}>
+        <LanguageProvider>
+          <Navbar />
+          <main className="min-h-[calc(100vh-64px)]">
+            {children}
+          </main>
+          <AIChat />
+        </LanguageProvider>
+      </body>
+    </html>
+  );
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\app\page.tsx
+
+// client/src/app/page.tsx
+'use client';
+
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { useLanguage } from '../context/LanguageContext';
+import { ArrowRight, Clock, ShoppingBag, Utensils } from 'lucide-react';
+
+export default function HomePage() {
+  const { translate } = useLanguage();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const features = [
+    {
+      icon: Clock,
+      title: translate('Quick & Easy'),
+      description: translate('Order ahead and skip the line'),
+    },
+    {
+      icon: Utensils,
+      title: translate('Fresh & Delicious'),
+      description: translate('Made fresh daily with quality ingredients'),
+    },
+    {
+      icon: ShoppingBag,
+      title: translate('Convenient Pickup'),
+      description: translate('Ready when you are'),
+    },
+  ];
+
+  const popularItems = [
+    {
+      name: translate('Orange Chicken'),
+      image: '/images/entrees/the_original_orange_chicken.png',
+      price: 11.99,
+    },
+    {
+      name: translate('Beijing Beef'),
+      image: '/images/entrees/beijing_beef.png',
+      price: 12.99,
+    },
+    {
+      name: translate('Chow Mein'),
+      image: '/images/sides/chow_mein.png',
+      price: 4.99,
+    },
+  ];
+
+  return (
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <div className="relative h-[70vh] bg-black overflow-hidden">
+        {/* Video Background - Only rendered on client side */}
+        {isClient && (
+          <div className="absolute inset-0">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover opacity-70"
+            >
+              <source src="/images/hero-video.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+            <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+          </div>
+        )}
+        
+        {/* Static Background for Server - Hidden when video loads */}
+        {!isClient && (
+          <div className="absolute inset-0">
+            <Image
+              src="/images/hero-image.jpg"
+              alt="Background"
+              fill
+              className="object-cover opacity-70"
+              priority
+            />
+            <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+          </div>
+        )}
+
+        {/* Content */}
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-white text-center px-4">
+        <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white text-shadow-lg">
+            {translate('Welcome to Panda Express')}
+            </h1>
+          <p className="text-xl md:text-2xl mb-8 text-shadow">
+            {translate('Experience the bold flavors of American Chinese cuisine')}
+          </p>
+          <Link
+            href="/cart"
+            className="btn-primary text-lg px-8 py-3 flex items-center space-x-2 hover:scale-105 transition-transform duration-200"
+          >
+            <span>{translate('Start Your Order')}</span>
+            <ArrowRight className="h-5 w-5" />
+          </Link>
+        </div>
+      </div>
+
+
+      {/* New Seasonal Item: Moon Cakes Section */}
+      <div className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center mb-8">
+            {translate('New Seasonal Item: Moon Cakes')}
+          </h2>
+          <div className="flex flex-col md:flex-row items-center justify-center space-y-8 md:space-y-0 md:space-x-8">
+            <div className="relative h-64 w-64">
+              <Image
+                src="/images/moon-cake.jpg"
+                alt={translate('Moon Cakes')}
+                fill
+                className="object-cover rounded-lg shadow-md"
+              />
+            </div>
+            <div className="text-center md:text-left">
+              <h3 className="text-2xl font-semibold mb-4">{translate('Celebrate the Mid-Autumn Festival')}</h3>
+              <p className="text-gray-600 mb-6">
+                {translate('Indulge in the rich and delicate flavors of traditional moon cakes, available for a limited time.')}
+              </p>
+              <Link
+                href="/cart"
+                className="btn-primary px-6 py-3 flex items-center space-x-2 hover:scale-105 transition-transform duration-200"
+              >
+                <span>{translate('Order Now')}</span>
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Features Section */}
+      <div className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className="text-center p-6 rounded-lg hover:shadow-lg transition-shadow"
+              >
+                <feature.icon className="h-12 w-12 text-[var(--panda-red)] mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                <p className="text-gray-600">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Popular Items Section */}
+      <div className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center mb-12">
+            {translate('Popular Items')}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {popularItems.map((item, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow"
+              >
+                <div className="relative h-48">
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="text-xl font-semibold mb-2">{item.name}</h3>
+                  <p className="text-[var(--panda-red)] font-bold">
+                    ${item.price.toFixed(2)}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            <Link href="/menu" className="btn-primary inline-flex items-center space-x-2">
+              <span>{translate('View Full Menu')}</span>
+              <ArrowRight className="h-5 w-5" />
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Accessibility Features */}
+      <div className="bg-white py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <button
+            onClick={() => document.documentElement.classList.toggle('text-lg')}
+            className="mx-2 px-4 py-2 bg-gray-100 rounded-md hover:bg-gray-200"
+          >
+            {translate('Increase Text Size')}
+          </button>
+          <button
+            onClick={() => document.documentElement.classList.toggle('high-contrast')}
+            className="mx-2 px-4 py-2 bg-gray-100 rounded-md hover:bg-gray-200"
+          >
+            {translate('High Contrast')}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\components\admin\Dashboard.tsx
+
+// client/src/components/admin/Dashboard.tsx
+interface DashboardProps {
+    stats: {
+      totalOrders: number;
+      totalRevenue: number;
+      averageOrderValue: number;
+      popularItems: Array<{
+        name: string;
+        quantity: number;
+        revenue: number;
+      }>;
+    };
+  }
+  
+  export default function Dashboard({ stats }: DashboardProps) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="dashboard-card">
+          <h3 className="text-lg font-semibold text-gray-600">Total Orders</h3>
+          <p className="text-3xl font-bold mt-2">{stats.totalOrders}</p>
+        </div>
+  
+        <div className="dashboard-card">
+          <h3 className="text-lg font-semibold text-gray-600">Total Revenue</h3>
+          <p className="text-3xl font-bold mt-2">
+            ${stats.totalRevenue.toFixed(2)}
+          </p>
+        </div>
+  
+        <div className="dashboard-card">
+          <h3 className="text-lg font-semibold text-gray-600">Average Order Value</h3>
+          <p className="text-3xl font-bold mt-2">
+            ${stats.averageOrderValue.toFixed(2)}
+          </p>
+        </div>
+  
+        <div className="dashboard-card">
+          <h3 className="text-lg font-semibold text-gray-600">Most Popular Item</h3>
+          <p className="text-3xl font-bold mt-2">
+            {stats.popularItems[0]?.name || 'N/A'}
+          </p>
+        </div>
+  
+        <div className="col-span-full">
+          <div className="dashboard-card">
+            <h3 className="text-lg font-semibold mb-4">Popular Items</h3>
+            <div className="overflow-x-auto">
+              <table className="min-w-full">
+                <thead>
+                  <tr>
+                    <th className="text-left p-2">Item Name</th>
+                    <th className="text-right p-2">Quantity Sold</th>
+                    <th className="text-right p-2">Revenue</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stats.popularItems.map((item, index) => (
+                    <tr key={index} className="border-t">
+                      <td className="p-2">{item.name}</td>
+                      <td className="text-right p-2">{item.quantity}</td>
+                      <td className="text-right p-2">${item.revenue.toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\components\admin\SalesChart.tsx
+
+// client/src/components/admin/SalesChart.tsx
+'use client';
+
+import { useState, useEffect } from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import api  from '@/lib/api';
+
+interface SalesChartProps {
+  dateRange: string;
+}
+
+interface ChartData {
+  date: string;
+  sales: number;
+  orders: number;
+}
+
+export default function SalesChart({ dateRange }: SalesChartProps) {
+  const [data, setData] = useState<ChartData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchChartData = async () => {
+      try {
+        const response = await api.get(`/admin/sales-chart?range=${dateRange}`);
+        setData(response.data);
+      } catch (error) {
+        console.error('Failed to fetch chart data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchChartData();
+  }, [dateRange]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--panda-red)]"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="dashboard-card h-96">
+      <h3 className="text-lg font-semibold mb-4">Sales Overview</h3>
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" />
+          <YAxis yAxisId="left" />
+          <YAxis yAxisId="right" orientation="right" />
+          <Tooltip />
+          <Legend />
+          <Line
+            yAxisId="left"
+            type="monotone"
+            dataKey="sales"
+            stroke="var(--panda-red)"
+            name="Sales ($)"
+          />
+          <Line
+            yAxisId="right"
+            type="monotone"
+            dataKey="orders"
+            stroke="var(--panda-gold)"
+            name="Orders"
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\components\cashier\Checkout.tsx
+
+import React, { useState } from 'react';
+import { MenuItem, Order, OrderItem } from '@/types';
+import { PlusCircle, Receipt, CreditCard } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/cashier/dialog';
+
+
+interface CheckoutProps {
+  menuItems: MenuItem[];
+  onCreateOrder: (order: Partial<Order>) => void;
+  activeOrder: Order | null;
+}
+
+interface ComboSelection {
+  entrees: MenuItem[];
+  side?: MenuItem;
+  maxEntrees: number;
+}
+
+export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutProps) {
+  const [draftOrders, setDraftOrders] = useState<Array<{
+    id: string;
+    items: OrderItem[];
+    createdAt: Date;
+  }>>([]);
+  
+  const [activeDraftId, setActiveDraftId] = useState<string | null>(null);
+  const [selectedTipPercent, setSelectedTipPercent] = useState<number | null>(null);
+  const [selectedSplit, setSelectedSplit] = useState<number | null>(null); // State for split bill
+  const [customTipAmount, setCustomTipAmount] = useState<string>('');
+  const [completedSplits, setCompletedSplits] = useState<number>(0); // State to track completed parts of split
+  const [isComboModalOpen, setIsComboModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [currentPaymentAmount, setCurrentPaymentAmount] = useState<number>(0);
+  const [processingPayment, setProcessingPayment] = useState(false);
+
+  const [currentComboSelection, setCurrentComboSelection] = useState<ComboSelection>({
+    entrees: [],
+    maxEntrees: 1
+  });
+  const [selectedComboBase, setSelectedComboBase] = useState<MenuItem | null>(null);
+
+
+  const currentItems = draftOrders.find(d => d.id === activeDraftId)?.items || [];
+  
+  const TAX_RATE = 0.0825;
+  const TIP_PERCENTAGES = [15, 18, 20];
+
+  const entrees = menuItems.filter(item => item.category === 'entree');
+  const sides = menuItems.filter(item => item.category === 'side');
+
+  const getComboRequirements = (comboType: string): { maxEntrees: number, name: string } => {
+    switch (comboType.toLowerCase()) {
+      case 'bowl':
+        return { maxEntrees: 1, name: 'Bowl' };
+      case 'plate':
+        return { maxEntrees: 2, name: 'Plate' };
+      case 'bigger plate':
+        return { maxEntrees: 3, name: 'Bigger Plate' };
+      default:
+        return { maxEntrees: 1, name: 'Combo' };
+    }
+  };
+
+  
+  const createNewDraft = () => {
+    const newDraft = {
+      id: `draft-${Date.now()}`,
+      items: [],
+      createdAt: new Date(),
+    };
+    
+    setDraftOrders(prev => [...prev, newDraft]);
+    setActiveDraftId(newDraft.id);
+    
+    // Reset both tip and split bill selections when a new draft is created
+    setSelectedTipPercent(null);
+    setCustomTipAmount('');
+    setSelectedSplit(null); // Reset split bill on new draft
+    setCompletedSplits(0); // Reset completed split count
+  };
+
+  const handleComboClick = (comboItem: MenuItem) => {
+    const { maxEntrees } = getComboRequirements(comboItem.name);
+    setSelectedComboBase(comboItem);
+    setCurrentComboSelection({
+      entrees: [],
+      maxEntrees
+    });
+    setIsComboModalOpen(true);
+  };
+
+  const handleEntreeSelection = (entree: MenuItem) => {
+    setCurrentComboSelection(prev => {
+      const existingIndex = prev.entrees.findIndex(e => e.id === entree.id);
+      
+      if (existingIndex >= 0) {
+        // Remove the entree if it's already selected
+        return {
+          ...prev,
+          entrees: prev.entrees.filter((_, index) => index !== existingIndex)
+        };
+      }
+      
+      if (prev.entrees.length >= prev.maxEntrees) {
+        // Remove the first entree if we're at max capacity
+        return {
+          ...prev,
+          entrees: [...prev.entrees.slice(1), entree]
+        };
+      }
+      
+      // Add the new entree
+      return {
+        ...prev,
+        entrees: [...prev.entrees, entree]
+      };
+    });
+  };
+
+
+
+  const addComboToOrder = () => {
+    if (!activeDraftId || !selectedComboBase || 
+        currentComboSelection.entrees.length !== currentComboSelection.maxEntrees || 
+        !currentComboSelection.side) return;
+
+    const entreeNames = currentComboSelection.entrees.map(e => e.name).join(', ');
+    const comboName = `${selectedComboBase.name} (${entreeNames}, ${currentComboSelection.side.name})`;
+    
+    setDraftOrders(prev => prev.map(draft => {
+      if (draft.id !== activeDraftId) return draft;
+      
+      return {
+        ...draft,
+        items: [...draft.items, {
+          menuItemId: selectedComboBase.id,
+          name: comboName,
+          quantity: 1,
+          price: selectedComboBase.price
+        }]
+      };
+    }));
+
+    setIsComboModalOpen(false);
+    setCurrentComboSelection({ entrees: [], maxEntrees: 1 });
+    setSelectedComboBase(null);
+  };
+
+
+
+
+  const addItem = (menuItem: MenuItem) => {
+    if (menuItem.category === 'combo') {
+      handleComboClick(menuItem);
+      return;
+    }
+
+    if (!activeDraftId) {
+      const newDraft = {
+        id: `draft-${Date.now()}`,
+        items: [{
+          menuItemId: menuItem.id,
+          name: menuItem.name,
+          quantity: 1,
+          price: menuItem.price
+        }],
+        createdAt: new Date(),
+      };
+      setDraftOrders([newDraft]);
+      setActiveDraftId(newDraft.id);
+      return;
+    }
+
+
+    setDraftOrders(prev => prev.map(draft => {
+      if (draft.id !== activeDraftId) return draft;
+      
+      const existingItem = draft.items.find(item => item.menuItemId === menuItem.id);
+      if (existingItem) {
+        return {
+          ...draft,
+          items: draft.items.map(item =>
+            item.menuItemId === menuItem.id
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          )
+        };
+      } else {
+        return {
+          ...draft,
+          items: [...draft.items, {
+            menuItemId: menuItem.id,
+            name: menuItem.name,
+            quantity: 1,
+            price: menuItem.price
+          }]
+        };
+      }
+    }));
+  };
+
+  const updateQuantity = (menuItemId: string, quantity: number) => {
+    setDraftOrders(prev => prev.map(draft => {
+      if (draft.id !== activeDraftId) return draft;
+      
+      if (quantity < 1) {
+        return {
+          ...draft,
+          items: draft.items.filter(item => item.menuItemId !== menuItemId)
+        };
+      }
+
+      return {
+        ...draft,
+        items: draft.items.map(item =>
+          item.menuItemId === menuItemId
+            ? { ...item, quantity }
+            : item
+        )
+      };
+    }));
+  };
+
+  const handleTipPercentSelect = (percent: number) => {
+    setSelectedTipPercent(percent);
+    setCustomTipAmount(''); // Reset custom tip amount when a percentage is selected
+  };
+
+  const handleCustomTipChange = (value: string) => {
+    setCustomTipAmount(value);
+    setSelectedTipPercent(null); // Clear percentage tip when custom tip is entered
+  };
+
+  const handleSplitSelect = (num: number) => {
+    setSelectedSplit(num); // Set selected split bill option
+    setCompletedSplits(0); // Reset completed split count when split selection changes
+  };
+
+  const calculateTotals = (items: OrderItem[]) => {
+    const subtotal = items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+    const tax = subtotal * TAX_RATE;
+    
+    let tipAmount = 0;
+    if (selectedTipPercent) {
+      tipAmount = (subtotal * selectedTipPercent) / 100;
+    } else if (customTipAmount) {
+      tipAmount = parseFloat(customTipAmount) || 0;
+    }
+    
+    const total = subtotal + tax + tipAmount;
+    return { subtotal, tax, tipAmount, total };
+  };
+
+  const handleCheckout = (index: number) => {
+    const { total } = calculateTotals(currentItems);
+    const splitAmount = selectedSplit ? total / selectedSplit : total;
+    setCurrentPaymentAmount(splitAmount);
+    setIsPaymentModalOpen(true);
+  };
+
+  const processPayment = async () => {
+    setProcessingPayment(true);
+    
+    // Simulate payment processing
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    setProcessingPayment(false);
+    setIsPaymentModalOpen(false);
+
+    // If it's the last split, complete the entire order
+    if (completedSplits + 1 === (selectedSplit || 1)) {
+      const { subtotal, tax, tipAmount, total } = calculateTotals(currentItems);
+      onCreateOrder({
+        items: currentItems,
+        subtotal,
+        tax,
+        tip: tipAmount,
+        total,
+        status: 'pending'
+      });
+      setDraftOrders(prev => prev.filter(d => d.id !== activeDraftId));
+      setActiveDraftId(null);
+      setSelectedTipPercent(null);
+      setCustomTipAmount('');
+      setSelectedSplit(null);
+      setCompletedSplits(0);
+    } else {
+      setCompletedSplits(prev => prev + 1);
+    }
+  };
+
+
+
+  return (
+    <div className="flex flex-col h-[calc(100vh-2rem)]">
+      <div className="mb-6 flex gap-2 overflow-x-auto pb-2">
+        <button
+          onClick={createNewDraft}
+          className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+        >
+          <PlusCircle className="w-4 h-4" />
+          New Order
+        </button>
+        {draftOrders.map((draft) => (
+          <button
+            key={draft.id}
+            onClick={() => setActiveDraftId(draft.id)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              activeDraftId === draft.id
+                ? 'bg-[var(--panda-red)] text-white'
+                : 'bg-gray-100 hover:bg-gray-200'
+            }`}
+          >
+            <Receipt className="w-4 h-4" />
+            Order ({draft.items.reduce((sum, item) => sum + item.quantity, 0)} items)
+          </button>
+        ))}
+      </div>
+
+      <div className="flex gap-6 flex-1 min-h-0">
+        <div className="flex-1 overflow-y-auto">
+          <h2 className="text-2xl font-bold mb-4">Menu Items</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pb-6">
+            {menuItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => addItem(item)}
+                disabled={!item.available}
+                className={`p-4 rounded-lg text-left transition-all ${
+                  item.available
+                    ? 'bg-white hover:shadow-md'
+                    : 'bg-gray-100 cursor-not-allowed'
+                }`}
+              >
+                <h3 className="font-semibold">{item.name}</h3>
+                <p className="text-sm text-gray-600">${item.price.toFixed(2)}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="w-96 bg-white rounded-lg shadow-md p-6 overflow-y-auto">
+          <h2 className="text-2xl font-bold mb-4">
+            {activeDraftId ? 'Current Order' : 'No Active Order'}
+          </h2>
+          {currentItems.length > 0 ? (
+            <>
+              <div className="space-y-4 mb-6">
+                {currentItems.map((item) => (
+                  <div key={item.menuItemId} className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-semibold">{item.name}</h3>
+                      <p className="text-sm text-gray-600">
+                        ${item.price.toFixed(2)} each
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={() => updateQuantity(item.menuItemId, item.quantity - 1)}
+                        className="text-gray-500 hover:text-gray-700"
+                      >
+                        -
+                      </button>
+                      <span>{item.quantity}</span>
+                      <button
+                        onClick={() => updateQuantity(item.menuItemId, item.quantity + 1)}
+                        className="text-gray-500 hover:text-gray-700"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="border-t pt-4 mb-4">
+                <h3 className="font-semibold mb-2">Add Tip</h3>
+                <div className="flex gap-2 mb-3">
+                  {TIP_PERCENTAGES.map((percent) => (
+                    <button
+                      key={percent}
+                      onClick={() => handleTipPercentSelect(percent)}
+                      className={`flex-1 py-2 px-3 rounded-lg text-sm ${
+                        selectedTipPercent === percent
+                          ? 'bg-[var(--panda-red)] text-white'
+                          : 'bg-gray-100 hover:bg-gray-200'
+                      }`}
+                    >
+                      {percent}%
+                    </button>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">$</span>
+                  <input
+                    type="number"
+                    value={customTipAmount}
+                    onChange={(e) => handleCustomTipChange(e.target.value)}
+                    placeholder="Custom amount"
+                    className="w-full p-2 border rounded-lg text-sm"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+              </div>
+
+              <div className="border-t pt-4 mb-4">
+                <h3 className="font-semibold mb-2">Split Bill</h3>
+                <div className="flex gap-2 mb-3">
+                  {[1, 2, 3, 4].map((num) => (
+                    <button
+                      key={num}
+                      onClick={() => handleSplitSelect(num)}
+                      className={`flex-1 py-2 px-3 rounded-lg text-sm ${
+                        selectedSplit === num
+                          ? 'bg-[var(--panda-red)] text-white'
+                          : 'bg-gray-100 hover:bg-gray-200'
+                      }`}
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-t pt-4 space-y-2">
+                <div className="flex justify-between">
+                  <span>Subtotal</span>
+                  <span>${calculateTotals(currentItems).subtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Tax</span>
+                  <span>${calculateTotals(currentItems).tax.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Tip</span>
+                  <span>${calculateTotals(currentItems).tipAmount.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between font-bold">
+                  <span>Total</span>
+                  <span>${calculateTotals(currentItems).total.toFixed(2)}</span>
+                </div>
+
+                <div className="space-y-4 mt-6">
+                  {Array(selectedSplit || 1).fill(null).map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleCheckout(index)}
+                      className={`w-full px-4 py-2 rounded-lg transition-colors ${
+                        index < completedSplits
+                          ? 'bg-gray-300 cursor-not-allowed'
+                          : 'bg-[var(--panda-red)] text-white hover:bg-[var(--panda-dark-red)]'
+                      }`}
+                      disabled={index < completedSplits}
+                    >
+                      Complete Order {selectedSplit && selectedSplit > 1 ? `(${index + 1}/${selectedSplit})` : ''}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          ) : (
+            <p className="text-gray-500">
+              {activeDraftId ? 'No items selected' : 'Select "New Order" to begin'}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <Dialog open={isComboModalOpen} onOpenChange={setIsComboModalOpen}>
+      <DialogContent className="sm:max-w-[500px] bg-white">
+        <DialogHeader>
+          <DialogTitle>Customize Your {selectedComboBase?.name}</DialogTitle>
+        </DialogHeader>
+        
+        <div className="mt-4">
+          <div className="mb-6">
+            <h3 className="font-semibold mb-2">
+              Select {currentComboSelection.maxEntrees > 1 ? `Entrees (${currentComboSelection.entrees.length}/${currentComboSelection.maxEntrees})` : 'Entree'}
+            </h3>
+            <div className="grid grid-cols-2 gap-2">
+              {entrees.map((entree) => (
+                <button
+                  key={entree.id}
+                  onClick={() => handleEntreeSelection(entree)}
+                  className={`p-2 rounded-lg text-left ${
+                    currentComboSelection.entrees.some(e => e.id === entree.id)
+                      ? 'bg-[var(--panda-red)] text-white'
+                      : 'bg-gray-100 hover:bg-gray-200'
+                  }`}
+                >
+                  {entree.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <h3 className="font-semibold mb-2">Select Side</h3>
+            <div className="grid grid-cols-2 gap-2">
+              {sides.map((side) => (
+                <button
+                  key={side.id}
+                  onClick={() => setCurrentComboSelection(prev => ({ ...prev, side }))}
+                  className={`p-2 rounded-lg text-left ${
+                    currentComboSelection.side?.id === side.id
+                      ? 'bg-[var(--panda-red)] text-white'
+                      : 'bg-gray-100 hover:bg-gray-200'
+                  }`}
+                >
+                  {side.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={addComboToOrder}
+            disabled={
+              currentComboSelection.entrees.length !== currentComboSelection.maxEntrees || 
+              !currentComboSelection.side
+            }
+            className="w-full px-4 py-2 rounded-lg bg-[var(--panda-red)] text-white hover:bg-[var(--panda-dark-red)] disabled:bg-gray-300 disabled:cursor-not-allowed"
+          >
+            Add to Order
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
+
+    <Dialog open={isPaymentModalOpen} onOpenChange={setIsPaymentModalOpen}>
+        <DialogContent className="sm:max-w-[400px] bg-white">
+          <DialogHeader>
+            <DialogTitle>Process Payment</DialogTitle>
+          </DialogHeader>
+          
+          <div className="mt-4">
+            <div className="text-center mb-6">
+              <CreditCard className="w-12 h-12 mx-auto mb-4 text-gray-600" />
+              <h3 className="text-2xl font-bold mb-2">
+                ${currentPaymentAmount.toFixed(2)}
+              </h3>
+              {selectedSplit && selectedSplit > 1 && (
+                <p className="text-sm text-gray-600">
+                  Split {completedSplits + 1} of {selectedSplit}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-4">
+              <button
+                onClick={processPayment}
+                disabled={processingPayment}
+                className="w-full px-4 py-3 rounded-lg bg-[var(--panda-red)] text-white hover:bg-[var(--panda-dark-red)] disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center"
+              >
+                {processingPayment ? (
+                  <span>Processing...</span>
+                ) : (
+                  <span>Process Payment</span>
+                )}
+              </button>
+
+              <button
+                onClick={() => setIsPaymentModalOpen(false)}
+                disabled={processingPayment}
+                className="w-full px-4 py-3 rounded-lg bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    
+    </div>
+  );
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\components\cashier\dialog.tsx
+
+"use client"
+
+import * as React from "react"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { X } from "lucide-react"
+
+import { cn } from "@/components/cashier/utils"
+
+const Dialog = DialogPrimitive.Root
+
+const DialogTrigger = DialogPrimitive.Trigger
+
+const DialogPortal = DialogPrimitive.Portal
+
+const DialogClose = DialogPrimitive.Close
+
+const DialogOverlay = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Overlay>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Overlay
+    ref={ref}
+    className={cn(
+      "fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      className
+    )}
+    {...props}
+  />
+))
+DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
+
+const DialogContent = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
+>(({ className, children, ...props }, ref) => (
+  <DialogPortal>
+    <DialogOverlay />
+    <DialogPrimitive.Content
+      ref={ref}
+      className={cn(
+        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
+        className
+      )}
+      {...props}
+    >
+      {children}
+      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+        <X className="h-4 w-4" />
+        <span className="sr-only">Close</span>
+      </DialogPrimitive.Close>
+    </DialogPrimitive.Content>
+  </DialogPortal>
+))
+DialogContent.displayName = DialogPrimitive.Content.displayName
+
+const DialogHeader = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn(
+      "flex flex-col space-y-1.5 text-center sm:text-left",
+      className
+    )}
+    {...props}
+  />
+)
+DialogHeader.displayName = "DialogHeader"
+
+const DialogFooter = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn(
+      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+      className
+    )}
+    {...props}
+  />
+)
+DialogFooter.displayName = "DialogFooter"
+
+const DialogTitle = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Title>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Title
+    ref={ref}
+    className={cn(
+      "text-lg font-semibold leading-none tracking-tight",
+      className
+    )}
+    {...props}
+  />
+))
+DialogTitle.displayName = DialogPrimitive.Title.displayName
+
+const DialogDescription = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Description>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Description
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props}
+  />
+))
+DialogDescription.displayName = DialogPrimitive.Description.displayName
+
+export {
+  Dialog,
+  DialogPortal,
+  DialogOverlay,
+  DialogClose,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\components\cashier\input.tsx
+
+import * as React from "react"
+
+import { cn } from "@/components/cashier/utils"
+
+export interface InputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, ...props }, ref) => {
+    return (
+      <input
+        type={type}
+        className={cn(
+          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+          className
+        )}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+Input.displayName = "Input"
+
+export { Input }
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\components\cashier\OrderList.tsx
+
+// client/src/components/cashier/OrderList.tsx
+import { Order } from '@/types';
+import { format } from 'date-fns';
+
+interface OrderListProps {
+  orders: Order[];
+  onUpdateStatus: (orderId: string, status: Order['status']) => void;
+  onSelectOrder: (order: Order) => void;
+}
+
+export default function OrderList({ orders, onUpdateStatus, onSelectOrder }: OrderListProps) {
+  const getStatusColor = (status: Order['status']) => {
+    const colors = {
+      pending: 'bg-yellow-100 text-yellow-800',
+      preparing: 'bg-blue-100 text-blue-800',
+      ready: 'bg-green-100 text-green-800',
+      completed: 'bg-gray-100 text-gray-800',
+      cancelled: 'bg-red-100 text-red-800'
+    };
+    return colors[status];
+  };
+
+  const getNextStatus = (currentStatus: Order['status']) => {
+    const statusFlow = {
+      pending: 'preparing',
+      preparing: 'ready',
+      ready: 'completed'
+    } as const;
+
+    return statusFlow[currentStatus as keyof typeof statusFlow] || null;
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-md p-6">
+      <h2 className="text-2xl font-bold mb-4">Active Orders</h2>
+      <div className="space-y-4">
+        {orders
+          .filter(order => order.status !== 'completed' && order.status !== 'cancelled')
+          .map((order) => (
+            <div
+              key={order.id}
+              className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+            >
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="font-semibold">Order #{order.orderNumber}</h3>
+                <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(order.status)}`}>
+                  {order.status}
+                </span>
+              </div>
+
+              <div className="space-y-2 mb-3">
+                {order.items.map((item, index) => (
+                  <div key={index} className="flex justify-between text-sm">
+                    <span>{item.quantity}x {item.name}</span>
+                    <span className="text-gray-600">${(item.price * item.quantity).toFixed(2)}</span>
+                  </div>
+                ))}
+                <div className="border-t pt-2 mt-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Subtotal</span>
+                    <span>${order.subtotal.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Tax</span>
+                    <span>${order.tax.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between font-semibold">
+                    <span>Total</span>
+                    <span>${order.total.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-sm text-gray-500 mb-3">
+                Created: {format(new Date(order.createdAt), 'MMM d, h:mm a')}
+              </div>
+
+              <div className="flex justify-between items-center">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelectOrder(order);
+                  }}
+                  className="text-sm text-[var(--panda-red)] hover:text-[var(--panda-dark-red)]"
+                >
+                  View Details
+                </button>
+                {getNextStatus(order.status) && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const nextStatus = getNextStatus(order.status);
+                      if (nextStatus) {
+                        onUpdateStatus(order.id, nextStatus);
+                      }
+                    }}
+                    className="btn-primary text-sm py-1"
+                  >
+                    Mark as {getNextStatus(order.status)}
+                  </button>
+                )}
+              </div>
+
+              {order.status === 'pending' && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onUpdateStatus(order.id, 'cancelled');
+                  }}
+                  className="mt-2 text-sm text-red-600 hover:text-red-800"
+                >
+                  Cancel Order
+                </button>
+              )}
+            </div>
+          ))}
+      </div>
+      
+      {orders.filter(order => order.status !== 'completed' && order.status !== 'cancelled').length === 0 && (
+        <div className="text-center text-gray-500 py-8">
+          No active orders
+        </div>
+      )}
+    </div>
+  );
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\components\cashier\utils.tsx
+
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
+ 
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\components\chat\AIChat.tsx
+
+// client/src/components/chat/AIChat.tsx
+'use client';
+
+import { useState, useRef, useEffect } from 'react';
+import { MessageSquare, X, Send, Loader } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
+
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
+
+export default function AIChat() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      role: 'assistant',
+      content: 'Hello! I can help you with anything about our menu, ingredients, or recommendations!',
+      timestamp: new Date(),
+    },
+  ]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<null | HTMLDivElement>(null);
+  const { translate } = useLanguage();
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSend = async () => {
+    if (!inputMessage.trim()) return;
+
+    const userMessage: Message = {
+      role: 'user',
+      content: inputMessage,
+      timestamp: new Date(),
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInputMessage('');
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: inputMessage,
+        }),
+      });
+
+      const data = await response.json();
+
+      const assistantMessage: Message = {
+        role: 'assistant',
+        content: data.response,
+        timestamp: new Date(),
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('Chat error:', error);
+      const errorMessage: Message = {
+        role: 'assistant',
+        content: 'Sorry, I encountered an error. Please try again.',
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed bottom-4 right-4 z-50">
+      {/* Chat Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`p-4 rounded-full ${
+          isOpen ? 'bg-red-500' : 'bg-[var(--panda-red)]'
+        } text-white shadow-lg hover:bg-[var(--panda-dark-red)] transition-colors duration-200`}
+        aria-label={isOpen ? 'Close chat' : 'Open chat'}
+      >
+        {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
+      </button>
+
+      {/* Chat Window */}
+      {isOpen && (
+        <div className="absolute bottom-16 right-0 w-96 h-[500px] bg-white rounded-lg shadow-xl flex flex-col overflow-hidden border border-gray-200">
+          {/* Header */}
+          <div className="bg-[var(--panda-red)] text-white p-4 flex justify-between items-center">
+            <h3 className="font-semibold">Panda Express Assistant</h3>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="text-white hover:text-gray-200"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={`flex ${
+                  message.role === 'user' ? 'justify-end' : 'justify-start'
+                }`}
+              >
+                <div
+                  className={`max-w-[80%] rounded-lg p-3 ${
+                    message.role === 'user'
+                      ? 'bg-[var(--panda-red)] text-white'
+                      : 'bg-gray-100'
+                  }`}
+                >
+                  <p className="text-sm">{message.content}</p>
+                  <span className="text-xs text-gray-500 mt-1 block">
+                    {new Date(message.timestamp).toLocaleTimeString()}
+                  </span>
+                </div>
+              </div>
+            ))}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="bg-gray-100 rounded-lg p-3">
+                  <Loader className="h-5 w-5 animate-spin" />
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input */}
+          <div className="border-t p-4">
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                placeholder={translate('Ask me anything about our menu...')}
+                className="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--panda-red)]"
+              />
+              <button
+                onClick={handleSend}
+                disabled={isLoading}
+                className="bg-[var(--panda-red)] text-white p-2 rounded-lg hover:bg-[var(--panda-dark-red)] disabled:opacity-50"
+              >
+                <Send size={20} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\components\chat\route.ts
+
+// client/src/app/api/chat/route.ts
+import { NextResponse } from 'next/server';
+import { ChatOpenAI } from 'langchain/chat_models/openai';
+import { ConversationalRetrievalQAChain } from 'langchain/chains';
+import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
+import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
+import { MemoryVectorStore } from 'langchain/vectorstores/memory';
+import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
+
+// Initialize OpenAI
+const chat = new ChatOpenAI({
+  openAIApiKey: process.env.OPENAI_API_KEY,
+  modelName: 'gpt-3.5-turbo',
+  temperature: 0.2,
+});
+
+// Initialize vector store
+let vectorStore: MemoryVectorStore | null = null;
+
+async function initializeVectorStore() {
+  if (vectorStore) return vectorStore;
+
+  // Load PDF
+  const loader = new PDFLoader('public/data/panda-express-menu.pdf');
+  const docs = await loader.load();
+
+  // Split documents
+  const textSplitter = new RecursiveCharacterTextSplitter({
+    chunkSize: 1000,
+    chunkOverlap: 200,
+  });
+  const splitDocs = await textSplitter.splitDocuments(docs);
+
+  // Create vector store
+  vectorStore = await MemoryVectorStore.fromDocuments(
+    splitDocs,
+    new OpenAIEmbeddings({
+      openAIApiKey: process.env.OPENAI_API_KEY,
+    })
+  );
+
+  return vectorStore;
+}
+
+export async function POST(req: Request) {
+  try {
+    const { message } = await req.json();
+
+    // Initialize or get vector store
+    const store = await initializeVectorStore();
+
+    // Create chain
+    const chain = ConversationalRetrievalQAChain.fromLLM(
+      chat,
+      store.asRetriever(),
+      {
+        returnSourceDocuments: true,
+        questionGeneratorTemplate:
+          'Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question that captures all relevant context from the conversation. Keep the rephrased question simple, clear and focused on Panda Express menu items and information.',
+        qaTemplate:
+          'You are a helpful Panda Express assistant. Use the following pieces of context to answer the question at the end. If you don\'t know the answer, just say that you don\'t know, don\'t try to make up an answer. Keep your answers conversational and friendly.\n\nContext: {context}\n\nQuestion: {question}\n\nHelpful Answer:',
+      }
+    );
+
+    // Get response
+    const response = await chain.call({
+      question: message,
+      chat_history: [],
+    });
+
+    return NextResponse.json({ response: response.text });
+  } catch (error) {
+    console.error('Chat error:', error);
+    return NextResponse.json(
+      { error: 'Failed to process request' },
+      { status: 500 }
+    );
+  }
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\components\layout\LanguageSelector.tsx
+
+// client/src/components/layout/LanguageSelector.tsx
+'use client';
+
+import { useState } from 'react';
+import { Globe } from 'lucide-react';
+import { languages, useLanguage } from '@/context/LanguageContext';
+
+export default function LanguageSelector() {
+  const [isOpen, setIsOpen] = useState(false);
+  const { currentLanguage, setLanguage } = useLanguage();
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100"
+        aria-label="Select Language"
+      >
+        <Globe className="h-5 w-5" />
+        <span>{languages.find(l => l.code === currentLanguage)?.flag}</span>
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+          <div className="py-1" role="menu">
+            {languages.map((lang) => (
+              <button
+                key={lang.code}
+                onClick={() => {
+                  setLanguage(lang.code);
+                  setIsOpen(false);
+                }}
+                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center space-x-2 ${
+                  currentLanguage === lang.code ? 'bg-gray-50 text-[var(--panda-red)]' : ''
+                }`}
+              >
+                <span>{lang.flag}</span>
+                <span>{lang.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\components\layout\LoginButton.tsx
+
+// client/src/components/layout/LoginButton.tsx
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { UserCircle, LogOut } from 'lucide-react';
+
+export default function LoginButton() {
+  const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
+
+  // In a real app, this would check a global auth state
+  const isAuthenticated = typeof window !== 'undefined' && localStorage.getItem('token');
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    router.push('/');
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative">
+      {isAuthenticated ? (
+        <>
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="flex items-center space-x-2 text-gray-700 hover:text-gray-900"
+          >
+            <UserCircle className="h-6 w-6" />
+            <span>Account</span>
+          </button>
+          
+          {isOpen && (
+            <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+              <div className="py-1">
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign out
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      ) : (
+        <button
+          onClick={() => router.push('/login')}
+          className="btn-primary flex items-center space-x-2"
+        >
+          <UserCircle className="h-6 w-6" />
+          <span>Login</span>
+        </button>
+      )}
+    </div>
+  );
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\components\layout\Navbar.tsx
+
+// client/src/components/layout/Navbar.tsx
+'use client';
+
+import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import LoginButton from './LoginButton';
+import Weather from './Weather';
+import LanguageSelector from './LanguageSelector';
+import { useLanguage } from '@/context/LanguageContext';
+import { Users, Calculator } from 'lucide-react'; // Import icons
+
+export default function Navbar() {
+  const pathname = usePathname();
+  const { translate } = useLanguage();
+
+  const navLinks = [
+    { href: '/menu', label: translate('Menu') },
+    { href: '/cart', label: translate('Cart') },
+    { href: '/order-status', label: translate('Accessibility') },
+  ];
+
+  return (
+    <nav className="bg-white shadow-lg border-b-4 border-[var(--panda-red)]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16 items-center">
+          <div className="flex items-center">
+            <Link href="/" className="flex items-center space-x-3">
+              <div className="relative w-10 h-10">
+                <Image
+                  src="/images/panda-logo.png"
+                  alt="Panda Express"
+                  fill
+                  className="object-contain rounded-full"
+                />
+              </div>
+              <span className="text-xl font-bold">Panda Express</span>
+            </Link>
+          </div>
+          
+          <div className="hidden md:flex items-center space-x-8">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`nav-link ${pathname === link.href ? 'nav-active' : ''}`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+
+          <div className="flex items-center space-x-4">
+            {/* Quick Access Buttons */}
+            <Link 
+              href="/admin"
+              className="flex items-center space-x-1 px-3 py-2 bg-[var(--panda-gold)] text-black rounded-md hover:bg-[var(--panda-light-gold)] transition-colors"
+            >
+              <Users size={18} />
+              <span>Manager</span>
+            </Link>
+            
+            <Link 
+              href="/cashier"
+              className="flex items-center space-x-1 px-3 py-2 bg-[var(--panda-red)] text-white rounded-md hover:bg-[var(--panda-dark-red)] transition-colors"
+            >
+              <Calculator size={18} />
+              <span>Cashier</span>
+            </Link>
+
+            <Weather />
+            <LanguageSelector />
+            <LoginButton />
+          </div>
+        </div>
+
+        {/* Mobile menu */}
+        <div className="md:hidden py-2 border-t">
+          <div className="flex flex-col space-y-2">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`nav-link block py-1 ${pathname === link.href ? 'nav-active' : ''}`}
+              >
+                {link.label}
+              </Link>
+            ))}
+            {/* Mobile Quick Access */}
+            <Link
+              href="/manager"
+              className="flex items-center space-x-2 px-3 py-2 bg-[var(--panda-gold)] text-black rounded-md hover:bg-[var(--panda-light-gold)] transition-colors mt-2"
+            >
+              <Users size={18} />
+              <span>Manager</span>
+            </Link>
+            <Link
+              href="/cashier"
+              className="flex items-center space-x-2 px-3 py-2 bg-[var(--panda-red)] text-white rounded-md hover:bg-[var(--panda-dark-red)] transition-colors"
+            >
+              <Calculator size={18} />
+              <span>Cashier</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\components\layout\Weather.tsx
+
+// client/src/components/layout/Weather.tsx
+'use client';
+
+import { useEffect, useState } from 'react';
+import { Cloud, Sun, CloudRain, Loader, MapPin, Clock } from 'lucide-react';
+
+interface WeatherData {
+  main: {
+    temp: number;
+  };
+  weather: Array<{
+    main: string;
+    description: string;
+  }>;
+}
+
+export default function Weather() {
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // College Station coordinates
+  const COLLEGE_STATION = {
+    lat: 30.6280,
+    lon: -96.3344,
+    name: 'College Station'
+  };
+
+  useEffect(() => {
+    // Update time every second
+    const timeInterval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    const fetchWeather = async () => {
+      console.log('API Key:', process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY);
+
+      if (!process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY) {
+        console.error('OpenWeather API key is missing');
+        setError('API key not configured');
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${COLLEGE_STATION.lat}&lon=${COLLEGE_STATION.lon}&appid=${process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY}&units=imperial`;
+        console.log('Fetching weather from:', url);
+
+        const response = await fetch(url);
+        console.log('Response status:', response.status);
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch weather: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Weather data:', data);
+        setWeather(data);
+      } catch (err) {
+        console.error('Weather fetch error:', err);
+        setError(err instanceof Error ? err.message : 'Unable to load weather');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchWeather();
+    // Refresh weather every 5 minutes
+    const weatherInterval = setInterval(fetchWeather, 5 * 60 * 1000);
+
+    return () => {
+      clearInterval(weatherInterval);
+      clearInterval(timeInterval);
+    };
+  }, []);
+
+  const getWeatherIcon = (weatherMain: string) => {
+    const mainWeather = weatherMain.toLowerCase();
+    console.log('Weather condition:', mainWeather);
+
+    switch (mainWeather) {
+      case 'clear':
+        return <Sun className="h-6 w-6 text-yellow-500" />;
+      case 'clouds':
+        return <Cloud className="h-6 w-6 text-gray-500" />;
+      case 'rain':
+      case 'drizzle':
+        return <CloudRain className="h-6 w-6 text-blue-500" />;
+      default:
+        return <Cloud className="h-6 w-6 text-gray-500" />;
+    }
+  };
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center space-x-2">
+        <Loader className="h-5 w-5 animate-spin text-[var(--panda-red)]" />
+        <span className="text-sm">Loading weather...</span>
+      </div>
+    );
+  }
+
+  if (error || !weather) {
+    return (
+      <div className="text-sm text-gray-500">
+        Weather unavailable: {error}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col bg-white rounded-lg px-4 py-2 shadow-sm">
+      {/* Location Row */}
+      <div className="flex items-center space-x-1 text-xs text-gray-500 mb-1">
+        <MapPin className="h-3 w-3" />
+        <span>{COLLEGE_STATION.name}</span>
+      </div>
+      
+      {/* Weather and Time Row */}
+      <div className="flex items-center justify-between">
+        {/* Weather Information */}
+        <div className="flex items-center space-x-3">
+          {getWeatherIcon(weather.weather[0].main)}
+          <div>
+            <div className="font-medium">
+              {Math.round(weather.main.temp)}°F
+            </div>
+            <div className="text-xs text-gray-500 capitalize">
+              {weather.weather[0].description}
+            </div>
+          </div>
+        </div>
+
+        {/* Time Information */}
+        <div className="flex items-center space-x-1 ml-4">
+          <Clock className="h-4 w-4 text-gray-400" />
+          <span className="text-sm text-gray-600">
+            {formatTime(currentTime)}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\components\menu\MenuGrid.tsx
+
+// client/src/components/menu/MenuGrid.tsx
+'use client';
+
+import Image from 'next/image';
+import { MenuItem } from '@/types';
+
+interface MenuGridProps {
+  items: MenuItem[];
+}
+
+export default function MenuGrid({ items }: MenuGridProps) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {items.map((item) => (
+        <div
+          key={item.id}
+          className="relative rounded-lg overflow-hidden bg-white shadow-md hover:shadow-lg transition-all duration-200"
+        >
+          <div className="relative h-48">
+            <Image
+              src={item.imageUrl}
+              alt={item.name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+            />
+          </div>
+
+          <div className="p-4">
+            <div className="flex justify-between items-start mb-2">
+              <h3 className="text-lg font-semibold">{item.name}</h3>
+              <span className="text-lg font-bold text-[var(--panda-red)]">
+                ${item.price.toFixed(2)}
+              </span>
+            </div>
+            
+            <p className="text-gray-600 text-sm mb-2">
+              {item.description}
+            </p>
+
+            {!item.available && (
+              <span className="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded">
+                Currently Unavailable
+              </span>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\context\LanguageContext.tsx
+
+// client/src/context/LanguageContext.tsx
+'use client';
+
+import { createContext, useContext, useState, useCallback } from 'react';
+
+// Define all supported languages
+export const languages = [
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
+  { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
+] as const;
+
+// Type definitions
+export type LanguageCode = (typeof languages)[number]['code'];
+
+export interface Translation {
+  [key: string]: {
+    [key in LanguageCode]: string;
+  };
+}
+
+// Basic translations (you can expand this)
+const translations: Translation = {
+  'Welcome to Panda Express': {
+    en: 'Welcome to Panda Express',
+    es: 'Bienvenido a Panda Express',
+    zh: '欢迎光临熊猫快餐',
+    vi: 'Chào mừng đến với Panda Express',
+  },
+  'Menu': {
+    en: 'Menu',
+    es: 'Menú',
+    zh: '菜单',
+    vi: 'Thực đơn',
+  },
+  'Cart': {
+    en: 'Cart',
+    es: 'Carrito',
+    zh: '购物车',
+    vi: 'Giỏ hàng',
+  },
+  // Add more translations as needed
+};
+
+interface LanguageContextType {
+  currentLanguage: LanguageCode;
+  setLanguage: (lang: LanguageCode) => void;
+  translate: (key: string) => string;
+  isRTL: boolean;
+}
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+interface LanguageProviderProps {
+  children: React.ReactNode;
+}
+
+export function LanguageProvider({ children }: LanguageProviderProps) {
+  const [currentLanguage, setCurrentLanguage] = useState<LanguageCode>('en');
+
+  const translate = useCallback((key: string): string => {
+    if (translations[key] && translations[key][currentLanguage]) {
+      return translations[key][currentLanguage];
+    }
+
+    // If translation not found, return the key itself
+    console.warn(`Translation missing for key: ${key} in language: ${currentLanguage}`);
+    return key;
+  }, [currentLanguage]);
+
+  const isRTL = currentLanguage === 'ar'; // Add more RTL languages if needed
+
+  const setLanguage = useCallback((lang: LanguageCode) => {
+    setCurrentLanguage(lang);
+    document.documentElement.lang = lang;
+    document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+  }, [isRTL]);
+
+  return (
+    <LanguageContext.Provider 
+      value={{ 
+        currentLanguage, 
+        setLanguage, 
+        translate,
+        isRTL
+      }}
+    >
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+
+export function useLanguage() {
+  const context = useContext(LanguageContext);
+  if (context === undefined) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
+  return context;
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\lib\i18n\languages.ts
+
+// client/src/lib/i18n/languages.ts
+export const languages = [
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'es', name: 'Español', flag: '🇪🇸' },
+    { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
+    { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
+  ] as const;
+  
+  export type LanguageCode = typeof languages[number]['code'];
+  
+  // client/src/context/LanguageContext.tsx
+  'use client';
+  
+  import { createContext, useContext, useState } from 'react';
+  import { LanguageCode } from '@/lib/i18n/languages';
+  
+  interface LanguageContextType {
+    currentLanguage: LanguageCode;
+    setLanguage: (lang: LanguageCode) => void;
+    translate: (key: string) => string;
+  }
+  
+  const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+  
+  export function LanguageProvider({ children }: { children: React.ReactNode }) {
+    const [currentLanguage, setCurrentLanguage] = useState<LanguageCode>('en');
+  
+    const setLanguage = async (lang: LanguageCode) => {
+      // Here you would integrate with Azure Translator API
+      // For now, we'll just set the language
+      setCurrentLanguage(lang);
+    };
+  
+    const translate = (key: string) => {
+      // Here you would use Azure Translator API to translate the text
+      // For now, we'll return the key
+      return key;
+    };
+  
+    return (
+      <LanguageContext.Provider value={{ currentLanguage, setLanguage, translate }}>
+        {children}
+      </LanguageContext.Provider>
+    );
+  }
+  
+  export function useLanguage() {
+    const context = useContext(LanguageContext);
+    if (context === undefined) {
+      throw new Error('useLanguage must be used within a LanguageProvider');
+    }
+    return context;
+  }
+  
+  // client/src/components/layout/LanguageSelector.tsx
+  'use client';
+  
+  import { useState } from 'react';
+  import { Globe } from 'lucide-react';
+  import { useLanguage } from '@/context/LanguageContext';
+  import { languages } from '@/lib/i18n/languages';
+  
+  export default function LanguageSelector() {
+    const [isOpen, setIsOpen] = useState(false);
+    const { currentLanguage, setLanguage } = useLanguage();
+  
+    return (
+      <div className="relative">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100"
+        >
+          <Globe className="h-5 w-5" />
+          <span>{languages.find(l => l.code === currentLanguage)?.flag}</span>
+        </button>
+  
+        {isOpen && (
+          <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+            <div className="py-1" role="menu">
+              {languages.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => {
+                    setLanguage(lang.code);
+                    setIsOpen(false);
+                  }}
+                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center space-x-2 ${
+                    currentLanguage === lang.code ? 'bg-gray-50 text-[var(--panda-red)]' : ''
+                  }`}
+                >
+                  <span>{lang.flag}</span>
+                  <span>{lang.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\lib\api.ts
+
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL || '/api',
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Add request interceptor
+api.interceptors.request.use((config) => {
+  // Get token from localStorage
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  
+  return config;
+});
+
+// Add response interceptor
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Handle unauthorized access
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default api;
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\types\index.ts
+
+// client/src/types/index.ts
+export interface MenuItem {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    category: 'entree' | 'side' | 'drink' | 'appetizer' | 'combo';
+    imageUrl: string;
+    available: boolean;
+  }
+  
+  export interface OrderItem {
+    menuItemId: string;
+    name: string;
+    quantity: number;
+    price: number;
+  }
+  
+  export interface Order {
+    id: string;
+    orderNumber: string;
+    items: OrderItem[];
+    subtotal: number;
+    tax: number;
+    total: number;
+    status: 'pending' | 'preparing' | 'ready' | 'completed' | 'cancelled';
+    cashierId: string;
+    createdAt: string;
+    tip?: number;
+  }
+  
+  export interface User {
+    id: string;
+    username: string;
+    role: 'admin' | 'cashier';
+    name: string;
+  }
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\types\translations.ts
+
+// client/src/types/translations.ts
+import { LanguageCode } from '@/context/LanguageContext';
+
+export interface TranslationKey {
+  [key: string]: {
+    [key in LanguageCode]: string;
+  };
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\src\utils\menuItems.ts
+
+import { MenuItem } from '@/types';
+export const menuItems: MenuItem[] = [
+    {
+        id: '41',
+        name: 'Bowl',
+        description: '1 Side & 1 Entree',
+        price: 8.30,
+        category: 'combo',
+        imageUrl: '/images/combos/bowl.png',
+        available: true,
+      },
+      {
+        id: '42',
+        name: 'Plate',
+        description: '1 Side & 2 Entrees',
+        price: 9.80,
+        category: 'combo',
+        imageUrl: '/images/combos/plate.png',
+        available: true,
+      },
+      {
+        id: '43',
+        name: 'Bigger Plate',
+        description: '1 Side & 3 Entrees',
+        price: 11.30,
+        category: 'combo',
+        imageUrl: '/images/combos/biggerPlate.png',
+        available: true,
+      },
+    {
+      id: '1',
+      name: 'Orange Chicken',
+      description: 'Crispy chicken wok-tossed in a sweet and spicy orange sauce',
+      price: 5.00,
+      category: 'entree',
+      imageUrl: '/images/entrees/the_original_orange_chicken.png',
+      available: true,
+    },
+    {
+      id: '2',
+      name: 'Beijing Beef',
+      description: 'Crispy beef wok-tossed with bell peppers and onions',
+      price: 5.00,
+      category: 'entree',
+      imageUrl: '/images/entrees/beijing_beef.png',
+      available: true,
+    },
+    {
+      id: '3',
+      name: 'Black Pepper Chicken',
+      description: 'Marinated chicken, celery, and onions in a bold black pepper sauce',
+      price: 5.00,
+      category: 'entree',
+      imageUrl: '/images/entrees/black_pepper_chicken.png',
+      available: true,
+    },
+    {
+      id: '4',
+      name: 'Black Pepper Sirloin Steak',
+      description: 'Sirloin steak wok-seared with baby broccoli, onions, red bell peppers, and mushrooms in a savory black pepper sauce',
+      price: 6.00,
+      category: 'entree',
+      imageUrl: '/images/entrees/black_pepper_sirloin_steak.png',
+      available: true,
+    },
+    {
+      id: '5',
+      name: 'Broccoli Beef',
+      description: 'Tender beef and fresh broccoli in a ginger soy sauce',
+      price: 5.00,
+      category: 'entree',
+      imageUrl: '/images/entrees/broccoli_beef.png',
+      available: true,
+    },
+    {
+      id: '6',
+      name: 'Beijing Beef',
+      description: 'Crispy beef wok-tossed with bell peppers and onions',
+      price: 5.00,
+      category: 'entree',
+      imageUrl: '/images/entrees/beijing_beef.png',
+      available: true,
+    },
+    {
+      id: '7',
+      name: 'Grilled Teriyaki Chicken',
+      description: 'Grilled Chicken hand-sliced to order and served with teriyaki sauce',
+      price: 5.00,
+      category: 'entree',
+      imageUrl: '/images/entrees/grilled_teriyaki_chicken.png',
+      available: true,
+    },
+    {
+      id: '8',
+      name: 'Honey Sesame Chicken Breast',
+      description: 'Crispy strips of white-meat chicken with veggies ina mildly sweet sauce with organic honey',
+      price: 5.00,
+      category: 'entree',
+      imageUrl: '/images/entrees/honey_sesame_chicken_breast.png',
+      available: true,
+    },
+    {
+      id: '9',
+      name: 'Honey Walnut Shrimp',
+      description: 'Large tempura-battered shrimp, work-tossed in a honey sauce and topped with glazed walnuts',
+      price: 6.00,
+      category: 'entree',
+      imageUrl: '/images/entrees/honey_walnut_shrimp.png',
+      available: true,
+    },
+    {
+      id: '10',
+      name: 'Hot Ones Blazing Bourbon Chicken',
+      description: 'Crispy boneless chicken bites and veggies wok-tossed in an extra spicy and sweet bourbon sauce',
+      price: 5.00,
+      category: 'entree',
+      imageUrl: '/images/entrees/hot_ones_blazing_bourbon_chicken.png',
+      available: true,
+    },
+    {
+      id: '11',
+      name: 'Kung Pao Chicken',
+      description: 'A Sichuan-inspired dish with chicken, peanuts and vegetables, finished with chili pepppers',
+      price: 5.00,
+      category: 'entree',
+      imageUrl: '/images/entrees/kung_pao_chicken.png',
+      available: true,
+    },
+    {
+      id: '12',
+      name: 'Mushroom Chicken',
+      description: 'A delicate combination of chicken, mushrooms and zucchini wok-tossed with a light ginger soy sauce',
+      price: 5.00,
+      category: 'entree',
+      imageUrl: '/images/entrees/mushroom_chicken.png',
+      available: true,
+    },
+    {
+      id: '13',
+      name: 'String Bean Chicken Breast',
+      description: 'Chicken breast, string beans and onions wok-tossed in a mild ginger soy sauce',
+      price: 5.00,
+      category: 'entree',
+      imageUrl: '/images/entrees/string_bean_chicken_breast.png',
+      available: true,
+    },
+    {
+      id: '14',
+      name: 'SweetFire Chicken Breast',
+      description: 'Crispy, white-meat chicken, red bell peppers, onions and pineapples in a bright and sweet chili sauce',
+      price: 5.00,
+      category: 'entree',
+      imageUrl: '/images/entrees/sweetfire_chicken_breast.png',
+      available: true,
+    },
+    {
+      id: '15',
+      name: 'Chow Mein',
+      description: 'Stir-fried wheat noodles with onions and celery',
+      price: 5.00,
+      category: 'side',
+      imageUrl: '/images/sides/chow_mein.png',
+      available: true,
+    },
+    {
+      id: '16',
+      name: 'Fried Rice',
+      description: 'Prepared steamed white rice with soy sauce, eggs, peas, carrots and green onions',
+      price: 5.00,
+      category: 'side',
+      imageUrl: '/images/sides/fried_rice.png',
+      available: true,
+    },
+    {
+      id: '17',
+      name: 'Super Greens',
+      description: 'A healthful medley of broccoli, kale, and cabbage',
+      price: 5.00,
+      category: 'side',
+      imageUrl: '/images/sides/super_greens.png',
+      available: true,
+    },
+    {
+      id: '18',
+      name: 'White Steamed Rice',
+      description: 'White rice',
+      price: 5.00,
+      category: 'side',
+      imageUrl: '/images/sides/white_steamed_rice.png',
+      available: true,
+    },
+    {
+      id: '19',
+      name: 'Apple Pie Roll',
+      description: 'Juicy apples and fall spices in a crispy rolled pastry, finished with cinnamon sugar',
+      price: 2.80,
+      category: 'appetizer',
+      imageUrl: '/images/appetizers/apple_pie_roll.png',
+      available: true,
+    },
+    {
+      id: '20',
+      name: 'Chicken Egg Roll',
+      description: 'Cabbage, carrots, green onions and chicken in a crispy wonton wrapper',
+      price: 2.5,
+      category: 'appetizer',
+      imageUrl: '/images/appetizers/chicken_egg_roll.png',
+      available: true,
+    },
+    {
+      id: '21',
+      name: 'Cream Cheese Rangoon',
+      description: 'Wonton wrappers filled with cream cheese and served with sweet and sour sauce',
+      price: 3.00,
+      category: 'appetizer',
+      imageUrl: '/images/appetizers/cream_cheese_rangoon.png',
+      available: true,
+    },
+    {
+      id: '22',
+      name: 'Veggie Sprint Roll',
+      description: 'Cabbage, celery, carrots, green onions and Chinese noodles in a crispy wonton wrapper',
+      price: 2.00,
+      category: 'appetizer',
+      imageUrl: '/images/appetizers/veggie_spring_roll.png',
+      available: true,
+    },
+    {
+      id: '23',
+      name: 'Barqs Root Beer',
+      description: '',
+      price: 1.50,
+      category: 'drink',
+      imageUrl: '/images/drinks/barqs_root_beer.png',
+      available: true,
+    },
+    {
+      id: '24',
+      name: 'Coca Cola',
+      description: '',
+      price: 1.50,
+      category: 'drink',
+      imageUrl: '/images/drinks/coca_cola.png',
+      available: true,
+    },
+    {
+      id: '25',
+      name: 'Coca Cola Cherry',
+      description: '',
+      price: 1.50,
+      category: 'drink',
+      imageUrl: '/images/drinks/coke_mexico.png',
+      available: true,
+    },
+    {
+      id: '26',
+      name: 'Coke Zero',
+      description: '',
+      price: 1.50,
+      category: 'drink',
+      imageUrl: '/images/drinks/coke_zero.png',
+      available: true,
+    },
+    {
+      id: '27',
+      name: 'Dasani',
+      description: '',
+      price: 1.00,
+      category: 'drink',
+      imageUrl: '/images/drinks/dasani.png',
+      available: true,
+    },
+    {
+      id: '28',
+      name: 'Diet Coke',
+      description: '',
+      price: 1.98,
+      category: 'drink',
+      imageUrl: '/images/drinks/diet_coke.png',
+      available: true,
+    },
+    {
+      id: '29',
+      name: 'Dr Pepper',
+      description: '',
+      price: 1.99,
+      category: 'drink',
+      imageUrl: '/images/drinks/dr_pepper.png',
+      available: true,
+    },
+    {
+      id: '30',
+      name: 'Fanta',
+      description: '',
+      price: 1.50,
+      category: 'drink',
+      imageUrl: '/images/drinks/fanta_orange.png',
+      available: true,
+    },
+    {
+      id: '31',
+      name: 'Fuze Raspberry Iced Tea',
+      description: '',
+      price: 1.50,
+      category: 'drink',
+      imageUrl: '/images/drinks/fize_raspberry_iced_tea.png',
+      available: true,
+    },
+    {
+      id: '32',
+      name: 'Minute Maid Apple Juice',
+      description: '',
+      price: 1.50,
+      category: 'drink',
+      imageUrl: '/images/drinks/minute_maid_apple_juice.png',
+      available: true,
+    },
+    {
+      id: '33',
+      name: 'Minute Maid Lemonade',
+      description: '',
+      price: 1.50,
+      category: 'drink',
+      imageUrl: '/images/drinks/minute_maid_lemonade.png',
+      available: true,
+    },
+    {
+      id: '34',
+      name: 'Mango Tea',
+      description: '',
+      price: 2.00,
+      category: 'drink',
+      imageUrl: '/images/drinks/passion_mango_black_tea.png',
+      available: true,
+    },
+    {
+      id: '35',
+      name: 'Peach Lychee Refresher',
+      description: '',
+      price: 2.00,
+      category: 'drink',
+      imageUrl: '/images/drinks/peach_lychee_flavored_refresher.png',
+      available: true,
+    },
+    {
+      id: '36',
+      name: 'Pomegranate Pineapple Flavored Lemonade',
+      description: '',
+      price: 2.00,
+      category: 'drink',
+      imageUrl: '/images/drinks/pomegranite_pineapple_flavored_lemonade.png',
+      available: true,
+    },
+    {
+      id: '37',
+      name: 'Smartwater',
+      description: '',
+      price: 2.00,
+      category: 'drink',
+      imageUrl: '/images/drinks/smartwater.png',
+      available: true,
+    },
+    {
+      id: '38',
+      name: 'Sprite',
+      description: '',
+      price: 2.00,
+      category: 'drink',
+      imageUrl: '/images/drinks/sprite.png',
+      available: true,
+    },
+    {
+      id: '39',
+      name: 'Watermelon Mange Flavored Refresher',
+      description: '',
+      price: 2.00,
+      category: 'drink',
+      imageUrl: '/images/drinks/watermelon_mango_flavored_refresher.png',
+      available: true,
+    },
+    {
+      id: '40',
+      name: 'Sprite',
+      description: '',
+      price: 2.00,
+      category: 'drink',
+      imageUrl: '/images/drinks/sprite.png',
+      available: true,
+    },
+    
+  ];
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\.eslintrc.json
+
+{
+    "extends": ["next/core-web-vitals", "next/typescript"]
+  }
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\next-env.d.ts
+
+/// <reference types="next" />
+/// <reference types="next/image-types/global" />
+
+// NOTE: This file should not be edited
+// see https://nextjs.org/docs/app/building-your-application/configuring/typescript for more information.
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\package.json
+
+{
+  "name": "panda-express-pos-client",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@heroicons/react": "^2.1.5",
+    "@radix-ui/react-dialog": "^1.1.2",
+    "axios": "^1.7.7",
+    "clsx": "^2.0.0",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.263.1",
+    "next": "^14.2.15",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "recharts": "^2.13.0",
+    "tailwind-merge": "^2.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
+    "typescript": "^5.6.3"
+  }
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\postcss.config.js
+
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\tailwind.config.js
+
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        'panda-red': 'var(--panda-red)',
+        'panda-dark-red': 'var(--panda-dark-red)',
+        'panda-gold': 'var(--panda-gold)',
+        'panda-light-gold': 'var(--panda-light-gold)',
+        'panda-cream': 'var(--panda-cream)',
+      },
+    },
+  },
+  plugins: [],
+}
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\tailwind.config.ts
+
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  content: [
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        background: "var(--background)",
+        foreground: "var(--foreground)",
+      },
+    },
+  },
+  plugins: [],
+};
+export default config;
+
+# C:\Users\rahif\Desktop\project-3-team-6b\project-3\client\tsconfig.json
+
+{
+    "compilerOptions": {
+      "lib": ["dom", "dom.iterable", "esnext"],
+      "allowJs": true,
+      "skipLibCheck": true,
+      "strict": true,
+      "noEmit": true,
+      "esModuleInterop": true,
+      "module": "esnext",
+      "moduleResolution": "bundler",
+      "resolveJsonModule": true,
+      "isolatedModules": true,
+      "jsx": "preserve",
+      "incremental": true,
+      "plugins": [
+        {
+          "name": "next"
+        }
+      ],
+      "paths": {
+        "@/*": ["./src/*"]
+      }
+    },
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+    "exclude": ["node_modules"]
+  }

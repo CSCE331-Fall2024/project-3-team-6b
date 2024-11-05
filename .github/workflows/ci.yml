@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: './project-3/client/package-lock.json'
+
+    - name: Install dependencies
+      working-directory: ./project-3/client
+      run: |
+        npm cache clean --force
+        rm -rf node_modules
+        npm install --force
+      
+    - name: Build
+      working-directory: ./project-3/client
+      run: npm run dev
+      env:
+        NEXT_PUBLIC_API_URL: '/api'
+        CI: false
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-output
+        path: ./project-3/client/.next

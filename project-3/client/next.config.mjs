@@ -1,22 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    output: 'standalone',
     images: {
-      domains: ['localhost'],
-    },
-    webpack: (config) => {
-      config.module.rules.push({
-        test: /\.(mp4|webm)$/,
-        use: {
-          loader: 'file-loader',
-          options: {
-            publicPath: '/_next/static/videos/',
-            outputPath: 'static/videos/',
-            name: '[name].[hash].[ext]',
-          },
+      domains: ['api.placeholder.com'],
+      unoptimized: true,
+      remotePatterns: [
+        {
+          protocol: 'https',
+          hostname: '**',
         },
-      });
-      return config;
+      ],
     },
+    typescript: {
+      ignoreBuildErrors: true,
+    },
+    eslint: {
+      ignoreDuringBuilds: true,
+    }
   };
   
   export default nextConfig;

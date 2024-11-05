@@ -1,9 +1,11 @@
-// src/lib/api.ts
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://your-api-url.com', // Replace with your actual API URL
-  timeout: 1000,
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
 export default api;

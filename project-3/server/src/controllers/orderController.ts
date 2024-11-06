@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import db from '../config/db'; // Assuming db is an instance of Pool from 'pg'
+import db from '../config/db'; 
 
 interface MenuItem {
   id: number;

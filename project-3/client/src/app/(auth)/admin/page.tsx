@@ -1,13 +1,20 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
 
 export default function ManagerPage() {
   const [message, setMessage] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleButtonClick = (action: string) => {
-    setMessage(`You clicked "${action}"!`);
-    setTimeout(() => setMessage(null), 3000);
+    if (action === 'Update Inventory') {
+      router.push('/admin/update-inventory'); // navigate to the new page
+    } else {
+      setMessage(`You clicked "${action}"!`);
+      setTimeout(() => setMessage(null), 3000);
+    }
   };
 
   return (
@@ -38,9 +45,9 @@ export default function ManagerPage() {
 
         <button
           className="dashboard-card p-4 bg-purple-500 text-white rounded-lg shadow hover:bg-purple-600"
-          onClick={() => handleButtonClick('Adjust Pricing')}
+          onClick={() => handleButtonClick('Update Inventory')}
         >
-          Adjust Pricing
+          Update Inventory
         </button>
 
         <button

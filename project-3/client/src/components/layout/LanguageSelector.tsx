@@ -1,43 +1,62 @@
-// client/src/components/layout/LanguageSelector.tsx
-'use client';
+import React, { useState } from 'react';
+import { Globe, ChevronDown } from 'lucide-react';
+import GoogleTranslate from '../GoogleTranslate';
 
-import { useState } from 'react';
-import { Globe } from 'lucide-react';
-import { languages, useLanguage } from '@/context/LanguageContext';
+// Define supported languages with their details
+const languages = [
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
+  { code: 'zh', name: '中文', flag: '🇨🇳' }
+];
 
 export default function LanguageSelector() {
   const [isOpen, setIsOpen] = useState(false);
-  const { currentLanguage, setLanguage } = useLanguage();
 
   return (
-    <div className="relative">
+    <div className="relative inline-block">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100"
-        aria-label="Select Language"
+        className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-sm 
+                   hover:shadow-md transition-all duration-200 border border-gray-200"
+        aria-expanded={isOpen}
       >
-        <Globe className="h-5 w-5" />
-        <span>{languages.find(l => l.code === currentLanguage)?.flag}</span>
+        <Globe className="h-5 w-5 text-[var(--panda-red)]" />
+        <span className="text-sm font-medium text-gray-700">Select Language</span>
+        <ChevronDown 
+          className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${
+            isOpen ? 'rotate-180' : ''
+          }`}
+        />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
-          <div className="py-1" role="menu">
+        <div className="absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white border border-gray-200 z-50">
+          {/* Quick Select Languages */}
+          <div className="p-2 space-y-1">
             {languages.map((lang) => (
               <button
                 key={lang.code}
                 onClick={() => {
-                  setLanguage(lang.code);
+                  // Add your language change logic here
                   setIsOpen(false);
                 }}
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center space-x-2 ${
-                  currentLanguage === lang.code ? 'bg-gray-50 text-[var(--panda-red)]' : ''
-                }`}
+                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 
+                         hover:bg-gray-50 rounded-md transition-colors duration-150"
               >
-                <span>{lang.flag}</span>
+                <span className="text-base">{lang.flag}</span>
                 <span>{lang.name}</span>
               </button>
             ))}
+          </div>
+          
+          {/* Divider */}
+          <div className="h-px bg-gray-200 mx-2" />
+          
+          {/* Google Translate Section */}
+          <div className="p-3">
+            <div className="text-xs text-gray-500 mb-2">More languages</div>
+            <GoogleTranslate />
           </div>
         </div>
       )}

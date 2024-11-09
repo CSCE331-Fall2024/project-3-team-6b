@@ -113,7 +113,7 @@ export const addMenuItem = async (req: Request, res: Response) => {
 
 // Controller function to update menu items
 export const updateMenuItem = async (req: Request, res: Response) => {
-  const { id, name, category, price, count, type } = req.body;
+  const { name, category, price, count } = req.body;
   let query = '';
   let values: (string | number | boolean)[] = [];
 
@@ -156,10 +156,45 @@ export const updateMenuItem = async (req: Request, res: Response) => {
     }
 
     // Return the updated item
+    console.log('here');
     res.json(result.rows[0]);
   } catch (error) {
     console.error('Error updating menu item:', error);
-    res.status(500).json({ error: 'Failed to update menu item' });
+    res.status(500).json({ error: error });
   }
 };
+
+export const removeMenuItem = async (req: Request, res: Response) => {
+  const { category, name } = req.body;
+
+  // Validate category to ensure it's an allowed table name
+  const allowedCategories = ['entree_side', 'free_items', 'raw_items', 'appetizers', 'drink_table'];
+  if (!allowedCategories.includes(category)) {
+    return res.status(400).json({ error: 'Invalid category' });
+  }
+
+  // Check if both `category` and `name` are provided
+  if (!category || !name) {
+    return res.status(400).json({ error: 'Category and name are required' });
+  }
+
+  // Define parameterized DELETE query
+  const query = `DELETE FROM ${category} WHERE name = $1 RETURNING *`;
+  const values = [name];
+
+  try {
+    const result = await db.query(query, values);
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+
+    // Return the deleted item
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error removing menu item:', error);
+    res.status(500).json({ error: 'Failed to remove menu item' });
+  }
+};
+
+
 

@@ -1,13 +1,14 @@
 from flask import Flask, request, jsonify
-# from langchain.llms import OpenAI
-# from dotenv import load_dotenv
-# import os
+from langchain_openai import OpenAI
+from dotenv import load_dotenv
+import os
 
-# load_dotenv()
+load_dotenv()
 
 app = Flask(__name__)
 
-# llm = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+api_key = os.getenv("OPENAI_API_KEY")
+llm = OpenAI(api_key=api_key)
 
 @app.route('/generate', methods=['POST'])
 def generate_response():
@@ -17,15 +18,11 @@ def generate_response():
     if not prompt:
         return jsonify({"error": "Prompt is required"}), 400
 
-    # response = llm(prompt)
-    return jsonify({"response" : "hello generate"})
-
-    # return jsonify({"response": response})
-
-@app.route('/hi', methods=['GET'])
-def hello_world():
-    response = "hello world"
-    return jsonify({"response": response})
+    try:
+        response = llm.invoke(prompt)
+        return jsonify({"response": response})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

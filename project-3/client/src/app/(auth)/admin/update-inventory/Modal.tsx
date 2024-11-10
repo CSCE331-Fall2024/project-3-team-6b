@@ -44,10 +44,19 @@ interface ModalProps {
   
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
-      if (action === 'add' || action === 'update') {
-        onSave(formData);
+    
+      const filteredData = { ...formData };
+      if (filteredData.category === 'free_items' || filteredData.category === 'raw_items') {
+        delete filteredData.price;
+        delete filteredData.type;
       }
+      if (filteredData.category === 'drink_table' || filteredData.category === 'appetizers'){
+        delete filteredData.type;
+      }
+    
+      onSave(filteredData);
     };
+    
   
     const handleRemove = () => {
       onConfirmRemove();

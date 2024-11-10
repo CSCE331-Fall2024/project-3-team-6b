@@ -107,7 +107,14 @@ useEffect(() => {
   // Modal component for adding, updating, or removing items
   const handleSaveItem = async (data: Partial<MenuItem>) => {
     let response;
-    
+    //try this delete later if no work
+    // Check and format price if it's a number
+    // if (data.price !== undefined && typeof data.price === 'number') {
+    //   console.log('Formatting price:', data.price); // Log the original price
+    //   data.price = parseFloat(data.price.toFixed(2)); // Format to 2 decimal places
+    // } else {
+    //     console.log('Price is not a number or is undefined:', data.price); // Log if not a number
+    // }
     if (modalAction === 'add') {
       response = await fetch('http://localhost:5000/api/menu-items', {
         method: 'POST',

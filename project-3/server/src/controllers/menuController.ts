@@ -44,15 +44,15 @@ loadMenuItems();
 export const getMenuItems = async (req: Request, res: Response) => {
     try {
         const result = await db.query(`
-          SELECT id, LOWER(TRIM(name)) AS name, 'entree_side' AS category, retail_price AS price, inventory AS count, type as type FROM entree_side
+          SELECT id, name, 'entree_side' AS category, retail_price AS price, inventory AS count, type as type FROM entree_side
           UNION ALL
-          SELECT id, LOWER(TRIM(name)) AS name, 'free_items' AS category, NULL AS price, inventory AS count, NULL AS type FROM free_items
+          SELECT id, name, 'free_items' AS category, NULL AS price, inventory AS count, NULL AS type FROM free_items
           UNION ALL
-          SELECT id, LOWER(TRIM(name)) AS name, 'drink_table' AS category, retail_price AS price, inventory AS count, NULL AS type FROM drink_table
+          SELECT id, name, 'drink_table' AS category, retail_price AS price, inventory AS count, NULL AS type FROM drink_table
           UNION ALL
-          SELECT id, LOWER(TRIM(name)) AS name, 'appetizers' AS category, retail_price AS price, inventory AS count, NULL AS type FROM appetizers
+          SELECT id, name, 'appetizers' AS category, retail_price AS price, inventory AS count, NULL AS type FROM appetizers
           UNION ALL
-          SELECT id, LOWER(TRIM(name)) AS name, 'raw_items' AS category, NULL AS price, inventory AS count, NULL AS type FROM raw_items
+          SELECT id, name, 'raw_items' AS category, NULL AS price, inventory AS count, NULL AS type FROM raw_items
         `);
         // Return the combined data from all tables
         res.json(result.rows);
@@ -73,8 +73,14 @@ export const addMenuItem = async (req: Request, res: Response) => {
     // Choose the query and values based on the specified category
     switch (category) {
       case 'entree_side':
-        query = `INSERT INTO entree_side (name, retail_price, wholesale_price, inventory, type) VALUES ($1, $2, $3, $4, $5) RETURNING *`;
-        values = [name, price, 2, count, type];
+        // Get the current row count in `entree_side` table
+        const rowCountResult = await db.query('SELECT COUNT(*) FROM entree_side');
+        const rowCount = parseInt(rowCountResult.rows[0].count, 10);
+
+        // Set the new ID based on the row count
+        let newId = rowCount + 1;
+        query = `INSERT INTO entree_side (name, retail_price, wholesale_price, inventory, type, id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`;
+        values = [name, price, 2, count, type, newId];
         break;
 
       case 'free_items':
@@ -132,7 +138,6 @@ export const updateMenuItem = async (req: Request, res: Response) => {
     case 'drink_table':
       query = `UPDATE drink_table SET retail_price = $1, inventory = $2 WHERE name = $3 RETURNING *`;
       values = [price, count, name];
-      console.log(query);
       break;
 
     case 'appetizers':
@@ -150,17 +155,18 @@ export const updateMenuItem = async (req: Request, res: Response) => {
   }
 
   try {
+    console.log('Executing query:', query);
+    console.log('With values:', values);
     const result = await db.query(query, values);
     if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Item not found' });
     }
-
     // Return the updated item
     console.log('here');
     res.json(result.rows[0]);
   } catch (error) {
     console.error('Error updating menu item:', error);
-    res.status(500).json({ error: error });
+    res.status(500).json({ error: 'Failed to update menu' });
   }
 };
 

@@ -131,3 +131,6 @@ dist
 
 # pycache files
 __pycache__/
+
+# venv
+venv/

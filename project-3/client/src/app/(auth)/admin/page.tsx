@@ -1,14 +1,22 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function ManagerPage() {
+  const router = useRouter();
   const [message, setMessage] = useState<string | null>(null);
 
   const handleButtonClick = (action: string) => {
+    if (action === 'View Sales Reports') {
+      router.push('/admin/reports');
+      return;
+    }
+    
     setMessage(`You clicked "${action}"!`);
     setTimeout(() => setMessage(null), 3000);
   };
+  
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

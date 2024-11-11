@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 export default function ManagerPage() {
   const router = useRouter();
   const [message, setMessage] = useState<string | null>(null);
-  const router = useRouter();
 
   const handleButtonClick = (action: string) => {
     if (action === 'Update Inventory') {

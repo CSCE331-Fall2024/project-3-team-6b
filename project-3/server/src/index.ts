@@ -3,6 +3,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { db } from './config/db';
 import orderRoutes from './routes/orders';
+import menuRoutes from './routes/menu';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -32,6 +33,9 @@ initializeDatabase();
 
 // Routes
 app.use('/api/orders', orderRoutes);
+app.use('/api/menu-items', menuRoutes);
+
+
 
 // Health check endpoint that includes database status
 app.get('/health', async (req: Request, res: Response) => {

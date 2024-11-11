@@ -1,0 +1,6 @@
+flask==2.3.3
+langchain>=0.0.280
+openai>=0.11.5
+python-dotenv>=1.0.0
+faiss-cpu>=1.7.4
+pymupdf>=1.22.5

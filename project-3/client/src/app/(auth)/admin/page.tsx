@@ -11,7 +11,11 @@ export default function ManagerPage() {
   const handleButtonClick = (action: string) => {
     if (action === 'Update Inventory') {
       router.push('/admin/update-inventory'); // navigate to the new page
-    } else {
+    } 
+    else if (action === 'View Sales Reports') {
+      router.push('/admin/reports'); // navigate to the new page
+    }
+    else {
       setMessage(`You clicked "${action}"!`);
       setTimeout(() => setMessage(null), 3000);
     }

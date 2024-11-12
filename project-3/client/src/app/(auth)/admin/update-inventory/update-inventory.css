@@ -234,3 +234,77 @@ form {
   display: flex;
   flex-direction: column;
 }
+
+/* Centering the tab buttons and action buttons */
+.tab-navigation,
+.button-group {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+/* Styling for the tab buttons */
+.tab-navigation button {
+  background-color: #007bff; /* Primary color */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin: 0 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.tab-navigation button.active {
+  background-color: #0056b3; /* Darker shade for active tab */
+}
+
+.tab-navigation button:hover {
+  background-color: #0056b3;
+}
+
+/* Styling for the action buttons (Add, Update, Remove) */
+.button-group .btn-add {
+  background-color: #28a745; /* Green for add */
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin: 0 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.button-group .btn-update {
+  background-color: #ffc107; /* Yellow for update */
+  color: black;
+  border: none;
+  padding: 10px 15px;
+  margin: 0 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.button-group .btn-remove {
+  background-color: #dc3545; /* Red for remove */
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin: 0 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.button-group .btn-add:hover {
+  background-color: #218838;
+}
+
+.button-group .btn-update:hover {
+  background-color: #e0a800;
+}
+
+.button-group .btn-remove:hover {
+  background-color: #c82333;
+}

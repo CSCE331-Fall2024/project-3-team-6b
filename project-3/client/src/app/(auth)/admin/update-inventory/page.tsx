@@ -22,26 +22,30 @@ export default function UpdateInventoryPage() {
   const [modalAction, setModalAction] = useState<'add' | 'update' | 'remove' | null>(null);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [modalVisible, setModalVisible] = useState(false);  // Track modal visibility
+  const [activeTab, setActiveTab] = useState<string>('entree_side'); // Tracks the selected category tab
 
-  // // Fetch menu items from the backend
-  useEffect(() => {
-    const fetchMenuItems = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/api/menu-items');
-        if (!response.ok) {
-          throw new Error('Failed to fetch menu items');
-        }
-        const data: MenuItem[] = await response.json();
-        setMenuItems(data);
-      } catch (error) {
-        setError((error as Error).message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const categories = ['entree_side', 'free_items', 'drink_table', 'appetizers', 'raw_items'];
 
-    fetchMenuItems();
-  }, []);
+
+  // Fetch menu items from the backend
+  // useEffect(() => {
+  //   const fetchMenuItems = async () => {
+  //     try {
+  //       const response = await fetch('http://localhost:5000/api/menu-items');
+  //       if (!response.ok) {
+  //         throw new Error('Failed to fetch menu items');
+  //       }
+  //       const data: MenuItem[] = await response.json();
+  //       setMenuItems(data);
+  //     } catch (error) {
+  //       setError((error as Error).message);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchMenuItems();
+  // }, []);
 
   // Function to fetch the menu items
   const fetchMenuItems = async () => {
@@ -60,7 +64,7 @@ export default function UpdateInventoryPage() {
     }
   };
 
-// // useEffect to load items on component mount
+// useEffect to load items on component mount
 useEffect(() => {
   fetchMenuItems();
 }, []);
@@ -167,13 +171,9 @@ useEffect(() => {
     setSelectedItem(null); // Clear selection
   };
   
-  // Handle row click to select an item
-  const handleRowClick = (item: MenuItem) => {
-    if (selectedItem?.name === item.name) {
-      setSelectedItem(null); // Deselect if the same row is clicked again
-    } else {
-      setSelectedItem(item); // Select the clicked row
-    }
+  const handleTabClick = (category: string) => {
+    setActiveTab(category);
+    setSelectedItem(null); // Clear selection when switching tabs
   };
 
   return (
@@ -183,6 +183,19 @@ useEffect(() => {
       {loading && <p>Loading menu items...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
+      {/* Tab Navigation */}
+      <div className="tab-navigation">
+        {categories.map((category) => (
+          <button
+            key={category}
+            className={activeTab === category ? 'active' : ''}
+            onClick={() => handleTabClick(category)}
+          >
+            {category.replace('_', ' ').toUpperCase()}
+          </button>
+        ))}
+      </div>
+
       {/* Action Buttons */}
       <div className="button-group">
         <button className="btn-add" onClick={handleAddItem}>Add Item</button>
@@ -190,7 +203,7 @@ useEffect(() => {
         <button className="btn-remove" onClick={handleRemoveItem}>Remove Item</button>
       </div>
 
-      {/* Table displaying menu items */}
+      {/* Table displaying menu items for the active category */}
       <table className="menu-table">
         <thead>
           <tr>
@@ -202,39 +215,37 @@ useEffect(() => {
           </tr>
         </thead>
         <tbody>
-          {menuItems.map((item) => (
-            <tr
-              key={item.name}
-              className={selectedItem?.name === item.name ? 'selected' : ''}
-              onClick={() => handleSelectItem(item)}
-            >
-              <td>{item.name}</td>
-              <td>{item.category}</td>
-              <td>{item.price}</td>
-              <td>{item.count}</td>
-              <td>{item.type === true ? "t" : item.type === false ? "f" : ""}</td>
-            </tr>
-          ))}
+          {menuItems
+            .filter((item) => item.category === activeTab)
+            .map((item) => (
+              <tr
+                key={item.name}
+                className={selectedItem?.name === item.name ? 'selected' : ''}
+                onClick={() => handleSelectItem(item)}
+              >
+                <td>{item.name}</td>
+                <td>{item.category}</td>
+                <td>{item.price}</td>
+                <td>{item.count}</td>
+                <td>{item.type === true ? 't' : item.type === false ? 'f' : ''}</td>
+              </tr>
+            ))}
         </tbody>
       </table>
 
-      {/* Modal to handle add/update actions */}
+      {/* Modal */}
       {modalVisible && (
         <>
-          <div className="overlay" onClick={() => setModalVisible(false)} /> {/* Grey background */}
+          <div className="overlay" onClick={() => setModalVisible(false)} />
           <Modal
             onClose={() => setModalVisible(false)}
-            onSave={handleSaveItem} // handleSaveItem will handle add/update logic
-            onConfirmRemove={handleConfirmRemove} // for removing item
-            initialData={(modalAction === 'update' || modalAction === 'remove') && selectedItem ? selectedItem : undefined} // Ensure selectedItem is passed or undefined
-            action={modalAction} // Pass the action (add, update, or remove) to the modal for dynamic content
+            onSave={handleSaveItem}
+            onConfirmRemove={() => handleSaveItem(selectedItem!)} // for removing item
+            initialData={(modalAction === 'update' || modalAction === 'remove') && selectedItem ? selectedItem : undefined}
+            action={modalAction}
           />
         </>
       )}
-
-
-
-      
     </div>
   );
 }

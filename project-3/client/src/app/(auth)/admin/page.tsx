@@ -9,7 +9,7 @@ export default function ManagerPage() {
   const [message, setMessage] = useState<string | null>(null);
 
   const handleButtonClick = (action: string) => {
-    if (action === 'Update Inventory') {
+    if (action === 'Update Menu Items and Inventory') {
       router.push('/admin/update-inventory'); // navigate to the new page
     } else {
       setMessage(`You clicked "${action}"!`);
@@ -46,9 +46,9 @@ export default function ManagerPage() {
 
         <button
           className="dashboard-card p-4 bg-purple-500 text-white rounded-lg shadow hover:bg-purple-600"
-          onClick={() => handleButtonClick('Update Inventory')}
+          onClick={() => handleButtonClick('Update Menu Items and Inventory')}
         >
-          Update Inventory
+          Update Menu Items and Inventory
         </button>
 
         <button
@@ -58,12 +58,12 @@ export default function ManagerPage() {
           Generate Financial Reports
         </button>
 
-        <button
+        {/* <button
           className="dashboard-card p-4 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600"
           onClick={() => handleButtonClick('Update Menu Items')}
         >
           Update Menu Items
-        </button>
+        </button> */}
       </div>
 
       {message && (

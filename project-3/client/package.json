@@ -21,13 +21,14 @@
     "express": "^4.21.1",
     "langchain": "^0.3.5",
     "lucide-react": "^0.263.1",
-    "next": "14.0.3",
+    "next": "^14.2.17",
     "openai": "^4.72.0",
     "pdf-parse": "^1.1.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "recharts": "^2.13.0",
-    "tailwind-merge": "^2.5.4"
+    "tailwind-merge": "^2.5.4",
+    "pg": "^8.13.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

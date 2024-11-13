@@ -1,7 +1,7 @@
 // src/app/api/orders/route.ts
 
 import { NextResponse } from 'next/server';
-import { query } from '@/server/db/config';
+import { query } from '@/server/src/db/config';
 
 export async function POST(req: Request) {
   try {

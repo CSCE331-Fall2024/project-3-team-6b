@@ -46,7 +46,7 @@ export default function AIChat() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://127.0.0.1:5001/generate', {
+      const response = await fetch('http://127.0.0.1:5000/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

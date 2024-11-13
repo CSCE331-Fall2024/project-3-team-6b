@@ -31,7 +31,7 @@ export default function UpdateInventoryPage() {
   // useEffect(() => {
   //   const fetchMenuItems = async () => {
   //     try {
-  //       const response = await fetch('http://localhost:5000/api/menu-items');
+  //       const response = await fetch('http://localhost:4000/api/menu-items');
   //       if (!response.ok) {
   //         throw new Error('Failed to fetch menu items');
   //       }
@@ -51,7 +51,7 @@ export default function UpdateInventoryPage() {
   const fetchMenuItems = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/menu-items');
+      const response = await fetch('http://localhost:4000/api/menu-items');
       if (!response.ok) {
         throw new Error('Failed to fetch menu items');
       }
@@ -120,20 +120,20 @@ useEffect(() => {
     //     console.log('Price is not a number or is undefined:', data.price); // Log if not a number
     // }
     if (modalAction === 'add') {
-      response = await fetch('http://localhost:5000/api/menu-items', {
+      response = await fetch('http://localhost:4000/api/menu-items', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
     } else if (modalAction === 'update' && selectedItem) {
-      response = await fetch('http://localhost:5000/api/menu-items', {
+      response = await fetch('http://localhost:4000/api/menu-items', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...selectedItem, ...data })
       });
       console.log(JSON.stringify(data));
     } else if (modalAction === 'remove' && selectedItem) {
-      response = await fetch(`http://localhost:5000/api/menu-items`, {
+      response = await fetch(`http://localhost:4000/api/menu-items`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...selectedItem, ...data })
@@ -154,7 +154,7 @@ useEffect(() => {
     if (!selectedItem) return;
   
     // Send DELETE request to backend to remove the item by name and category
-    const response = await fetch('http://localhost:5000/api/menu-items', {
+    const response = await fetch('http://localhost:4000/api/menu-items', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: selectedItem.name, category: selectedItem.category }), // Send name and category for identification

@@ -6,12 +6,14 @@ from langchain.embeddings import OpenAIEmbeddings
 from langchain.llms import OpenAI
 from langchain.chains import RetrievalQA
 from dotenv import load_dotenv
+from flask_cors import CORS
 import os
 
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
+CORS(app)
 
 def load_documents():
     docs = []
@@ -76,7 +78,9 @@ def generate_response():
             return jsonify({"response": "I don't know"}), 200
         return jsonify({"response": response})
     except Exception as e:
+        print(f"Error: {e}")  
         return jsonify({"error": str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)

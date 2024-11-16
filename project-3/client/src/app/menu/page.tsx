@@ -4,20 +4,24 @@
 import { useEffect, useState } from 'react';
 import MenuGrid from '@/components/menu/MenuGrid';
 import { MenuItem } from '@/types';
-import { menuItems as initialMenuItems } from '@/utils/menuItems';
+import { fetchMenuItems as initialMenuItems } from '@/utils/menuItems';
 
 export default function MenuPage() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
 
-  // Temporary data for testing
   
 
   useEffect(() => {
-    // Simulating API call with dummy data
-    setMenuItems(initialMenuItems);
-    setIsLoading(false);
+    // Call the fetch function and await its result
+    const fetchData = async () => {
+      const items = await initialMenuItems(); // Assuming this fetches the menu items correctly
+      setMenuItems(items); // Set the state with the fetched items
+      setIsLoading(false); // Turn off loading spinner
+    };
+
+    fetchData(); // Call fetchData to execute the async operation
   }, []);
 
   const categories = [

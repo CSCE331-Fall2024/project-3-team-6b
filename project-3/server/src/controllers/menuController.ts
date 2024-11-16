@@ -40,6 +40,46 @@ async function loadMenuItems() {
 loadMenuItems();
 
 
+// Fetch price based on name and category
+export const getItemPrice = async (req: Request, res: Response) => {
+  const { name, category } = req.query;
+
+  if (!name || !category) {
+    return res.status(400).json({ error: 'Missing name or category parameter' });
+  }
+  let tableName = '';
+  if (category === 'entree') {
+    tableName = 'entree_side';
+  } else if (category === 'side') {
+    tableName = 'entree_side';
+  } else if (category === 'drink') {
+    tableName = 'drink_table';
+  } else if (category === 'appetizer') {
+    tableName = 'appetizers';
+  } else {
+    return res.status(400).json({ error: 'Unsupported category' });
+  }
+
+  // Lowercase the item name only for "entree, side"
+  const itemName = category === 'entree' || category === 'side' ? (name as string).toLowerCase() : name;
+
+  try {
+    // Directly insert table name and item name into the query
+    const query = `SELECT retail_price FROM ${tableName} WHERE name = $1`; // Use parameterized query to avoid SQL injection
+    const { rows } = await db.query(query, [itemName]); // Pass itemName as a parameter
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+
+    const price = rows[0].retail_price;
+    res.json({ price });
+  } catch (error) {
+    console.error('Error fetching price:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 // Controller function to get menu items
 export const getMenuItems = async (req: Request, res: Response) => {
     try {

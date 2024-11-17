@@ -39,46 +39,95 @@ async function loadMenuItems() {
 // Call loadMenuItems at startup
 loadMenuItems();
 
+// fetch all the menu items from the database
+export const getAllMenuItems = async (req: Request, res: Response) => {
+  try {
+    // Query to fetch menu items from all tables
+    const result = await db.query(`
+      SELECT name, retail_price, 'entree_side' as category FROM entree_side
+      UNION ALL
+      SELECT name, retail_price, 'drink_table' as category FROM drink_table
+      UNION ALL
+      SELECT name, retail_price, 'appetizers' as category FROM appetizers
+    `);
 
-// Fetch price based on name and category
+    // Format the result into an array
+    const menuItems = result.rows.map((row: any) => ({
+      name: row.name,
+      price: parseFloat(row.retail_price), // Ensure price is a number
+      category: row.category,
+    }));
+
+    // Send the array back to the frontend
+    res.json(menuItems);
+  } catch (error) {
+    console.error('Failed to fetch menu items:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
+// export const getItemPrice = async (req: Request, res: Response) => {
+//   const { name, category } = req.query;
+//   if (!name || !category) {
+//     return res.status(400).json({ error: 'Missing name or category parameter' });
+//   }
+
+//   try {
+//     const query = `SELECT retail_price FROM ${category} WHERE LOWER(name) = LOWER($1)`;
+//     console.log('Querying:', query, 'with', [name]);
+//     const { rows } = await db.query(query, [name]);
+
+//     if (rows.length === 0) {
+//       return res.status(404).json({ error: 'Item not found' });
+//     }
+
+//     const price = rows[0].retail_price;
+//     res.json({ price });
+//   } catch (error) {
+//     console.error('Error fetching price:', error);
+//     res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// };
+
 export const getItemPrice = async (req: Request, res: Response) => {
   const { name, category } = req.query;
 
   if (!name || !category) {
     return res.status(400).json({ error: 'Missing name or category parameter' });
   }
-  let tableName = '';
-  if (category === 'entree') {
-    tableName = 'entree_side';
-  } else if (category === 'side') {
-    tableName = 'entree_side';
-  } else if (category === 'drink') {
-    tableName = 'drink_table';
-  } else if (category === 'appetizer') {
-    tableName = 'appetizers';
-  } else {
-    return res.status(400).json({ error: 'Unsupported category' });
-  }
-
-  // Lowercase the item name only for "entree, side"
-  const itemName = category === 'entree' || category === 'side' ? (name as string).toLowerCase() : name;
 
   try {
-    // Directly insert table name and item name into the query
-    const query = `SELECT retail_price FROM ${tableName} WHERE name = $1`; // Use parameterized query to avoid SQL injection
-    const { rows } = await db.query(query, [itemName]); // Pass itemName as a parameter
+    if (category === 'entree_side') {
+      // Query both retail_price and type for entree_side
+      const query = `SELECT retail_price, type FROM entree_side WHERE LOWER(name) = LOWER($1)`;
+      console.log('Querying:', query, 'with', [name]);
+      const { rows } = await db.query(query, [name]);
 
-    if (rows.length === 0) {
-      return res.status(404).json({ error: 'Item not found' });
+      if (rows.length === 0) {
+        return res.status(404).json({ error: 'Item not found' });
+      }
+
+      const { retail_price: price, type } = rows[0];
+      return res.json({ price, type });
+    } else {
+      // Query only retail_price for other categories
+      const query = `SELECT retail_price FROM ${category} WHERE LOWER(name) = LOWER($1)`;
+      const { rows } = await db.query(query, [name]);
+
+      if (rows.length === 0) {
+        return res.status(404).json({ error: 'Item not found' });
+      }
+
+      const price = rows[0].retail_price;
+      return res.json({ price });
     }
-
-    const price = rows[0].retail_price;
-    res.json({ price });
   } catch (error) {
     console.error('Error fetching price:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
 
 // Controller function to get menu items
 export const getMenuItems = async (req: Request, res: Response) => {

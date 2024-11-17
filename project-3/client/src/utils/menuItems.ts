@@ -1,5 +1,13 @@
 import { MenuItem } from '@/types';
 
+// Capitalizes the first letter of each word in a string
+const capitalizeWords = (str: string): string => {
+  return str
+    .split(' ') // Split the string into words
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize each word
+    .join(' '); // Join the words back into a string
+};
+
 export const fetchMenuItems = async (): Promise<MenuItem[]> => {
     // Initialize populatedItems with the combo items already included
     const populatedItems: MenuItem[] = [
@@ -10,7 +18,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         price: 8.30,
         category: 'combo',
         imageUrl: '/images/combos/bowl.png',
-        available: true,
+        available: true
       },
       {
         id: '42',
@@ -19,7 +27,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         price: 9.80,
         category: 'combo',
         imageUrl: '/images/combos/plate.png',
-        available: true,
+        available: true
       },
       {
         id: '43',
@@ -28,7 +36,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         price: 11.30,
         category: 'combo',
         imageUrl: '/images/combos/biggerPlate.png',
-        available: true,
+        available: true
       }
     ];
 
@@ -36,11 +44,11 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
     const staticItems: Omit<MenuItem, 'price'>[] = [
       {
         id: '1',
-        name: 'Orange Chicken',
+        name: 'The Original Orange Chicken',
         description: 'Crispy chicken wok-tossed in a sweet and spicy orange sauce',
         category: 'entree',
         imageUrl: '/images/entrees/the_original_orange_chicken.png',
-        available: true,
+        available: true
       },
       {
         id: '2',
@@ -48,7 +56,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: 'Crispy beef wok-tossed with bell peppers and onions',
         category: 'entree',
         imageUrl: '/images/entrees/beijing_beef.png',
-        available: true,
+        available: true
       },
       {
         id: '3',
@@ -56,7 +64,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: 'Marinated chicken, celery, and onions in a bold black pepper sauce',
         category: 'entree',
         imageUrl: '/images/entrees/black_pepper_chicken.png',
-        available: true,
+        available: true
       },
       {
         id: '4',
@@ -64,7 +72,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: 'Sirloin steak wok-seared with baby broccoli, onions, red bell peppers, and mushrooms in a savory black pepper sauce',
         category: 'entree',
         imageUrl: '/images/entrees/black_pepper_sirloin_steak.png',
-        available: true,
+        available: true
       },
       {
         id: '5',
@@ -72,7 +80,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: 'Tender beef and fresh broccoli in a ginger soy sauce',
         category: 'entree',
         imageUrl: '/images/entrees/broccoli_beef.png',
-        available: true,
+        available: true
       },
       {
         id: '6',
@@ -80,7 +88,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: 'Crispy beef wok-tossed with bell peppers and onions',
         category: 'entree',
         imageUrl: '/images/entrees/beijing_beef.png',
-        available: true,
+        available: true
       },
       {
         id: '7',
@@ -88,15 +96,15 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: 'Grilled Chicken hand-sliced to order and served with teriyaki sauce',
         category: 'entree',
         imageUrl: '/images/entrees/grilled_teriyaki_chicken.png',
-        available: true,
+        available: true
       },
       {
         id: '8',
-        name: 'Honey Sesame Chicken Breast',
+        name: 'Honey Sesame Chicken',
         description: 'Crispy strips of white-meat chicken with veggies ina mildly sweet sauce with organic honey',
         category: 'entree',
         imageUrl: '/images/entrees/honey_sesame_chicken_breast.png',
-        available: true,
+        available: true
       },
       {
         id: '9',
@@ -104,7 +112,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: 'Large tempura-battered shrimp, work-tossed in a honey sauce and topped with glazed walnuts',
         category: 'entree',
         imageUrl: '/images/entrees/honey_walnut_shrimp.png',
-        available: true,
+        available: true
       },
       {
         id: '10',
@@ -112,7 +120,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: 'Crispy boneless chicken bites and veggies wok-tossed in an extra spicy and sweet bourbon sauce',
         category: 'entree',
         imageUrl: '/images/entrees/hot_ones_blazing_bourbon_chicken.png',
-        available: true,
+        available: true
       },
       {
         id: '11',
@@ -120,7 +128,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: 'A Sichuan-inspired dish with chicken, peanuts and vegetables, finished with chili pepppers',
         category: 'entree',
         imageUrl: '/images/entrees/kung_pao_chicken.png',
-        available: true,
+        available: true
       },
       {
         id: '12',
@@ -128,23 +136,23 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: 'A delicate combination of chicken, mushrooms and zucchini wok-tossed with a light ginger soy sauce',
         category: 'entree',
         imageUrl: '/images/entrees/mushroom_chicken.png',
-        available: true,
+        available: true
       },
       {
         id: '13',
-        name: 'String Bean Chicken Breast',
+        name: 'String Bean Chicken',
         description: 'Chicken breast, string beans and onions wok-tossed in a mild ginger soy sauce',
         category: 'entree',
         imageUrl: '/images/entrees/string_bean_chicken_breast.png',
-        available: true,
+        available: true
       },
       {
         id: '14',
-        name: 'SweetFire Chicken Breast',
+        name: 'SweetFire Chicken',
         description: 'Crispy, white-meat chicken, red bell peppers, onions and pineapples in a bright and sweet chili sauce',
         category: 'entree',
         imageUrl: '/images/entrees/sweetfire_chicken_breast.png',
-        available: true,
+        available: true
       },
       {
         id: '15',
@@ -152,7 +160,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: 'Stir-fried wheat noodles with onions and celery',
         category: 'side',
         imageUrl: '/images/sides/chow_mein.png',
-        available: true,
+        available: true
       },
       {
         id: '16',
@@ -160,7 +168,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: 'Prepared steamed white rice with soy sauce, eggs, peas, carrots and green onions',
         category: 'side',
         imageUrl: '/images/sides/fried_rice.png',
-        available: true,
+        available: true
       },
       {
         id: '17',
@@ -168,7 +176,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: 'A healthful medley of broccoli, kale, and cabbage',
         category: 'side',
         imageUrl: '/images/sides/super_greens.png',
-        available: true,
+        available: true
       },
       {
         id: '18',
@@ -176,7 +184,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: 'White rice',
         category: 'side',
         imageUrl: '/images/sides/white_steamed_rice.png',
-        available: true,
+        available: true
       },
       {
         id: '19',
@@ -184,7 +192,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: 'Juicy apples and fall spices in a crispy rolled pastry, finished with cinnamon sugar',
         category: 'appetizer',
         imageUrl: '/images/appetizers/apple_pie_roll.png',
-        available: true,
+        available: true
       },
       {
         id: '20',
@@ -192,7 +200,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: 'Cabbage, carrots, green onions and chicken in a crispy wonton wrapper',
         category: 'appetizer',
         imageUrl: '/images/appetizers/chicken_egg_roll.png',
-        available: true,
+        available: true
       },
       {
         id: '21',
@@ -200,7 +208,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: 'Wonton wrappers filled with cream cheese and served with sweet and sour sauce',
         category: 'appetizer',
         imageUrl: '/images/appetizers/cream_cheese_rangoon.png',
-        available: true,
+        available: true
       },
       {
         id: '22',
@@ -208,7 +216,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: 'Cabbage, celery, carrots, green onions and Chinese noodles in a crispy wonton wrapper',
         category: 'appetizer',
         imageUrl: '/images/appetizers/veggie_spring_roll.png',
-        available: true,
+        available: true
       },
       {
         id: '23',
@@ -216,7 +224,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: '',
         category: 'drink',
         imageUrl: '/images/drinks/barqs_root_beer.png',
-        available: true,
+        available: true
       },
       {
         id: '24',
@@ -224,15 +232,15 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: '',
         category: 'drink',
         imageUrl: '/images/drinks/coca_cola.png',
-        available: true,
+        available: true
       },      
       {
         id: '25',
-        name: 'Coca Mexico 12oz Bottle',
+        name: 'Coke Mexico 12oz Bottle',
         description: '',
         category: 'drink',
         imageUrl: '/images/drinks/coke_mexico.png',
-        available: true,
+        available: true
       },
       {
         id: '26',
@@ -240,7 +248,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: '',
         category: 'drink',
         imageUrl: '/images/drinks/coke_zero.png',
-        available: true,
+        available: true
       },
       {
         id: '27',
@@ -248,7 +256,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: '',
         category: 'drink',
         imageUrl: '/images/drinks/dasani.png',
-        available: true,
+        available: true
       },
       {
         id: '28',
@@ -256,7 +264,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: '',
         category: 'drink',
         imageUrl: '/images/drinks/diet_coke.png',
-        available: true,
+        available: true
       },
       {
         id: '29',
@@ -264,7 +272,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: '',
         category: 'drink',
         imageUrl: '/images/drinks/dr_pepper.png',
-        available: true,
+        available: true
       },
       {
         id: '30',
@@ -272,7 +280,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: '',
         category: 'drink',
         imageUrl: '/images/drinks/fanta_orange.png',
-        available: true,
+        available: true
       },
       {
         id: '31',
@@ -280,15 +288,15 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: '',
         category: 'drink',
         imageUrl: '/images/drinks/fize_raspberry_iced_tea.png',
-        available: true,
+        available: true
       },
       {
         id: '32',
-        name: 'Minute Maid Apple Juice 12 oz Bottle',
+        name: 'Minute Maid Apple Juice 12oz Bottle',
         description: '',
         category: 'drink',
         imageUrl: '/images/drinks/minute_maid_apple_juice.png',
-        available: true,
+        available: true
       },
       {
         id: '33',
@@ -296,15 +304,15 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: '',
         category: 'drink',
         imageUrl: '/images/drinks/minute_maid_lemonade.png',
-        available: true,
+        available: true
       },
       {
         id: '34',
-        name: 'Mango Tea',
+        name: 'Mango Guava Flavored Tea',
         description: '',
         category: 'drink',
         imageUrl: '/images/drinks/passion_mango_black_tea.png',
-        available: true,
+        available: true
       },
       {
         id: '35',
@@ -312,7 +320,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: '',
         category: 'drink',
         imageUrl: '/images/drinks/peach_lychee_flavored_refresher.png',
-        available: true,
+        available: true
       },
       {
         id: '36',
@@ -320,7 +328,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: '',
         category: 'drink',
         imageUrl: '/images/drinks/pomegranite_pineapple_flavored_lemonade.png',
-        available: true,
+        available: true
       },
       {
         id: '37',
@@ -328,7 +336,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: '',
         category: 'drink',
         imageUrl: '/images/drinks/smartwater.png',
-        available: true,
+        available: true
       },
       {
         id: '38',
@@ -336,7 +344,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: '',
         category: 'drink',
         imageUrl: '/images/drinks/sprite.png',
-        available: true,
+        available: true
       },
       {
         id: '39',
@@ -344,7 +352,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: '',
         category: 'drink',
         imageUrl: '/images/drinks/watermelon_mango_flavored_refresher.png',
-        available: true,
+        available: true
       },
       {
         id: '40',
@@ -352,25 +360,91 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
         description: '',
         category: 'drink',
         imageUrl: '/images/drinks/sprite.png',
-        available: true,
+        available: true
+      },
+      {
+        id: '41',
+        name: 'Powerade Mountain Berry Blast',
+        description: '',
+        category: 'drink',
+        imageUrl: '/images/drinks/powerade_berry_blast.png',
+        available: true
+      },
+      {
+        id: '42',
+        name: 'Coca Cola Cherry',
+        description: '',
+        category: 'drink',
+        imageUrl: '/images/drinks/coca_cola_cherry.png',
+        available: true
       }
 
     ];
-
-    // Fetch prices for non-combo items and populate the array
-    for (const item of staticItems) {
+    try {
+      // Fetch all menu items using the /items endpoint
+      const response = await fetch(`http://localhost:4000/api/menu-items/all`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch menu items');
+      }
+  
+      const allItems = await response.json(); // Assuming it returns an array of { name, category, price }
+      let idNum = 4;
+      for (const item of allItems) {
         try {
-          const response = await fetch(`http://localhost:4000/api/menu-items/price?name=${item.name}&category=${item.category}`);
-          if (!response.ok) {
-              throw new Error(`Failed to fetch price for ${item.name}`);
+          //console.log(`Fetching price for: ${item.name}, Category: ${item.category}`);
+          const priceResponse = await fetch(
+            `http://localhost:4000/api/menu-items/price?name=${item.name}&category=${item.category}`
+          );
+
+          if (!priceResponse.ok) {
+            console.warn(`Price not found for ${item.name} (${item.category}).`);
+            continue; // Skip this item if the price is unavailable
           }
 
-          const data = await response.json();
-          populatedItems.push({ ...item, price: data.price || 0 });
-          } catch (error) {
-              console.error(`Error fetching price for ${item.name}:`, error);
-        }
-    }
+          const priceData = await priceResponse.json();
+  
+          // Find a matching static item for description and imageUrl
+          const staticItem = staticItems.find(
+            (staticItem) =>
+              staticItem.name.toLowerCase() === item.name.toLowerCase()
+          );
+          
+          // Capitalize the item name
+          const capitalizedName = capitalizeWords(item.name);
 
+          // Determine the category based on priceData.type
+          let category = item.category;
+          if (priceData.type !== undefined) { //this means category is entree_side
+            category = priceData.type ? "entree" : "side";
+          }
+          else if (item.category === "drink_table"){
+            category = "drink";
+          }
+          else if (item.category === "appetizers"){
+            category = "appetizer";
+          }
+
+          // Push the enriched item into populatedItems
+          populatedItems.push({
+            id: idNum.toString(), // You can set this dynamically if needed
+            name: capitalizedName, // Use the capitalized name
+            category,
+            price: priceData.price || 0,
+            description: staticItem?.description || '',
+            imageUrl: staticItem?.imageUrl || '',
+            available: true
+          });
+        } catch (error) {
+          console.error(`Error fetching price for ${item.name}:`, error);
+        }
+        idNum += 1;
+        if (idNum == 41){ //skip straight to 44 bc combos are 41-43
+          idNum = 44;
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching menu items:', error);
+    }
+  
     return populatedItems;
 };

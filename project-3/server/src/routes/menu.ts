@@ -1,6 +1,6 @@
 // server/src/routes/menu.ts
 import { Router } from 'express';
-import { addMenuItem, updateMenuItem, removeMenuItem, getMenuItems, getItemPrice } from '../controllers/menuController';
+import { addMenuItem, updateMenuItem, removeMenuItem, getMenuItems, getItemPrice, getAllMenuItems } from '../controllers/menuController';
 
 const router = Router();
 console.log('Menu route loaded');
@@ -12,6 +12,7 @@ router.delete('/', removeMenuItem);
 
 // New route to fetch price of a specific menu item
 router.get('/price', getItemPrice);
+router.get('/all', getAllMenuItems);
 
 export default router;
 

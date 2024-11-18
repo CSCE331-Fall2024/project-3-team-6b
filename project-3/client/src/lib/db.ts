@@ -1,4 +1,3 @@
-// src/lib/db.ts
 import { Pool, PoolConfig } from 'pg';
 
 const dbConfig: PoolConfig = {

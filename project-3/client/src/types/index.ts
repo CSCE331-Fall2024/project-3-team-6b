@@ -1,12 +1,10 @@
-// client/src/types/index.ts
-export interface MenuItem {
-    id: string;
+// src/types/index.ts
+
+export interface ComboComponent {
+    menuItemId: string;
     name: string;
-    description: string;
-    price: number;
-    category: 'entree' | 'side' | 'drink' | 'appetizer' | 'combo';
-    imageUrl: string;
-    available: boolean;
+    quantity: number;
+    category: 'entree' | 'side';
   }
   
   export interface OrderItem {
@@ -14,24 +12,30 @@ export interface MenuItem {
     name: string;
     quantity: number;
     price: number;
+    category: 'entree' | 'side' | 'drink' | 'appetizer' | 'combo';
+    components?: ComboComponent[]; // For combo items
   }
   
   export interface Order {
-    id: string;
-    orderNumber: string;
+    id?: string;
     items: OrderItem[];
     subtotal: number;
     tax: number;
-    total: number;
-    status: 'pending' | 'preparing' | 'ready' | 'completed' | 'cancelled';
-    cashierId: string;
-    createdAt: string;
     tip?: number;
+    total: number;
+    status?: 'pending' | 'preparing' | 'ready' | 'completed' | 'cancelled';
+    createdAt?: string;
+  }
+
+  export interface MenuItem {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    category: 'combo' | 'entree' | 'side' | 'drink' | 'appetizer';
+    imageUrl: string;
+    available: boolean;
+    selectedSide?: MenuItem;
+    selectedEntrees?: MenuItem[];
   }
   
-  export interface User {
-    id: string;
-    username: string;
-    role: 'admin' | 'cashier';
-    name: string;
-  }

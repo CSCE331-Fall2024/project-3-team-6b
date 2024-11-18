@@ -20,18 +20,28 @@ export default function Navbar() {
   const [magnifierEnabled, setMagnifierEnabled] = useState(false);
   const [magnification, setMagnification] = useState(1.5);
   const [isAccessibilityDropdownOpen, setIsAccessibilityDropdownOpen] = useState(false);
+  const [mousePosition, setMousePosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  const handleMouseMove = (event: React.MouseEvent) => {
+    setMousePosition({
+      x: event.clientX,
+      y: event.clientY,
+    });
+  };
 
   useEffect(() => {
     if (magnifierEnabled) {
       // Apply the scale transformation based on the magnification value
-      document.body.style.transform = `scale(${magnification})`;
-      document.body.style.transformOrigin = 'top left'; // Keep zoom anchored at the top left
+      document.body.style.transform = `scale(${magnification})`
+      document.body.style.transformOrigin = 'top center'; // Keep zoom anchored at the top left
       document.body.style.transition = 'transform 0.3s ease'; // Smooth zoom transition
     } else {
       // Reset the transform when magnifier is disabled
       document.body.style.transform = 'none';
     }
   }, [magnifierEnabled, magnification]);
+
+
   // Function to toggle high contrast mode
   const toggleHighContrastMode = () => {
     document.documentElement.classList.toggle('high-contrast');
@@ -55,7 +65,7 @@ export default function Navbar() {
 
   
   return (
-    <nav className="bg-white shadow-lg border-b-4 border-[var(--panda-red)]">
+    <nav className="bg-white shadow-lg border-b-4 border-[var(--panda-red)]" onMouseMove={handleMouseMove}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Logo Section */}
@@ -193,6 +203,7 @@ export default function Navbar() {
 
       
       {/* <ScreenMagnifier enabled={magnifierEnabled} magnification={magnification} /> */}
+      
     </nav>
   );
 }

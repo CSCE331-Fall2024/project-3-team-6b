@@ -85,12 +85,15 @@ export default function MenuPage() {
             </button>
       </div>
 
+      <div className="flex justify-center items-center min-h-screen">
+
       <div className="w-full lg:w-3/4">
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--panda-red)]"></div>
         </div>
       ) : (
+        
             <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {filteredItems.map(item => (
         <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full">
@@ -100,11 +103,13 @@ export default function MenuPage() {
               <h3 className="text font-bold">{item.name}</h3>
               <p className="text-red-500 mb-2">{item.description}</p> {/* Full text shown */}
             </div>
+            <p className="text-[var(--panda-red)] font-bold">${item.price.toFixed(2)}</p>
           </div>
         </div>
       ))}
     </div>
       )}
+      </div>
       </div>
       
     </div>

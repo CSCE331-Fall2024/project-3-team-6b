@@ -15,6 +15,9 @@ export default function ManagerPage() {
     else if (action === 'View Sales Reports') {
       router.push('/admin/reports'); // navigate to the new page
     }
+    else if (action === 'Manage Staff'){
+      router.push('/admin/employees');
+    }
     else {
       setMessage(`You clicked "${action}"!`);
       setTimeout(() => setMessage(null), 3000);

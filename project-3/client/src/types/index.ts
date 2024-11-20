@@ -38,4 +38,11 @@ export interface ComboComponent {
     selectedSide?: MenuItem;
     selectedEntrees?: MenuItem[];
   }
+
+  export interface Employee {
+    employee_id: string;
+    name: string;
+    salary: number;
+    position: string;
+  }
   

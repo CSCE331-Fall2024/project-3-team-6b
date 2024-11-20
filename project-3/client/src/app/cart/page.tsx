@@ -3,10 +3,11 @@
 import { menuItems } from '@/utils/menuItems';
 import { MenuItem } from '@/types';
 import React, { useState } from 'react';
-// Define the menu items
-
+import { useRouter } from 'next/navigation';
 
 const MenuPage: React.FC = () => {
+  const router = useRouter();
+  // Keep your existing state variables
   const [selectedCategory, setSelectedCategory] = useState('combo');
   const [cartItems, setCartItems] = useState<MenuItem[]>([]);
   const [showModal, setShowModal] = useState(false);
@@ -16,94 +17,43 @@ const MenuPage: React.FC = () => {
   const [showSideModal, setShowSideModal] = useState(false);
   const [showEntreeModal, setShowEntreeModal] = useState(false);
 
+  // Add new state for order processing
+  const [selectedTipPercent, setSelectedTipPercent] = useState<number | null>(null);
+  const [customTipAmount, setCustomTipAmount] = useState<string>('');
+  const [isProcessingOrder, setIsProcessingOrder] = useState(false);
+
+  const TAX_RATE = 0.0825; // 8.25% tax rate
+
+  // Calculate order totals
+  const subtotal = cartItems.reduce((acc, item) => acc + item.price, 0);
+  const tax = subtotal * TAX_RATE;
+  const tipAmount = selectedTipPercent ? (subtotal * selectedTipPercent) / 100 : 
+                   customTipAmount ? parseFloat(customTipAmount) : 0;
+  const total = subtotal + tax + tipAmount;
+
+  // Keep your existing filter functions
   const sideItems = menuItems.filter(item => item.category === 'side');
-
   const entreeItems = menuItems.filter(item => item.category === 'entree' || item.category === 'appetizer');
-
-  // Filter the menu items based on the selected category
   const filteredItems = selectedCategory === 'all'
     ? menuItems
     : menuItems.filter(item => item.category === selectedCategory);
 
-  // Add item to cart
-  const addToCart = (item: MenuItem) => {
-    if (item.category === 'combo') {
-        const comboItem = {
-          ...item,
-          selectedSide,
-          selectedEntrees,
-        };
-        setCartItems([...cartItems, comboItem]);
-      } else {
-        setCartItems([...cartItems, item]);
-      }
-  };
+    const renderCartItemDetails = (item: MenuItem) => {
+        if (item.category === 'combo') {
+          return (
+            <div className="text-gray-600 text-sm mt-2">
+              <p><strong>Side:</strong> {item.selectedSide ? item.selectedSide.name : 'None'}</p>
+              <p><strong>Entrees:</strong> {item.selectedEntrees && item.selectedEntrees.length > 0
+                ? item.selectedEntrees.map(entree => entree.name).join(', ')
+                : 'None'}
+              </p>
+            </div>
+          );
+        }
+        return null;
+      };
 
-  const renderCartItemDetails = (item: MenuItem) => {
-    if (item.category === 'combo') {
-      return (
-        <div className="text-gray-600 text-sm mt-2">
-          <p><strong>Side:</strong> {item.selectedSide ? item.selectedSide.name : 'None'}</p>
-          <p><strong>Entrees:</strong> {item.selectedEntrees && item.selectedEntrees.length > 0
-            ? item.selectedEntrees.map(entree => entree.name).join(', ')
-            : 'None'}
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
-  
-
-  // Remove item from cart
-  const removeFromCart = (index: number) => {
-    const updatedItems = [...cartItems];
-    updatedItems.splice(index, 1);
-    setCartItems(updatedItems);
-  };
-
-  const handleSideSelect = (side: MenuItem) => {
-    setSelectedSide(side);
-    setShowSideModal(false);
-  };
-
-  const handleEntreeSelect = (entree: MenuItem) => {
-    if (modalItem?.name === 'Bowl' && selectedEntrees.length < 1) {
-      setSelectedEntrees([entree]);
-    } else if (modalItem?.name === 'Plate' && selectedEntrees.length < 2) {
-      setSelectedEntrees([...selectedEntrees, entree]);
-    } else if (modalItem?.name === 'Bigger Plate' && selectedEntrees.length < 3) {
-      setSelectedEntrees([...selectedEntrees, entree]);
-    }
-    
-    if (
-      (modalItem?.name === 'Bowl' && selectedEntrees.length === 0) ||
-      (modalItem?.name === 'Plate' && selectedEntrees.length === 1) ||
-      (modalItem?.name === 'Bigger Plate' && selectedEntrees.length === 2)
-    ) {
-      setShowEntreeModal(false);
-    }
-  };
-
-  // Calculate the total cost
-  const total = cartItems.reduce((acc, item) => acc + item.price, 0);
-
-  // Handle modal opening and closing
-  const openModal = (item: MenuItem) => {
-    setModalItem(item);
-    setSelectedSide(null);
-    setSelectedEntrees([]);
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setModalItem(null);
-    setSelectedSide(null);
-    setSelectedEntrees([]);
-    setShowModal(false);
-  };
-
-  // Handle bowl, plate, and bigger plate orders
+      // Handle bowl, plate, and bigger plate orders
   const orderBowl = () => {
     openModal({
       id: 'bowl',
@@ -140,9 +90,155 @@ const MenuPage: React.FC = () => {
     });
   };
 
-  const handleCheckout = () => {
-    console.log('Checking out with items:', cartItems);
-    console.log('Total amount:', total.toFixed(2));
+    // Remove item from cart
+  const removeFromCart = (index: number) => {
+    const updatedItems = [...cartItems];
+    updatedItems.splice(index, 1);
+    setCartItems(updatedItems);
+  };
+
+  const handleSideSelect = (side: MenuItem) => {
+    setSelectedSide(side);
+    setShowSideModal(false);
+  };
+
+  const handleEntreeSelect = (entree: MenuItem) => {
+    if (modalItem?.name === 'Bowl' && selectedEntrees.length < 1) {
+      setSelectedEntrees([entree]);
+    } else if (modalItem?.name === 'Plate' && selectedEntrees.length < 2) {
+      setSelectedEntrees([...selectedEntrees, entree]);
+    } else if (modalItem?.name === 'Bigger Plate' && selectedEntrees.length < 3) {
+      setSelectedEntrees([...selectedEntrees, entree]);
+    }
+    
+    if (
+      (modalItem?.name === 'Bowl' && selectedEntrees.length === 0) ||
+      (modalItem?.name === 'Plate' && selectedEntrees.length === 1) ||
+      (modalItem?.name === 'Bigger Plate' && selectedEntrees.length === 2)
+    ) {
+      setShowEntreeModal(false);
+    }
+  };
+
+
+  // Handle modal opening and closing
+  const openModal = (item: MenuItem) => {
+    setModalItem(item);
+    setSelectedSide(null);
+    setSelectedEntrees([]);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setModalItem(null);
+    setSelectedSide(null);
+    setSelectedEntrees([]);
+    setShowModal(false);
+  };  
+  
+    // Modify the handleCheckout function
+  const handleCheckout = async () => {
+    if (cartItems.length === 0) {
+      alert('Your cart is empty');
+      return;
+    }
+
+    setIsProcessingOrder(true);
+
+    try {
+      // Format cart items for the API
+      const formattedItems = cartItems.flatMap(item => {
+        if (item.category === 'combo') {
+          // Handle combo items
+          const entrées = item.selectedEntrees?.map(entree => ({
+            menuItemId: entree.id,
+            name: entree.name.toLowerCase(),
+            quantity: 1,
+            price: item.price / (item.selectedEntrees?.length || 1), // Split combo price
+            category: 'entree'
+          }));
+
+          const side = item.selectedSide ? [{
+            menuItemId: item.selectedSide.id,
+            name: item.selectedSide.name.toLowerCase(),
+            quantity: 1,
+            price: 0, // Side is included in combo price
+            category: 'side'
+          }] : [];
+
+          return [...(entrées || []), ...side];
+        }
+
+        // Handle regular items
+        return {
+          menuItemId: item.id,
+          name: item.name.toLowerCase(),
+          quantity: 1,
+          price: item.price,
+          category: item.category
+        };
+      });
+
+      const orderData = {
+        items: formattedItems,
+        subtotal,
+        tax,
+        tip: tipAmount,
+        total
+      };
+
+      const response = await fetch('/api/customer-orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to process order');
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Store order details for confirmation page
+        localStorage.setItem('lastOrder', JSON.stringify({
+          orderId: result.orderId,
+          items: cartItems,
+          subtotal,
+          tax,
+          tip: tipAmount,
+          total,
+          timestamp: new Date().toISOString()
+        }));
+
+        // Clear cart and redirect
+        setCartItems([]);
+        router.push(`/order-confirmation/${result.orderId}`);
+      } else {
+        throw new Error(result.message || 'Failed to process order');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      alert('Failed to process order. Please try again.');
+    } finally {
+      setIsProcessingOrder(false);
+    }
+  };
+
+  // Keep all your existing handlers
+  const addToCart = (item: MenuItem) => {
+    if (item.category === 'combo') {
+      const comboItem = {
+        ...item,
+        selectedSide,
+        selectedEntrees,
+      };
+      setCartItems([...cartItems, comboItem]);
+    } else {
+      setCartItems([...cartItems, item]);
+    }
   };
 
   return (
@@ -155,6 +251,7 @@ const MenuPage: React.FC = () => {
         <div className="w-full lg:w-3/4">
         <div className="flex flex-wrap justify-center gap-4 mb-8">
             {/* Category buttons */}
+
             
                 
             <button 
@@ -237,46 +334,106 @@ const MenuPage: React.FC = () => {
 </div>
 
 
-        
         </div>
 
-        {/* Checkout column */}
+        {/* Enhanced Checkout column */}
         <div className="w-full md:w-1/4 mt-8 md:mt-0 md:ml-8">
           <div className="bg-white rounded-lg shadow-md p-4">
             <h2 className="text-lg font-bold mb-4">Your Cart</h2>
-            <ul>
-              {cartItems.map((item, index) => (
-                <li key={item.id} className="flex justify-between items-center mb-2">
-                  <div>
-                    <h3 className="text-md font-bold">{item.name}</h3>
-                    <p className="text-gray-500">${item.price.toFixed(2)}</p>
-                    {renderCartItemDetails(item)}
+            {cartItems.length === 0 ? (
+              <p className="text-gray-500 text-center py-4">Your cart is empty</p>
+            ) : (
+              <>
+                <ul className="mb-4 divide-y divide-gray-200">
+                  {cartItems.map((item, index) => (
+                    <li key={item.id} className="py-4 flex justify-between items-start">
+                      <div className="flex-1">
+                        <h3 className="font-bold">{item.name}</h3>
+                        <p className="text-gray-500">${item.price.toFixed(2)}</p>
+                        {renderCartItemDetails(item)}
+                      </div>
+                      <button
+                        className="text-[var(--panda-red)] hover:text-red-700 ml-2"
+                        onClick={() => removeFromCart(index)}
+                      >
+                        Remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="border-t pt-4">
+                  <div className="flex justify-between mb-2">
+                    <span>Subtotal</span>
+                    <span>${subtotal.toFixed(2)}</span>
                   </div>
-                  <button
-                    className="text-[var(--panda-red)] hover:text-red-600"
-                    onClick={() => removeFromCart(index)}
-                  >
-                    Remove
-                  </button>
-                </li>
-              ))}
-            </ul>
-            <div className="border-t pt-4 mt-4">
-              <p className="text-lg font-bold">Total: ${total.toFixed(2)}</p>
-              <div className="flex justify-between mt-4">
-                
-              </div>
-            </div>
+                  <div className="flex justify-between mb-2">
+                    <span>Tax (8.25%)</span>
+                    <span>${tax.toFixed(2)}</span>
+                  </div>
+
+                  {/* Tip Selection */}
+                  <div className="mb-4">
+                    <p className="text-sm font-medium mb-2">Add Tip</p>
+                    <div className="flex gap-2 mb-2">
+                      {[15, 18, 20].map((percent) => (
+                        <button
+                          key={percent}
+                          onClick={() => {
+                            setSelectedTipPercent(percent);
+                            setCustomTipAmount('');
+                          }}
+                          className={`flex-1 py-1 px-2 rounded text-sm ${
+                            selectedTipPercent === percent
+                              ? 'bg-[var(--panda-red)] text-white'
+                              : 'bg-gray-100 hover:bg-gray-200'
+                          }`}
+                        >
+                          {percent}%
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">$</span>
+                      <input
+                        type="number"
+                        value={customTipAmount}
+                        onChange={(e) => {
+                          setCustomTipAmount(e.target.value);
+                          setSelectedTipPercent(null);
+                        }}
+                        placeholder="Custom amount"
+                        className="w-full p-2 border rounded text-sm"
+                        min="0"
+                        step="0.01"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between font-bold text-lg border-t pt-4">
+                    <span>Total</span>
+                    <span>${total.toFixed(2)}</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleCheckout}
+                  disabled={isProcessingOrder}
+                  className={`w-full px-4 py-3 rounded-md mt-4 text-white transition-colors
+                    ${isProcessingOrder 
+                      ? 'bg-gray-400 cursor-not-allowed' 
+                      : 'bg-[var(--panda-red)] hover:bg-[var(--panda-dark-red)]'
+                    }`}
+                >
+                  {isProcessingOrder ? 'Processing...' : 'Checkout'}
+                </button>
+              </>
+            )}
           </div>
-          <button
-              onClick={handleCheckout}
-              className="w-full bg-[var(--panda-red)] text-white px-4 py-2 rounded-md mt-4 hover:bg-red-700 transition-colors"
-            >
-              Checkout
-            </button>
         </div>
       </div>
 
+      
       {/* Modal for bowl, plate, and bigger plate orders */}
       {showModal && modalItem && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75 z-50">

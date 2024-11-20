@@ -1,4 +1,3 @@
-// client/src/components/chat/AIChat.tsx
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -47,27 +46,24 @@ export default function AIChat() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch('http://127.0.0.1:5000/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          message: inputMessage,
-        }),
+        body: JSON.stringify({ prompt: inputMessage }),
       });
 
       const data = await response.json();
 
       const assistantMessage: Message = {
         role: 'assistant',
-        content: data.response,
+        content: data.response || 'I don’t know',
         timestamp: new Date(),
       };
 
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
-      console.error('Chat error:', error);
       const errorMessage: Message = {
         role: 'assistant',
         content: 'Sorry, I encountered an error. Please try again.',
@@ -81,7 +77,6 @@ export default function AIChat() {
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
-      {/* Chat Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`p-4 rounded-full ${
@@ -92,10 +87,8 @@ export default function AIChat() {
         {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
       </button>
 
-      {/* Chat Window */}
       {isOpen && (
         <div className="absolute bottom-16 right-0 w-96 h-[500px] bg-white rounded-lg shadow-xl flex flex-col overflow-hidden border border-gray-200">
-          {/* Header */}
           <div className="bg-[var(--panda-red)] text-white p-4 flex justify-between items-center">
             <h3 className="font-semibold">Panda Express Assistant</h3>
             <button
@@ -106,7 +99,6 @@ export default function AIChat() {
             </button>
           </div>
 
-          {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((message, index) => (
               <div
@@ -139,7 +131,6 @@ export default function AIChat() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input */}
           <div className="border-t p-4">
             <div className="flex space-x-2">
               <input

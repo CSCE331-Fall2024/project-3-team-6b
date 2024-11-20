@@ -1,0 +1,58 @@
+/* styles/globals.css or your preferred global CSS file */
+
+/* General layout */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  /* Title */
+  .title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Table Styles */
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 2rem;
+  }
+  
+  .table th,
+  .table td {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+  
+  /* Header Styles */
+  .table th {
+    background-color: #f4f4f4;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  
+  /* Row Styles */
+  .table td {
+    font-size: 1rem;
+    color: #333;
+  }
+  
+  .table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  /* Loading and Error Messages */
+  .loading {
+    font-size: 1.2rem;
+    color: #666;
+  }
+  
+  .error {
+    font-size: 1.2rem;
+    color: red;
+  }
+  

@@ -40,17 +40,17 @@ export default function HomePage() {
     {
       name: translate('Orange Chicken'),
       image: '/images/entrees/the_original_orange_chicken.png',
-      price: 11.99,
+      price: 5.00,
     },
     {
       name: translate('Beijing Beef'),
       image: '/images/entrees/beijing_beef.png',
-      price: 12.99,
+      price: 5.00,
     },
     {
       name: translate('Chow Mein'),
       image: '/images/sides/chow_mein.png',
-      price: 4.99,
+      price: 5.00,
     },
   ];
 

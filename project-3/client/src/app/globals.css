@@ -412,6 +412,7 @@
     }
   }
 
+
   /* Increased Grid Gap */
   .text-lg .gap-4 {
     gap: 2rem !important;
@@ -457,4 +458,6 @@
     margin-left: 1rem !important;
   }
 }
+
+
 

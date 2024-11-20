@@ -73,15 +73,6 @@ export const menuItems: MenuItem[] = [
       available: true,
     },
     {
-      id: '6',
-      name: 'Beijing Beef',
-      description: 'Crispy beef wok-tossed with bell peppers and onions',
-      price: 5.00,
-      category: 'entree',
-      imageUrl: '/images/entrees/beijing_beef.png',
-      available: true,
-    },
-    {
       id: '7',
       name: 'Grilled Teriyaki Chicken',
       description: 'Grilled Chicken hand-sliced to order and served with teriyaki sauce',
@@ -377,15 +368,5 @@ export const menuItems: MenuItem[] = [
       category: 'drink',
       imageUrl: '/images/drinks/watermelon_mango_flavored_refresher.png',
       available: true,
-    },
-    {
-      id: '40',
-      name: 'Sprite',
-      description: '',
-      price: 2.00,
-      category: 'drink',
-      imageUrl: '/images/drinks/sprite.png',
-      available: true,
-    },
-    
+    }
   ];

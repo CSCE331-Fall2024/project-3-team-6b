@@ -687,10 +687,11 @@ const MenuGrid = ({ items }: { items: MenuItem[] }) => {
 
           <div className="p-4">
             <div className="flex justify-between items-start mb-2">
-              <h3 className="text-lg font-semibold">{item.name}</h3>
-              <span className="text-lg font-bold text-[var(--panda-red)]">
-                ${item.price.toFixed(2)}
-              </span>
+            <h3 className="text-lg font-semibold">{item.name}</h3>
+            <span className="text-lg font-bold text-[var(--panda-red)]">
+              ${Number(item.price).toFixed(2)}
+            </span>
+
             </div>
             
             <p className="text-gray-600 text-sm mb-2">

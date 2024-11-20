@@ -26,27 +26,6 @@ export default function UpdateInventoryPage() {
 
   const categories = ['entree_side', 'free_items', 'drink_table', 'appetizers', 'raw_items'];
 
-
-  // Fetch menu items from the backend
-  // useEffect(() => {
-  //   const fetchMenuItems = async () => {
-  //     try {
-  //       const response = await fetch('http://localhost:4000/api/menu-items');
-  //       if (!response.ok) {
-  //         throw new Error('Failed to fetch menu items');
-  //       }
-  //       const data: MenuItem[] = await response.json();
-  //       setMenuItems(data);
-  //     } catch (error) {
-  //       setError((error as Error).message);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchMenuItems();
-  // }, []);
-
   // Function to fetch the menu items
   const fetchMenuItems = async () => {
     setLoading(true);

@@ -11,7 +11,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { Users, Calculator, ChevronDown } from 'lucide-react'; // Import icons
 import { Search } from 'lucide-react'; // Import the magnifier icon
 import ScreenMagnifier from '../../components/ScreenMagnifier';
-import ScreenZoom from '../ScreenZoom';
+
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -21,6 +21,8 @@ export default function Navbar() {
   const [magnification, setMagnification] = useState(1.5);
   const [isAccessibilityDropdownOpen, setIsAccessibilityDropdownOpen] = useState(false);
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [selectedOption, setSelectedOption] = useState<null | 'high-contrast' | 'text-lg' | 'magnifier' | 'all'>(null);
+
 
   const handleMouseMove = (event: React.MouseEvent) => {
     setMousePosition({
@@ -33,7 +35,7 @@ export default function Navbar() {
     if (magnifierEnabled) {
       // Apply the scale transformation based on the magnification value
       document.body.style.transform = `scale(${magnification})`
-      document.body.style.transformOrigin = 'top center'; // Keep zoom anchored at the top left
+      document.body.style.transformOrigin = 'top left'; // Keep zoom anchored at the top left
       document.body.style.transition = 'transform 0.3s ease'; // Smooth zoom transition
     } else {
       // Reset the transform when magnifier is disabled
@@ -99,56 +101,61 @@ export default function Navbar() {
             </Link>
 
             {/* Accessibility Dropdown */}
-            {/* Accessibility Dropdown */}
-<div className="relative">
-  <button
-    type="button"
-    onClick={toggleAccessibilityDropdown}
-    className="nav-link px-4 py-2 text-[var(--panda-black)]"
-    aria-expanded={isAccessibilityDropdownOpen}
-  >
-    {translate('Accessibility')}
-  </button>
+            
+    <div className="relative">
+      <button
+        type="button"
+        onClick={toggleAccessibilityDropdown}
+        className="nav-link px-4 py-2 text-[var(--panda-black)]"
+        aria-expanded={isAccessibilityDropdownOpen}
+      >
+        {translate('Accessibility')}
+      </button>
 
-  {/* Dropdown Menu */}
-  {isAccessibilityDropdownOpen && (
-    <div
-      className="absolute right-0 mt-2 w-48 bg-white shadow-lg border rounded-md py-2 z-50"
-      style={{ zIndex: 50 }}
-    >
-      <button
-        onClick={() => document.documentElement.classList.toggle('high-contrast')}
-        className="px-4 py-2 text-left w-full hover:bg-gray-100 focus:outline-none"
-      >
-        {translate('High Contrast')}
-      </button>
-      <button
-        onClick={() => document.documentElement.classList.toggle('text-lg')}
-        className="px-4 py-2 text-left w-full hover:bg-gray-100 focus:outline-none"
-      >
-        {translate('Increase Text Size')}
-      </button>
-      <button
-        onClick={() => setMagnifierEnabled((prev) => !prev)}
-        className={`px-4 py-2 text-left w-full hover:bg-gray-100 focus:outline-none ${
-          magnifierEnabled ? 'bg-blue-100' : ''
-        }`}
-      >
-        {translate('Magnifier')}
-      </button>
-      <button
-        onClick={() => {
-          document.documentElement.classList.toggle('high-contrast');
-          document.documentElement.classList.toggle('text-lg');
-          setMagnifierEnabled(true);
-        }}
-        className="px-4 py-2 text-left w-full hover:bg-gray-100 focus:outline-none"
-      >
-        {translate('Enable All')}
-      </button>
+      {/* Dropdown Menu */}
+      {isAccessibilityDropdownOpen && (
+        <div
+          className="absolute right-0 mt-2 w-48 bg-white shadow-lg border rounded-md py-2 z-50"
+          style={{ zIndex: 50 }}
+        >
+          <button
+            onClick={() => {
+              document.documentElement.classList.toggle('high-contrast');
+              setSelectedOption((prev) => (prev === 'high-contrast' ? null : 'high-contrast'));
+            }}
+            className={`px-4 py-2 text-left w-full hover:bg-gray-100 focus:outline-none ${
+              selectedOption === 'high-contrast' ? 'bg-blue-100 text-blue-800' : ''
+            }`}
+          >
+            {translate('High Contrast')}
+          </button>
+          <button
+            onClick={() => {
+              document.documentElement.classList.toggle('text-lg');
+              setSelectedOption((prev) => (prev === 'text-lg' ? null : 'text-lg'));
+            }}
+            className={`px-4 py-2 text-left w-full hover:bg-gray-100 focus:outline-none ${
+              selectedOption === 'text-lg' ? 'bg-blue-100 text-blue-800' : ''
+            }`}
+          >
+            {translate('Increase Text Size')}
+          </button>
+          <button
+            onClick={() => {
+              setMagnifierEnabled((prev) => !prev);
+              setSelectedOption((prev) => (prev === 'magnifier' ? null : 'magnifier'));
+            }}
+            className={`px-4 py-2 text-left w-full hover:bg-gray-100 focus:outline-none ${
+              selectedOption === 'magnifier' && magnifierEnabled ? 'bg-blue-100 text-blue-800' : ''
+            }`}
+          >
+            {translate('Magnifier')}
+          </button>
+          
+        </div>
+      )}
     </div>
-  )}
-</div>
+
 
 
           </div>
@@ -183,7 +190,7 @@ export default function Navbar() {
 
       {/* Magnifier Options */}
       {magnifierEnabled && (
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-left mt-4 pl-4">
           <label htmlFor="magnification" className="mr-2">
             {translate('Magnification Level')}:
           </label>

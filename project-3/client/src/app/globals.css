@@ -48,7 +48,7 @@
   /* Enhanced Text Sizes */
   .high-contrast h1 {
     font-size: 8rem !important; /* 56px */
-    line-height: 4rem !important;
+    line-height: 6rem !important;
     margin-bottom: 1.5rem !important;
   }
 
@@ -320,3 +320,141 @@
   z-index: 9999;
   position: absolute;
 }
+
+/* Enhanced Text Sizes without color */
+@layer base {
+  
+
+  .text-lg h1 {
+    font-size: 8rem !important; /* 56px */
+    line-height: 6rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .text-lg h2 {
+    font-size: 5rem !important; /* 44px */
+    line-height: 4.25rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .text-lg h3 {
+    font-size: 3rem !important; /* 36px */
+    line-height: 3.5rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .text-lg p {
+    font-size: 2.5rem !important; /* 24px */
+    line-height: 2.75rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  /* Button and Link Text */
+  .text-lg .btn-primary,
+  .text-lg .btn-secondary,
+  .text-lg .nav-link {
+    font-size: 2rem !important; /* 24px */
+    line-height: 2rem !important;
+    padding: 1rem 1.5rem !important;
+  }
+
+  .text-lg nav {
+    height: 125px !important; /* Increase navbar height */
+    padding: 0 2rem !important; /* Increase padding for more space */
+    padding-top: 1rem !important;
+  }
+
+  /* Input Fields */
+  .text-lg input,
+  .text-lg select,
+  .text-lg textarea {
+    font-size: 1.5rem !important; /* 24px */
+    line-height: 2rem !important;
+    padding: 1rem !important;
+  }
+
+  /* Text Sizes */
+  .text-lg .text-xl {
+    font-size: 1.75rem !important; /* 28px */
+    line-height: 2.25rem !important;
+  }
+
+  .text-lg .text-lg {
+    font-size: 1.5rem !important; /* 24px */
+    line-height: 2rem !important;
+  }
+
+  .text-lg .text-base {
+    font-size: 1.25rem !important; /* 20px */
+    line-height: 1.75rem !important;
+  }
+
+  /* Grid Adjustments */
+  .text-lg .grid {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+
+  @media (min-width: 640px) {
+    .text-lg .grid {
+      grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .text-lg .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .text-lg .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+  }
+
+  /* Increased Grid Gap */
+  .text-lg .gap-4 {
+    gap: 2rem !important;
+  }
+
+  /* Button Sizing */
+  .text-lg .btn-primary {
+    font-size: 2rem !important;
+    padding: 1rem 1.5rem !important;
+    line-height: 2rem !important;
+    font-weight: bold;
+    min-height: 3.5rem !important;
+    margin: 0.5rem !important;
+  }
+
+  /* Input fields */
+  .text-lg .input-field {
+    min-height: 3.5rem !important;
+  }
+
+  .text-lg .max-w-md {
+    max-width: 600px !important; /* Make modal wider */
+    max-height: 90vh !important; /* Set a max height for the modal (90% of viewport height) */
+    overflow-y: auto !important;
+  }
+
+  /* Tables */
+  .text-lg .table-header {
+    font-size: 1.5rem !important;
+  }
+
+  .text-lg .table-cell {
+    font-size: 1.25rem !important;
+    padding: 1rem !important;
+  }
+
+  /* Spacing Adjustments for Larger Text */
+  .text-lg .space-y-4 > * + * {
+    margin-top: 1rem !important;
+  }
+
+  .text-lg .space-x-4 > * + * {
+    margin-left: 1rem !important;
+  }
+}
+

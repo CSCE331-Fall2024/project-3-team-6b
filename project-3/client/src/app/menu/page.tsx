@@ -38,28 +38,71 @@ export default function MenuPage() {
       <h1 className="text-4xl font-bold text-center mb-8">Our Menu</h1>
       
       <div className="flex justify-center space-x-4 mb-8">
-        {categories.map(category => (
-          <button
-            key={category.id}
-            onClick={() => setSelectedCategory(category.id)}
-            className={`px-4 py-2 rounded-md transition-colors duration-200 ${
-              selectedCategory === category.id
-                ? 'bg-[var(--panda-red)] text-white'
-                : 'bg-gray-100 hover:bg-gray-200'
-            }`}
-          >
-            {category.name}
-          </button>
-        ))}
+      <button 
+              className="btn-primary px-4 py-2 rounded-md bg-[var(--panda-red)] text-white"
+              onClick={() => setSelectedCategory('combo')}
+            >
+              Combos
+            </button>
+            
+            <button 
+              className="btn-primary px-4 py-2 rounded-md bg-[var(--panda-red)] text-white"
+              onClick={() => setSelectedCategory('entree')}
+            >
+              Entrees
+            </button>
+            
+            <button 
+              className="btn-primary px-4 py-2 rounded-md bg-[var(--panda-red)] text-white"
+              onClick={() => setSelectedCategory('side')}
+            >
+              Sides
+            </button>
+            
+            <button 
+              className="btn-primary px-4 py-2 rounded-md bg-[var(--panda-red)] text-white"
+              onClick={() => setSelectedCategory('appetizer')}
+            >
+              Appetizers
+            </button>
+            
+            <button 
+              className="btn-primary px-4 py-2 rounded-md bg-[var(--panda-red)] text-white"
+              onClick={() => setSelectedCategory('drink')}
+            >
+              Drinks
+            </button>
+            
+            <button 
+              className="btn-primary px-4 py-2 rounded-md bg-[var(--panda-red)] text-white"
+              onClick={() => setSelectedCategory('all')}
+            >
+              All Items
+            </button>
       </div>
 
+      <div className="w-full lg:w-3/4">
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--panda-red)]"></div>
         </div>
       ) : (
-        <MenuGrid items={filteredItems} />
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {filteredItems.map(item => (
+        <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full">
+          <img src={item.imageUrl} alt={item.name} className="w-full h-48 object-cover" />
+          <div className="p-4 flex flex-col flex-grow justify-between">
+            <div className="min-h-[100px]"> {/* Adjust min height as needed */}
+              <h3 className="text font-bold">{item.name}</h3>
+              <p className="text-red-500 mb-2">{item.description}</p> {/* Full text shown */}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
       )}
+      </div>
+      
     </div>
   );
 }

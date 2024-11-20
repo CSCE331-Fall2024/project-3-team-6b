@@ -243,65 +243,97 @@ const MenuPage: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
       <h1 className="text-4xl font-bold text-center mb-8">Our Menu</h1>
 
-      <div className="flex flex-col md:flex-row">
+      <div className="flex flex-col lg:flex-row gap-8">
         {/* Menu items grid */}
-        <div className="w-full md:w-3/4">
-          <div className="flex justify-center space-x-4 mb-8">
+        <div className="w-full lg:w-3/4">
+        <div className="flex flex-wrap justify-center gap-4 mb-8">
             {/* Category buttons */}
-            <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('combo')}>
+
+            
+                
+            <button 
+              className="btn-primary px-4 py-2 rounded-md bg-[var(--panda-red)] text-white"
+              onClick={() => setSelectedCategory('combo')}
+            >
               Combos
             </button>
-            <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('entree')}>
+            
+            <button 
+              className="btn-primary px-4 py-2 rounded-md bg-[var(--panda-red)] text-white"
+              onClick={() => setSelectedCategory('entree')}
+            >
               Entrees
             </button>
-            <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('side')}>
+            
+            <button 
+              className="btn-primary px-4 py-2 rounded-md bg-[var(--panda-red)] text-white"
+              onClick={() => setSelectedCategory('side')}
+            >
               Sides
             </button>
-            <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('appetizer')}>
+            
+            <button 
+              className="btn-primary px-4 py-2 rounded-md bg-[var(--panda-red)] text-white"
+              onClick={() => setSelectedCategory('appetizer')}
+            >
               Appetizers
             </button>
-            <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('drink')}>
+            
+            <button 
+              className="btn-primary px-4 py-2 rounded-md bg-[var(--panda-red)] text-white"
+              onClick={() => setSelectedCategory('drink')}
+            >
               Drinks
             </button>
-            <button className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md" onClick={() => setSelectedCategory('all')}>
+            
+            <button 
+              className="btn-primary px-4 py-2 rounded-md bg-[var(--panda-red)] text-white"
+              onClick={() => setSelectedCategory('all')}
+            >
               All Items
             </button>
+          
+                
+            
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filteredItems.map(item => (
-              <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full">
-                <img src={item.imageUrl} alt={item.name} className="w-full h-48 object-cover" />
-                <div className="p-4 flex flex-col flex-grow justify-between">
-                  <div className="min-h-[100px]">
-                    <h3 className="text-lg font-bold">{item.name}</h3>
-                    <p className="text-gray-500 mb-2">{item.description}</p>
-                  </div>
-                  <div>
-                    <p className="text-[var(--panda-red)] font-bold">${item.price.toFixed(2)}</p>
-                    <button
-                      className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md mt-2 w-full"
-                      onClick={() => {
-                        if (item.name === 'Bowl') {
-                          orderBowl();
-                        } else if (item.name === 'Plate') {
-                          orderPlate();
-                        } else if (item.name === 'Bigger Plate') {
-                          orderBiggerPlate();
-                        } else {
-                          addToCart(item);
-                        }
-                      }}
-                    >
-                      {item.category === 'combo' ? 'Create' : 'Add to Cart'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+  {filteredItems.map(item => (
+    <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full">
+      <img src={item.imageUrl} alt={item.name} className="w-full h-48 object-cover" />
+      <div className="p-4 flex flex-col flex-grow justify-between">
+        <div className="min-h-[100px]"> {/* Adjust min height as needed */}
+          <h3 className="text font-bold">{item.name}</h3>
+          <p className="text-red-500 mb-2">{item.description}</p> {/* Full text shown */}
+        </div>
+        <div>
+          <p className="text-[var(--panda-red)] font-bold">${item.price.toFixed(2)}</p>
+          <button
+            className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md mt-2 w-full"
+            onClick={() => {
+              if (item.name === 'Bowl') {
+                orderBowl();
+              } else if (item.name === 'Plate') {
+                orderPlate();
+              } else if (item.name === 'Bigger Plate') {
+                orderBiggerPlate();
+              } else {
+                addToCart(item);
+              }
+            }}
+          >
+            {item.category === 'combo' ? 'Create' : 'Add to Cart'}
+          </button>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
+
+
         </div>
 
         {/* Enhanced Checkout column */}
@@ -437,7 +469,7 @@ const MenuPage: React.FC = () => {
                       <p className="text-gray-600 text-sm">{selectedSide.description}</p>
                     </div>
                     <button
-                      className="text-[var(--panda-red)] hover:text-red-700 text-sm"
+                      className="text-[var(--panda-white)] hover:text-red-700 text-sm"
                       onClick={() => {
                         setSelectedSide(null);
                         setShowSideModal(true);
@@ -486,7 +518,7 @@ const MenuPage: React.FC = () => {
                           <p className="text-gray-600 text-sm">{entree.description}</p>
                         </div>
                         <button
-                          className="text-[var(--panda-red)] hover:text-red-700 text-sm"
+                          className="text-[var(--panda-white)] hover:text-red-700 text-sm"
                           onClick={() => {
                             setSelectedEntrees(selectedEntrees.filter((_, i) => i !== index));
                             setShowEntreeModal(true);
@@ -516,7 +548,7 @@ const MenuPage: React.FC = () => {
               >
                 Add to Cart
               </button>
-              <button className="text-[var(--panda-red)] hover:text-red-600" onClick={closeModal}>
+              <button className="text-[var(--panda-white)] hover:text-r-600" onClick={closeModal}>
                 Cancel
               </button>
             </div>

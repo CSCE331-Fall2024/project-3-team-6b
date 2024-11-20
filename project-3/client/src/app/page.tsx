@@ -5,11 +5,14 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useLanguage } from '../context/LanguageContext';
-import { ArrowRight, Clock, ShoppingBag, Utensils } from 'lucide-react';
+import { ArrowRight, Clock, ShoppingBag, Utensils, Search } from 'lucide-react';
+import ScreenMagnifier from '../components/ScreenMagnifier';
 
 export default function HomePage() {
   const { translate } = useLanguage();
   const [isClient, setIsClient] = useState(false);
+  const [magnifierEnabled, setMagnifierEnabled] = useState(false);
+  const [magnification, setMagnification] = useState(2);
 
   useEffect(() => {
     setIsClient(true);
@@ -37,17 +40,17 @@ export default function HomePage() {
     {
       name: translate('Orange Chicken'),
       image: '/images/entrees/the_original_orange_chicken.png',
-      price: 11.99,
+      price: 5.00,
     },
     {
       name: translate('Beijing Beef'),
       image: '/images/entrees/beijing_beef.png',
-      price: 12.99,
+      price: 5.00,
     },
     {
       name: translate('Chow Mein'),
       image: '/images/sides/chow_mein.png',
-      price: 4.99,
+      price: 5.00,
     },
   ];
 
@@ -193,23 +196,54 @@ export default function HomePage() {
         </div>
       </div>
 
+      
       {/* Accessibility Features */}
-      <div className="bg-white py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <button
-            onClick={() => document.documentElement.classList.toggle('text-lg')}
-            className="mx-2 px-4 py-2 bg-gray-100 rounded-md hover:bg-gray-200"
-          >
-            {translate('Increase Text Size')}
-          </button>
-          <button
-            onClick={() => document.documentElement.classList.toggle('high-contrast')}
-            className="mx-2 px-4 py-2 bg-gray-100 rounded-md hover:bg-gray-200"
-          >
-            {translate('High Contrast')}
-          </button>
+  <div className="bg-white py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <button
+        onClick={() => document.documentElement.classList.toggle('text-lg')}
+        className="mx-2 px-4 py-2 bg-gray-100 rounded-md hover:bg-gray-200"
+      >
+        {translate('Increase Text Size')}
+      </button>
+      <button
+        onClick={() => document.documentElement.classList.toggle('high-contrast')}
+        className="mx-2 px-4 py-2 bg-gray-100 rounded-md hover:bg-gray-200"
+      >
+        {translate('High Contrast')}
+      </button>
+      <button
+        onClick={() => setMagnifierEnabled(!magnifierEnabled)}
+        className={`mx-2 px-4 py-2 rounded-md hover:bg-gray-200 ${
+          magnifierEnabled ? 'bg-blue-100' : 'bg-gray-100'
+        }`}
+        aria-pressed={magnifierEnabled}
+      >
+        <Search className="inline-block mr-2 h-4 w-4" />
+        {translate('Screen Magnifier')}
+      </button>
+      {magnifierEnabled && (
+        <div className="mt-4">
+          <label htmlFor="magnification" className="mr-2">
+            {translate('Magnification Level')}:
+          </label>
+          <input
+            type="range"
+            id="magnification"
+            min="1.5"
+            max="4"
+            step="0.5"
+            value={magnification}
+            onChange={(e) => setMagnification(Number(e.target.value))}
+            className="w-32 align-middle"
+          />
+          <span className="ml-2">{magnification}x</span>
         </div>
-      </div>
+      )}
+    </div>
+  </div>
+
+  <ScreenMagnifier enabled={magnifierEnabled} magnification={magnification} />
     </div>
   );
 }

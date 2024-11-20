@@ -261,36 +261,82 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
     setIsPaymentModalOpen(true);
   };
 
-  const processPayment = async () => {
-    setProcessingPayment(true);
-    
-    // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setProcessingPayment(false);
-    setIsPaymentModalOpen(false);
+ const processPayment = async () => {
+  setProcessingPayment(true);
+  
+  try {
+    // Calculate all totals
+    const { subtotal, tax, tipAmount, total } = calculateTotals(currentItems);
 
-    // If it's the last split, complete the entire order
-    if (completedSplits + 1 === (selectedSplit || 1)) {
-      const { subtotal, tax, tipAmount, total } = calculateTotals(currentItems);
-      onCreateOrder({
-        items: currentItems,
-        subtotal,
-        tax,
-        tip: tipAmount,
-        total,
-        status: 'pending'
-      });
+    // Format items with required category information
+    const formattedItems = currentItems.map(item => {
+      let category;
+      // Determine category based on item type or ID prefixes
+      if (item.menuItemId.startsWith('drink')) {
+        category = 'drink';
+      } else if (item.menuItemId.startsWith('app')) {
+        category = 'appetizer';
+      } else if (item.menuItemId.startsWith('side')) {
+        category = 'side';
+      } else {
+        category = 'entree';
+      }
+
+      return {
+        ...item,
+        category
+      };
+    });
+
+    // Prepare order data
+    const orderData = {
+      items: formattedItems,
+      subtotal,
+      tax,
+      tip: tipAmount,
+      total,
+      status: 'pending'
+    };
+
+    // Send order to backend
+    const response = await fetch('/api/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(orderData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create order');
+    }
+
+    // Handle successful order
+    const result = await response.json();
+    
+    if (result.success) {
+      // Clear current order
       setDraftOrders(prev => prev.filter(d => d.id !== activeDraftId));
       setActiveDraftId(null);
+      
+      // Reset payment-related states
       setSelectedTipPercent(null);
       setCustomTipAmount('');
       setSelectedSplit(null);
       setCompletedSplits(0);
-    } else {
-      setCompletedSplits(prev => prev + 1);
+      
+      // Show success message or trigger receipt print
+      // You can add success notification here
     }
-  };
+
+  } catch (error) {
+    console.error('Payment processing error:', error);
+    // Show error message to user
+  } finally {
+    setProcessingPayment(false);
+    setIsPaymentModalOpen(false);
+  }
+};
 
 
 

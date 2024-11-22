@@ -389,6 +389,7 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
       }
   
       const allItems = await response.json(); // Assuming it returns an array of { name, category, price }
+      console.log('API Response:', allItems);
       let idNum = 4;
       for (const item of allItems) {
         try {
@@ -403,12 +404,16 @@ export const fetchMenuItems = async (): Promise<MenuItem[]> => {
           }
 
           const priceData = await priceResponse.json();
+          console.log(`Price data for ${item.name}:`, priceData);
   
           // Find a matching static item for description and imageUrl
           const staticItem = staticItems.find(
             (staticItem) =>
               staticItem.name.toLowerCase() === item.name.toLowerCase()
           );
+          if (!staticItem) {
+            console.warn(`No matching static item for ${item.name}`);
+          }
           
           // Capitalize the item name
           const capitalizedName = capitalizeWords(item.name);

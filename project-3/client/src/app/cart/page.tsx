@@ -1,14 +1,15 @@
 'use client';
 
-import { menuItems } from '@/utils/menuItems';
 import { MenuItem } from '@/types';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { fetchMenuItems as initialMenuItems } from '@/utils/menuItems';
 
 const MenuPage: React.FC = () => {
   const router = useRouter();
   // Keep your existing state variables
   const [selectedCategory, setSelectedCategory] = useState('combo');
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [cartItems, setCartItems] = useState<MenuItem[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [modalItem, setModalItem] = useState<MenuItem | null>(null);
@@ -16,11 +17,24 @@ const MenuPage: React.FC = () => {
   const [selectedEntrees, setSelectedEntrees] = useState<MenuItem[]>([]);
   const [showSideModal, setShowSideModal] = useState(false);
   const [showEntreeModal, setShowEntreeModal] = useState(false);
+  
 
   // Add new state for order processing
   const [selectedTipPercent, setSelectedTipPercent] = useState<number | null>(null);
   const [customTipAmount, setCustomTipAmount] = useState<string>('');
   const [isProcessingOrder, setIsProcessingOrder] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Call the fetch function and await its result
+    const fetchData = async () => {
+      const items = await initialMenuItems(); // Assuming this fetches the menu items correctly
+      setMenuItems(items); // Set the state with the fetched items
+      setIsLoading(false); // Turn off loading spinner
+    };
+
+    fetchData(); // Call fetchData to execute the async operation
+  }, []);
 
   const TAX_RATE = 0.0825; // 8.25% tax rate
 
@@ -30,6 +44,8 @@ const MenuPage: React.FC = () => {
   const tipAmount = selectedTipPercent ? (subtotal * selectedTipPercent) / 100 : 
                    customTipAmount ? parseFloat(customTipAmount) : 0;
   const total = subtotal + tax + tipAmount;
+
+  
 
   // Keep your existing filter functions
   const sideItems = menuItems.filter(item => item.category === 'side');
@@ -310,7 +326,8 @@ const MenuPage: React.FC = () => {
           <p className="text-red-500 mb-2">{item.description}</p> {/* Full text shown */}
         </div>
         <div>
-          <p className="text-[var(--panda-red)] font-bold">${item.price.toFixed(2)}</p>
+          <p className="text-[var(--panda-red)] font-bold">${Number(item.price).toFixed(2)}</p>
+          {/* <p className="text-[var(--panda-red)] font-bold">${item.price}</p> */}
           <button
             className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md mt-2 w-full"
             onClick={() => {
@@ -349,7 +366,8 @@ const MenuPage: React.FC = () => {
                     <li key={item.id} className="py-4 flex justify-between items-start">
                       <div className="flex-1">
                         <h3 className="font-bold">{item.name}</h3>
-                        <p className="text-gray-500">${item.price.toFixed(2)}</p>
+                        <p className="text-gray-500"> ${Number(item.price).toFixed(2)}</p>
+                        {/* <p className="text-gray-500">${item.price}</p> */}
                         {renderCartItemDetails(item)}
                       </div>
                       <button

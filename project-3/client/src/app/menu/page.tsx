@@ -103,7 +103,8 @@ export default function MenuPage() {
               <h3 className="text font-bold">{item.name}</h3>
               <p className="text-red-500 mb-2">{item.description}</p> {/* Full text shown */}
             </div>
-            <p className="text-[var(--panda-red)] font-bold">${item.price.toFixed(2)}</p>
+            <p className="text-[var(--panda-red)] font-bold"> ${Number(item.price).toFixed(2)}</p> 
+            {/* <p className="text-[var(--panda-red)] font-bold">${item.price}</p>  */}
           </div>
         </div>
       ))}

@@ -6,6 +6,7 @@ import OrderList from '@/components/cashier/OrderList';
 import EnhancedCheckout from '@/components/cashier/Checkout';
 import Checkout from '@/components/cashier/Checkout';
 import { MenuItem, Order } from '@/types';
+import { fetchMenuItems } from '@/utils/menuItems'
 import api from "@/lib/api";
 
 export default function CashierPage() {
@@ -416,7 +417,9 @@ export default function CashierPage() {
 
         setOrders(ordersRes.data);
         setMenuItems(menuRes.data); */
-        setMenuItems(dummyData);
+        //setMenuItems(dummyData);
+        const items = await fetchMenuItems();
+        setMenuItems(items);
       } catch (error) {
         console.error('Failed to fetch initial data:', error);
       } finally {

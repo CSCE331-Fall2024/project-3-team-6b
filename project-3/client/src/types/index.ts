@@ -35,7 +35,7 @@ export interface ComboComponent {
     category: 'combo' | 'entree' | 'side' | 'drink' | 'appetizer';
     imageUrl: string;
     available: boolean;
-    selectedSide?: MenuItem;
+    selectedSide?: MenuItem | null;  // Allow null explicitly
     selectedEntrees?: MenuItem[];
   }
 

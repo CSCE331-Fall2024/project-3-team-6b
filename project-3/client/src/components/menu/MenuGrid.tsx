@@ -1,5 +1,5 @@
+// MenuGrid.tsx
 import React from 'react';
-import Image from 'next/image';
 import { Info } from 'lucide-react';
 import {
   Dialog,
@@ -16,6 +16,7 @@ interface MenuItem {
   price: number;
   description: string;
   available: boolean;
+  category?: string; // Added to match the data structure
 }
 
 interface NutritionInfo {
@@ -31,52 +32,56 @@ interface NutritionInfo {
   dietaryFiber: number;
   sugars: number;
   protein: number;
+  allergens?: string[]; // Optional property for allergens
 }
 
 // Mapping between numerical IDs and nutrition data keys
 const nutritionIdMap: { [key: string]: string } = {
-  '1': 'orange-chicken',
+  '1': 'the-original-orange-chicken',
   '2': 'beijing-beef',
-  '3': 'broccoli-beef',
-  '4': 'black-pepper-chicken',
+  '3': 'black-pepper-chicken',
+  '4': 'black-pepper-sirloin-steak',
   '5': 'broccoli-beef',
   '7': 'grilled-teriyaki-chicken',
-  '8': 'honey-sesame-chicken-breast',
+  '8': 'honey-sesame-chicken',
   '9': 'honey-walnut-shrimp',
-  '10': 'hot-ones-blazing-bourbon-chicken',
+  '10': 'hot-ones-blazing-bourbon-chicken', // Fixed the key to match the nutritionData
   '11': 'kung-pao-chicken',
   '12': 'mushroom-chicken',
-  '13': 'string-bean-chicken-breast',
-  '14': 'sweetfire-chicken-breast',
+  '13': 'string-bean-chicken',
+  '14': 'sweetfire-chicken',
   '15': 'chow-mein',
   '16': 'fried-rice',
   '17': 'super-greens',
-  '18': 'steamed-rice',
+  '18': 'white-steamed-rice',
   '19': 'apple-pie-roll',
   '20': 'chicken-egg-roll',
   '21': 'cream-cheese-rangoon',
-  '22': 'veggie-spring-roll',
+  '22': 'veggie-egg-roll',
   '23': 'barqs-root-beer',
   '24': 'coca-cola',
-  '25': 'coca-cola-cherry',
-  '26': 'coke-zero',
-  '27': 'dasani',
-  '28': 'diet coke',
-  '29': "dr-pepper",
-  '30': 'fanta',
+  '25': 'coke-mexico-12oz-bottle',
+  '26': 'coke-zero-20oz-bottle',
+  '27': 'dasani-16oz-bottle',
+  '28': 'diet-coke',
+  '29': 'dr-pepper',
+  '30': 'fanta-orange',
   '31': 'fuze-raspberry-iced-tea',
-  '32': 'minute-maid-apple-juice',
+  '32': 'minute-maid-apple-juice-12oz-bottle',
   '33': 'minute-maid-lemonade',
-  '34': 'mango-tea',
-  '35': 'peach-lychee-refresher',
-  '36': 'pomegranite-pineapple-flavored-lemonade',
-  '37': 'smartwater',
+  '34': 'mango-guava-flavored-tea',
+  '35': 'peach-lychee-flavored-refresher',
+  '36': 'pomegranate-pineapple-flavored-lemonade',
+  '37': 'smartwater-700ml-bottle',
   '38': 'sprite',
   '39': 'watermelon-mango-flavored-refresher',
+  '41': 'powerade-mountain-berry-blast',
+  '42': 'coca-cola-cherry'
 };
 
+
 const nutritionData: { [key: string]: NutritionInfo } = {
-  'orange-chicken': {
+  'the-original-orange-chicken': {
     servingSize: '5.7 oz',
     calories: 420,
     caloriesFromFat: 180,
@@ -88,7 +93,8 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     totalCarbs: 43,
     dietaryFiber: 0,
     sugars: 18,
-    protein: 15
+    protein: 15,
+    allergens: ['Wheat', 'Soy', 'Eggs', 'Milkyhg'] 
   },
   'beijing-beef': {
     servingSize: '5.6 oz',
@@ -102,7 +108,8 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     totalCarbs: 57,
     dietaryFiber: 4,
     sugars: 25,
-    protein: 26
+    protein: 26,
+    allergens: ['Wheat', 'Soy', 'Milk'] 
   },
   'broccoli-beef': {
     servingSize: '5.4 oz',
@@ -116,7 +123,8 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     totalCarbs: 13,
     dietaryFiber: 3,
     sugars: 3,
-    protein: 10
+    protein: 10,
+    allergens: ['Wheat', 'Soy'] 
   },
   'black-pepper-chicken': {
     servingSize: '6.1 oz',
@@ -130,8 +138,24 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     totalCarbs: 12,
     dietaryFiber: 2,
     sugars: 5,
-    protein: 19
+    protein: 19,
+    allergens: ['Wheat', 'Soy'] 
   },
+  'black-pepper-sirloin-steak': {
+  servingSize: '6.1 oz', 
+  calories: 210,
+  caloriesFromFat: 90, 
+  totalFat: 10,
+  saturatedFat: 2, 
+  transFat: 0,
+  cholesterol: 65, 
+  sodium: 650, 
+  totalCarbs: 13,
+  dietaryFiber: 1,
+  sugars: 2, 
+  protein: 19,
+  allergens: ['Wheat', 'Soy'] 
+},
   'grilled-teriyaki-chicken': {
     servingSize: '6.3 oz',
     calories: 275,
@@ -144,9 +168,10 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     totalCarbs: 14,
     dietaryFiber: 0,
     sugars: 8,
-    protein: 33
+    protein: 33,
+    allergens: ['Wheat', 'Soy'] 
   },
-  'honey-sesame-chicken-breast': {
+  'honey-sesame-chicken': {
     servingSize: '5.7 oz', // Adjust as needed
     calories: 340,
     caloriesFromFat: 135,
@@ -158,7 +183,8 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     totalCarbs: 35,
     dietaryFiber: 2,
     sugars: 16,
-    protein: 16
+    protein: 16,
+    allergens: ['Wheat', 'Soy'] 
   },
   'honey-walnut-shrimp': {
     servingSize: '5.4 oz',
@@ -172,7 +198,8 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     totalCarbs: 27,
     dietaryFiber: 1,
     sugars: 15,
-    protein: 11
+    protein: 11,
+    allergens: ['Wheat', 'Soy', 'Treenuts'] 
   },
   'hot-ones-blazing-bourbon-chicken': {
     servingSize: '5.9 oz', // Adjust as needed
@@ -186,7 +213,8 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     totalCarbs: 37,
     dietaryFiber: 2,
     sugars: 12,
-    protein: 15
+    protein: 15,
+    allergens: ['Wheat', 'Soy'] 
   },
   'kung-pao-chicken': {
     servingSize: '5.6 oz', // Adjust as needed
@@ -200,7 +228,8 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     totalCarbs: 14,
     dietaryFiber: 2,
     sugars: 6,
-    protein: 16
+    protein: 16,
+    allergens: ['Wheat', 'Soy', 'Peanuts'] 
   },
   'mushroom-chicken': {
     servingSize: '5.9 oz',
@@ -214,9 +243,10 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     totalCarbs: 9,
     dietaryFiber: 1,
     sugars: 4,
-    protein: 17
+    protein: 17,
+    allergens: ['Wheat', 'Soy'] 
   },
-  'string-bean-chicken-breast': {
+  'string-bean-chicken': {
     servingSize: '5.6 oz',
     calories: 170,
     caloriesFromFat: 60,
@@ -228,9 +258,10 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     totalCarbs: 13,
     dietaryFiber: 2,
     sugars: 5,
-    protein: 15
+    protein: 15,
+    allergens: ['Wheat', 'Soy'] 
   },
-  'sweetfire-chicken-breast': {
+  'sweetfire-chicken': {
     servingSize: '5.8 oz',
     calories: 440,
     caloriesFromFat: 160,
@@ -242,7 +273,8 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     totalCarbs: 53,
     dietaryFiber: 1,
     sugars: 27,
-    protein: 17
+    protein: 17,
+    allergens: ['Wheat', 'Soy'] 
   },
   'chow-mein': {
     servingSize: '9.4 oz',
@@ -256,7 +288,8 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     totalCarbs: 61,
     dietaryFiber: 4,
     sugars: 5,
-    protein: 18
+    protein: 18,
+    allergens: ['Wheat', 'Soy'] 
   },
   'fried-rice': {
     servingSize: '9.3 oz',
@@ -270,7 +303,8 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     totalCarbs: 82,
     dietaryFiber: 1,
     sugars: 3,
-    protein: 12
+    protein: 12,
+    allergens: ['Wheat', 'Soy', 'Eggs'] 
   },
   'super-greens': {
     servingSize: '7 oz',
@@ -284,9 +318,10 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     totalCarbs: 10,
     dietaryFiber: 4, 
     sugars: 3, 
-    protein: 6
+    protein: 6,
+    allergens: ['Wheat', 'Soy'] 
   },
-  'steamed-rice': {
+  'white-steamed-rice': {
     servingSize: '8.1 oz',
     calories: 380,
     caloriesFromFat: 0,
@@ -312,7 +347,8 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     totalCarbs: 30,
     dietaryFiber: 1,
     sugars: 13,
-    protein: 2
+    protein: 2,
+    allergens: ['Wheat', 'Soy', 'Milk'] 
   },
   'chicken-egg-roll': {
     servingSize: '3.0 oz / 1 roll',
@@ -326,7 +362,8 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     totalCarbs: 16,
     dietaryFiber: 2,
     sugars: 2,
-    protein: 8
+    protein: 8,
+    allergens: ['Wheat', 'Soy'] 
   },
   'cream-cheese-rangoon': {
     servingSize: '2.4 oz / 3 pcs',
@@ -340,9 +377,10 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     totalCarbs: 24,
     dietaryFiber: 2,
     sugars: 1,
-    protein: 5
+    protein: 5,
+    allergens: ['Wheat', 'Eggs', 'Milk'] 
   },
-  'veggie-spring-roll': {
+  'veggie-egg-roll': {
     servingSize: '3.4 oz / 2 rolls',
     calories: 160,
     caloriesFromFat: 60,
@@ -354,7 +392,8 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     totalCarbs: 22,
     dietaryFiber: 4,
     sugars: 2,
-    protein: 2
+    protein: 2,
+    allergens: ['Wheat', 'Soy', 'Milk'] 
   },
   'barqs-root-beer': {
     servingSize: '12 fl oz',
@@ -398,7 +437,7 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     sugars: 42,
     protein: 0
   },
-  'coke-zero': {
+  'coke-zero-20oz-bottle': {
     servingSize: '12 fl oz',
     calories: 0,
     caloriesFromFat: 0,
@@ -412,7 +451,7 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     sugars: 0,
     protein: 0
   },
-  'dasani': {
+  'dasani-16oz-bottle': {
     servingSize: '16.9 fl oz',
     calories: 0,
     caloriesFromFat: 0,
@@ -454,7 +493,7 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     sugars: 40,
     protein: 0
   },
-  'fanta': {
+  'fanta-orange': {
     servingSize: '12 fl oz',
     calories: 160,
     caloriesFromFat: 0,
@@ -482,7 +521,7 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     sugars: 27,
     protein: 0
   },
-  'minute-maid-apple-juice': {
+  'minute-maid-apple-juice-12oz-bottle': {
     servingSize: '10 fl oz',
     calories: 140,
     caloriesFromFat: 0,
@@ -510,7 +549,7 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     sugars: 38,
     protein: 0
   },
-  'mango-tea': {
+  'mango-guava-flavored-tea': {
     servingSize: '16 fl oz',
     calories: 120,
     caloriesFromFat: 0,
@@ -524,7 +563,7 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     sugars: 28,
     protein: 0
   },
-  'peach-lychee-refresher': {
+  'peach-lychee-flavored-refresher': {
     servingSize: '16 fl oz',
     calories: 140,
     caloriesFromFat: 0,
@@ -538,7 +577,7 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     sugars: 33,
     protein: 0
   },
-  'pomegranite-pineapple-flavored-lemonade': {
+  'pomegranate-pineapple-flavored-lemonade': {
     servingSize: '16 fl oz',
     calories: 150,
     caloriesFromFat: 0,
@@ -552,7 +591,7 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     sugars: 38,
     protein: 0
   },
-  'smartwater': {
+  'smartwater-700ml-bottle': {
     servingSize: '16.9 fl oz',
     calories: 0,
     caloriesFromFat: 0,
@@ -593,16 +632,52 @@ const nutritionData: { [key: string]: NutritionInfo } = {
     dietaryFiber: 0,
     sugars: 35,
     protein: 0
-  }
-
-
+  },
+  'powerade-mountain-berry-blast': {
+  servingSize: '12 fl oz',
+  calories: 80,
+  caloriesFromFat: 0,
+  totalFat: 0,
+  saturatedFat: 0,
+  transFat: 0,
+  cholesterol: 0,
+  sodium: 150, // Typical for electrolyte drinks
+  totalCarbs: 21,
+  dietaryFiber: 0,
+  sugars: 21,
+  protein: 0
+},
+'coke-mexico-12oz-bottle': {
+  servingSize: '12 fl oz',
+  calories: 150,
+  caloriesFromFat: 0,
+  totalFat: 0,
+  saturatedFat: 0,
+  transFat: 0,
+  cholesterol: 0,
+  sodium: 85,
+  totalCarbs: 39,
+  dietaryFiber: 0,
+  sugars: 39,
+  protein: 0
+}
 };
 
-const NutritionPanel = ({ itemId, itemName }: { itemId: string; itemName: string }) => {
-  const nutritionKey = nutritionIdMap[itemId];
+const normalizeName = (name: string): string => {
+  return name.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '');
+};
+
+const NutritionPanel = ({ itemName }: { itemName: string }) => {
+  console.log("NutritionPanel itemName:", itemName);
+
+  const nutritionKey = normalizeName(itemName);
+  console.log("Mapped nutritionKey:", nutritionKey);
+
   const nutrition = nutritionData[nutritionKey];
-  
+  console.log("Nutrition data accessed:", nutrition);
+
   if (!nutrition) {
+    console.error("Nutrition information not found for key:", nutritionKey);
     return (
       <div className="p-4 text-center text-gray-500">
         <p>Nutrition information not available</p>
@@ -610,6 +685,7 @@ const NutritionPanel = ({ itemId, itemName }: { itemId: string; itemName: string
       </div>
     );
   }
+
 
   const nutritionItems = [
     { label: 'Serving Size', value: nutrition.servingSize, unit: '' },
@@ -636,6 +712,13 @@ const NutritionPanel = ({ itemId, itemName }: { itemId: string; itemName: string
           </div>
         </div>
       ))}
+
+      {nutrition.allergens && (
+        <div className="col-span-2 text-red-500 font-semibold mt-3">
+          <p>Allergen Warning: {nutrition.allergens.join(', ')}</p>
+        </div>
+      )}
+
       <div className="col-span-2 text-xs text-gray-500 mt-2">
         * Percent Daily Values are based on a 2,000 calorie diet.
       </div>
@@ -643,57 +726,55 @@ const NutritionPanel = ({ itemId, itemName }: { itemId: string; itemName: string
   );
 };
 
+
+
 const MenuGrid = ({ items }: { items: MenuItem[] }) => {
+  const itemsWithoutInfoButton = ['41', '42', '43'];
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       {items.map((item) => (
         <div
           key={item.id}
-          className="relative rounded-lg overflow-hidden bg-white shadow-md hover:shadow-lg transition-all duration-200"
+          className="relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-200"
         >
-          {/* Conditionally render the Dialog only for items that are not Bowl, Plate, or Bigger Plate */}
-          {item.name !== 'Bowl' && item.name !== 'Plate' && item.name !== 'Bigger Plate' && (
-            <div className="absolute top-2 right-2 z-10">
+          {!itemsWithoutInfoButton.includes(item.id) && (
+            <div className="absolute top-2 right-2 z-20">
               <Dialog>
                 <DialogTrigger asChild>
-                  <button className="p-1 rounded-full bg-white bg-opacity-90 hover:bg-opacity-100 transition-all shadow-md">
+                  <button
+                    className="p-2 rounded-full bg-white/90 hover:bg-white transition-all shadow-md"
+                    aria-label="Nutrition Information"
+                  >
                     <Info className="h-5 w-5 text-gray-600 hover:text-[var(--panda-red)]" />
                   </button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px] bg-white rounded-lg shadow-lg">
+                <DialogContent className="sm:max-w-[425px] bg-white border border-white shadow-lg rounded-lg">
                   <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                      <span>Nutrition Information</span>
-                      <span className="text-sm font-normal text-gray-500">
-                        ({item.name})
-                      </span>
-                    </DialogTitle>
+                    <DialogTitle>Nutrition Information - {item.name}</DialogTitle>
                   </DialogHeader>
-                  <NutritionPanel itemId={item.id} itemName={item.name} />
+                  <NutritionPanel itemName={item.name} />
                 </DialogContent>
               </Dialog>
             </div>
           )}
 
-          <div className="relative h-48">
-            <Image
+
+<div className="relative h-48">
+            <img
               src={item.imageUrl}
               alt={item.name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+              className="w-full h-full object-cover"
             />
           </div>
 
           <div className="p-4">
             <div className="flex justify-between items-start mb-2">
-            <h3 className="text-lg font-semibold">{item.name}</h3>
-            <span className="text-lg font-bold text-[var(--panda-red)]">
-              ${Number(item.price).toFixed(2)}
-            </span>
-
+              <h3 className="text-lg font-semibold">{item.name}</h3>
+              <span className="text-lg font-bold text-[var(--panda-red)]">
+                ${Number(item.price).toFixed(2)}
+              </span>
             </div>
-            
+
             <p className="text-gray-600 text-sm mb-2">
               {item.description}
             </p>
@@ -709,6 +790,5 @@ const MenuGrid = ({ items }: { items: MenuItem[] }) => {
     </div>
   );
 };
-
 
 export default MenuGrid;

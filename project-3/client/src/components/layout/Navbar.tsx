@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import LoginButton from './LoginButton';
+import AuthButton from '../AuthButton';
 import Weather from './Weather';
 import LanguageSelector from './LanguageSelector';
 import { useLanguage } from '@/context/LanguageContext';
@@ -183,7 +183,7 @@ export default function Navbar() {
             {/* Weather, Language Selector, and Login Button */}
             <Weather />
             <LanguageSelector />
-            <LoginButton />
+            <AuthButton />
           </div>
         </div>
       </div>

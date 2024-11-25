@@ -73,6 +73,7 @@ export default function MenuPage() {
         </button>
       </div>
 
+
       <div className="w-full">
         {isLoading ? (
           <div className="flex justify-center items-center h-64">

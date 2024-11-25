@@ -38,13 +38,12 @@ const MenuPage: React.FC = () => {
 
   const TAX_RATE = 0.0825; // 8.25% tax rate
 
-  // Calculate order totals
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price, 0);
-  const tax = subtotal * TAX_RATE;
-  const tipAmount = selectedTipPercent ? (subtotal * selectedTipPercent) / 100 : 
-                   customTipAmount ? parseFloat(customTipAmount) : 0;
-  const total = subtotal + tax + tipAmount;
-
+ // Calculate order totals with safety checks
+ const subtotal = cartItems?.reduce((acc, item) => acc + (item?.price || 0), 0) || 0;
+ const tax = (subtotal * TAX_RATE) || 0;
+ const tipAmount = selectedTipPercent ? ((subtotal * selectedTipPercent) / 100) : 
+                  (customTipAmount ? parseFloat(customTipAmount) || 0 : 0);
+ const total = subtotal + tax + tipAmount;
   
 
   // Keep your existing filter functions
@@ -383,59 +382,61 @@ const MenuPage: React.FC = () => {
                   ))}
                 </ul>
 
-                <div className="border-t pt-4">
-                  <div className="flex justify-between mb-2">
-                    <span>Subtotal</span>
-                    <span>${subtotal.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between mb-2">
-                    <span>Tax (8.25%)</span>
-                    <span>${tax.toFixed(2)}</span>
-                  </div>
+                {/* Cart Totals Section */}
+    <div className="border-t pt-4">
+      <div className="flex justify-between mb-2">
+        <span>Subtotal</span>
+        <span>${subtotal.toFixed(2)}</span>
+      </div>
+      <div className="flex justify-between mb-2">
+        <span>Tax (8.25%)</span>
+        <span>${tax.toFixed(2)}</span>
+      </div>
 
-                  {/* Tip Selection */}
-                  <div className="mb-4">
-                    <p className="text-sm font-medium mb-2">Add Tip</p>
-                    <div className="flex gap-2 mb-2">
-                      {[15, 18, 20].map((percent) => (
-                        <button
-                          key={percent}
-                          onClick={() => {
-                            setSelectedTipPercent(percent);
-                            setCustomTipAmount('');
-                          }}
-                          className={`flex-1 py-1 px-2 rounded text-sm ${
-                            selectedTipPercent === percent
-                              ? 'bg-[var(--panda-red)] text-white'
-                              : 'bg-gray-100 hover:bg-gray-200'
-                          }`}
-                        >
-                          {percent}%
-                        </button>
-                      ))}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm">$</span>
-                      <input
-                        type="number"
-                        value={customTipAmount}
-                        onChange={(e) => {
-                          setCustomTipAmount(e.target.value);
-                          setSelectedTipPercent(null);
-                        }}
-                        placeholder="Custom amount"
-                        className="w-full p-2 border rounded text-sm"
-                        min="0"
-                        step="0.01"
-                      />
-                    </div>
-                  </div>
+      {/* Tip Selection */}
+      <div className="mb-4">
+        <p className="text-sm font-medium mb-2">Add Tip</p>
+        <div className="flex gap-2 mb-2">
+          {[15, 18, 20].map((percent) => (
+            <button
+              key={percent}
+              onClick={() => {
+                setSelectedTipPercent(percent);
+                setCustomTipAmount('');
+              }}
+              className={`flex-1 py-1 px-2 rounded text-sm ${
+                selectedTipPercent === percent
+                  ? 'bg-[var(--panda-red)] text-white'
+                  : 'bg-gray-100 hover:bg-gray-200'
+              }`}
+            >
+              {percent}%
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm">$</span>
+          <input
+            type="number"
+            value={customTipAmount}
+            onChange={(e) => {
+              setCustomTipAmount(e.target.value);
+              setSelectedTipPercent(null);
+            }}
+            placeholder="Custom amount"
+            className="w-full p-2 border rounded text-sm"
+            min="0"
+            step="0.01"
+          />
+        </div>
+      </div>
 
-                  <div className="flex justify-between font-bold text-lg border-t pt-4">
-                    <span>Total</span>
-                    <span>${total.toFixed(2)}</span>
-                  </div>
-                </div>
+      {/* Total */}
+      <div className="flex justify-between font-bold text-lg border-t pt-4">
+        <span>Total</span>
+        <span>${total.toFixed(2)}</span>
+      </div>
+    </div>
 
                 <button
                   onClick={handleCheckout}

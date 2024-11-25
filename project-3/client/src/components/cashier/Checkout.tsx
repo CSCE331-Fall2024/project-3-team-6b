@@ -127,19 +127,19 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
     const entreeNames = currentComboSelection.entrees.map(e => e.name).join(', ');
     const comboName = `${selectedComboBase.name} (${entreeNames}, ${currentComboSelection.side.name})`;
     
-    setDraftOrders(prev => prev.map(draft => {
-      if (draft.id !== activeDraftId) return draft;
+    // setDraftOrders(prev => prev.map(draft => {
+    //   if (draft.id !== activeDraftId) return draft;
       
-      return {
-        ...draft,
-        items: [...draft.items, {
-          menuItemId: selectedComboBase.id,
-          name: comboName,
-          quantity: 1,
-          price: selectedComboBase.price
-        }]
-      };
-    }));
+    //   return {
+    //     ...draft,
+    //     items: [...draft.items, {
+    //       menuItemId: selectedComboBase.id,
+    //       name: comboName,
+    //       quantity: 1,
+    //       price: selectedComboBase.price
+    //     }]
+    //   };
+    // }));
 
     setIsComboModalOpen(false);
     setCurrentComboSelection({ entrees: [], maxEntrees: 1 });

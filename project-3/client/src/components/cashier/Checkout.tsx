@@ -382,7 +382,7 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
                 }`}
               >
                 <h3 className="font-semibold">{item.name}</h3>
-                <p className="text-sm text-gray-600">${item.price.toFixed(2)}</p>
+                <p className="text-sm text-gray-600">${item.price}</p>
               </button>
             ))}
           </div>

@@ -147,7 +147,7 @@ useEffect(() => {
       <div className="button-group">
         <button className="btn-add" onClick={handleAddItem}>Add Employee</button>
         <button className="btn-update" onClick={handleUpdateItem}>Update Employee</button>
-        <button className="btn-remove" onClick={handleRemoveItem}>Remove Remove</button>
+        <button className="btn-remove" onClick={handleRemoveItem}>Remove Employee</button>
       </div>
 
       {/* Table displaying menu items for the active category */}

@@ -251,7 +251,10 @@ const MenuPage: React.FC = () => {
         selectedSide,
         selectedEntrees,
       };
+
       setCartItems([...cartItems, comboItem]);
+      
+
     } else {
       setCartItems([...cartItems, item]);
     }

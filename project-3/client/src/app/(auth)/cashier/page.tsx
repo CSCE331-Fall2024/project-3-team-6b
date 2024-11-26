@@ -2,12 +2,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import OrderList from '@/components/cashier/OrderList';
+//import OrderList from '@/components/cashier/OrderList';
 import EnhancedCheckout from '@/components/cashier/Checkout';
 import Checkout from '@/components/cashier/Checkout';
 import { MenuItem, Order } from '@/types';
 import { fetchMenuItems } from '@/utils/menuItems'
-//import api from "@/lib/api";
+import { api } from '@/lib/api'; // Fixed import path
 
 export default function CashierPage() {
   const [orders, setOrders] = useState<Order[]>([]);

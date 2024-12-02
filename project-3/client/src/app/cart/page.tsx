@@ -4,7 +4,19 @@ import { MenuItem } from '@/types';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchMenuItems as initialMenuItems } from '@/utils/menuItems';
+
 import { X } from 'lucide-react';
+
+import NutritionPanel from '@/components/menu/NutritionPanel';
+import { Info } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/cashier/dialog";
+
 
 const MenuPage: React.FC = () => {
   const router = useRouter();
@@ -39,16 +51,16 @@ const MenuPage: React.FC = () => {
     fetchData(); // Call fetchData to execute the async operation
   }, []);
 
-  const TAX_RATE = 0.0825; // 8.25% tax rate
 
-  // Calculate order totals
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price, 0);
-  const tax = subtotal * TAX_RATE;
-  const tipAmount = selectedTipPercent ? (subtotal * selectedTipPercent) / 100 : 
-                   customTipAmount ? parseFloat(customTipAmount) : 0;
-  const total = subtotal + tax + tipAmount;
+const TAX_RATE = 0.0825;
 
-  
+// Ensure all values are properly converted to numbers and calculated
+const subtotal = cartItems?.reduce((acc, item) => acc + (Number(item?.price) || 0), 0) || 0;
+const tax = Number((subtotal * TAX_RATE).toFixed(2));
+const tipAmount = selectedTipPercent ? Number((subtotal * (selectedTipPercent / 100)).toFixed(2)) : 
+                 (customTipAmount ? Number(customTipAmount) : 0);
+const total = Number(subtotal) + Number(tax) + Number(tipAmount);
+
 
   // Keep your existing filter functions
   const sideItems = menuItems.filter(item => item.category === 'side');
@@ -324,6 +336,7 @@ const MenuPage: React.FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 
+
           {isLoading ? (
           <div className="flex justify-right items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--panda-red)]"></div>
@@ -365,6 +378,7 @@ const MenuPage: React.FC = () => {
 </div>
 
 
+
         </div>
 
         {/* Enhanced Checkout column */}
@@ -393,6 +407,7 @@ const MenuPage: React.FC = () => {
                     </li>
                   ))}
                 </ul>
+
 
                 <div className="border-t pt-4">
                   <div className="flex justify-between mb-2">
@@ -447,6 +462,7 @@ const MenuPage: React.FC = () => {
                     <span>${Number(total).toFixed(2)}</span>
                   </div>
                 </div>
+
 
                 <button
                   onClick={handleCheckout}

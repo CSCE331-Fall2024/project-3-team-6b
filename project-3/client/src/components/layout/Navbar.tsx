@@ -3,71 +3,96 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import LoginButton from './LoginButton';
+import { useState, useEffect, useRef } from 'react';
+import AuthButton from '../AuthButton';
 import Weather from './Weather';
+import { Users } from 'lucide-react';
+import { Calculator } from 'lucide-react';
 import LanguageSelector from './LanguageSelector';
 import { useLanguage } from '@/context/LanguageContext';
+
 import { Users, Calculator, ChevronDown , Accessibility } from 'lucide-react'; // Import icons
 import { Search } from 'lucide-react'; // Import the magnifier icon
-import ScreenMagnifier from '../../components/ScreenMagnifier';
+import ScreenMagnifier from '../ScreenMagnifier';
 
+
+interface AccessibilityOption {
+  id: 'high-contrast' | 'text-lg' | 'magnifier';
+  label: string;
+  action: () => void;
+}
 
 export default function Navbar() {
   const pathname = usePathname();
   const { translate } = useLanguage();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isAccessibilityDropdownOpen, setIsAccessibilityDropdownOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [magnifierEnabled, setMagnifierEnabled] = useState(false);
   const [magnification, setMagnification] = useState(1.5);
-  const [isAccessibilityDropdownOpen, setIsAccessibilityDropdownOpen] = useState(false);
-  const [mousePosition, setMousePosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [selectedOption, setSelectedOption] = useState<null | 'high-contrast' | 'text-lg' | 'magnifier' | 'all'>(null);
+  const [selectedOption, setSelectedOption] = useState<AccessibilityOption['id'] | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
+  const accessibilityOptions: AccessibilityOption[] = [
+    {
+      id: 'high-contrast',
+      label: translate('High Contrast'),
+      action: () => document.documentElement.classList.toggle('high-contrast')
+    },
+    {
+      id: 'text-lg',
+      label: translate('Increase Text Size'),
+      action: () => document.documentElement.classList.toggle('text-lg')
+    },
+    {
+      id: 'magnifier',
+      label: translate('Magnifier'),
+      action: () => setMagnifierEnabled(prev => !prev)
+    }
+  ];
 
-  const handleMouseMove = (event: React.MouseEvent) => {
-    setMousePosition({
-      x: event.clientX,
-      y: event.clientY,
-    });
-  };
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsAccessibilityDropdownOpen(false);
+      }
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+        setIsMobileMenuOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     if (magnifierEnabled) {
-      // Apply the scale transformation based on the magnification value
-      document.body.style.transform = `scale(${magnification})`
-      document.body.style.transformOrigin = 'top left'; // Keep zoom anchored at the top left
-      document.body.style.transition = 'transform 0.3s ease'; // Smooth zoom transition
+      document.body.style.transform = `scale(${magnification})`;
+      document.body.style.transformOrigin = 'top left';
+      document.body.style.transition = 'transform 0.3s ease';
     } else {
-      // Reset the transform when magnifier is disabled
       document.body.style.transform = 'none';
     }
+
+    return () => {
+      document.body.style.transform = 'none';
+    };
   }, [magnifierEnabled, magnification]);
 
+  const NavLink = ({ href, children, onClick }: { href: string; children: React.ReactNode; onClick?: () => void }) => (
+    <Link
+      href={href}
+      className={`nav-link ${pathname === href ? 'text-[var(--panda-red)]' : ''} hover:text-[var(--panda-red)] transition-colors`}
+      onClick={onClick}
+    >
+      {children}
+    </Link>
+  );
 
-  // Function to toggle high contrast mode
-  const toggleHighContrastMode = () => {
-    document.documentElement.classList.toggle('high-contrast');
-  };
-
-  // Function to toggle enlarged text
-  const toggleEnlargedText = () => {
-    document.documentElement.classList.toggle('text-lg');
-  };
-
-  // Function to enable all accessibility features
-  const enableAllAccessibilityFeatures = () => {
-    toggleHighContrastMode();
-    toggleEnlargedText();
-    
-  };
-
-  const toggleAccessibilityDropdown = () => {
-    setIsAccessibilityDropdownOpen(!isAccessibilityDropdownOpen);
-  };
-
-  
   return (
-    <nav className="bg-white shadow-lg border-b-4 border-[var(--panda-red)]" onMouseMove={handleMouseMove}>
+    <nav className="sticky top-0 z-50 bg-white shadow-lg border-b-4 border-[var(--panda-red)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
           {/* Logo Section */}
@@ -86,21 +111,13 @@ export default function Navbar() {
           </div>
 
           {/* Navigation Links */}
+
           <div className="hidden md:flex items-center space-x-8">
-            <Link
-              href="/menu"
-              className={`nav-link ${pathname === '/menu' ? 'nav-active' : ''}`}
-            >
-              {translate('Menu')}
-            </Link>
-            <Link
-              href="/cart"
-              className={`nav-link ${pathname === '/cart' ? 'nav-active' : ''}`}
-            >
-              {translate('Cart')}
-            </Link>
+            <NavLink href="/menu">{translate('Menu')}</NavLink>
+            <NavLink href="/cart">{translate('Cart')}</NavLink>
 
             {/* Accessibility Dropdown */}
+
             
     <div className="relative">
       <button
@@ -158,10 +175,9 @@ export default function Navbar() {
     </div>
 
 
-
           </div>
 
-          {/* Right Side Quick Access Buttons */}
+          {/* Right Side Items */}
           <div className="flex items-center space-x-4">
             {/* Manager Button */}
             <Link
@@ -184,34 +200,35 @@ export default function Navbar() {
             {/* Weather, Language Selector, and Login Button */}
             <Weather />
             <LanguageSelector />
-            <LoginButton />
+            <AuthButton />
           </div>
         </div>
       </div>
 
-      {/* Magnifier Options */}
-      {magnifierEnabled && (
-        <div className="flex justify-left mt-4 pl-4">
-          <label htmlFor="magnification" className="mr-2">
-            {translate('Magnification Level')}:
-          </label>
-          <input
-            type="range"
-            id="magnification"
-            min="1.5"
-            max="4"
-            step="0.5"
-            value={magnification}
-            onChange={(e) => setMagnification(Number(e.target.value))}
-            className="w-32"
-          />
-          <span className="ml-2">{magnification}x</span>
-        </div>
-      )}
-
+        {/* Magnifier Controls */}
+        {magnifierEnabled && (
+          <div className="absolute left-0 right-0 bg-white border-t px-4 py-2">
+            <div className="flex items-center space-x-4 max-w-7xl mx-auto">
+              <label htmlFor="magnification" className="text-sm font-medium">
+                {translate('Magnification Level')}:
+              </label>
+              <input
+                type="range"
+                id="magnification"
+                min="1.5"
+                max="4"
+                step="0.5"
+                value={magnification}
+                onChange={(e) => setMagnification(Number(e.target.value))}
+                className="w-32"
+              />
+              <span className="text-sm">{magnification}x</span>
+            </div>
+          </div>
+        )}
+      {/* </div> */}
       
-      {/* <ScreenMagnifier enabled={magnifierEnabled} magnification={magnification} /> */}
-      
+      {magnifierEnabled && <ScreenMagnifier enabled={magnifierEnabled} magnification={magnification} />}
     </nav>
   );
 }

@@ -37,19 +37,7 @@ export default function ManagerPage() {
           View Sales Reports
         </button>
 
-        <button
-          className="dashboard-card p-4 bg-green-500 text-white rounded-lg shadow hover:bg-green-600"
-          onClick={() => handleButtonClick('Restock Inventory')}
-        >
-          Restock Inventory
-        </button>
 
-        <button
-          className="dashboard-card p-4 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600"
-          onClick={() => handleButtonClick('Manage Staff')}
-        >
-          Manage Staff
-        </button>
 
         <button
           className="dashboard-card p-4 bg-purple-500 text-white rounded-lg shadow hover:bg-purple-600"
@@ -59,11 +47,12 @@ export default function ManagerPage() {
         </button>
 
         <button
-          className="dashboard-card p-4 bg-yellow-500 text-white rounded-lg shadow hover:bg-yellow-600"
-          onClick={() => handleButtonClick('Generate Financial Reports')}
+          className="dashboard-card p-4 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600"
+          onClick={() => handleButtonClick('Manage Staff')}
         >
-          Generate Financial Reports
+          Manage Staff
         </button>
+
 
         {/* <button
           className="dashboard-card p-4 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600"

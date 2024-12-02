@@ -57,14 +57,14 @@ export async function POST(req: Request) {
     };
 
     // Add drink_table only if there are drinks in the order
-    const drinkItems = orderData.items.filter(item => item.category === 'drink');
-    if (drinkItems.length > 0) {
-      baseOrderItems['drink_table'] = drinkItems.map(item => ({
-        id: parseInt(item.menuItemId),
-        name: item.name,
-        quantity: item.quantity
-      }));
-    }
+    // const drinkItems = orderData.items.filter(item => item.category === 'drink');
+    // if (drinkItems.length > 0) {
+    //   baseOrderItems['drink_table'] = drinkItems.map(item => ({
+    //     id: parseInt(item.menuItemId),
+    //     name: item.name,
+    //     quantity: item.quantity
+    //   }));
+    // }
 
     // Add takeout cartons for entrees
     if (baseOrderItems.entree_side.length > 0) {

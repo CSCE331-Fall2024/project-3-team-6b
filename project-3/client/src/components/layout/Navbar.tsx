@@ -1,12 +1,11 @@
-// src/components/layout/Navbar.tsx
 'use client';
 
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import { Users, Calculator } from 'lucide-react';
-import LoginButton from './LoginButton';
+import { useState, useEffect, useRef } from 'react';
+import { Menu, X } from 'lucide-react';
+// import AuthButton from '../AuthButton';
 import Weather from './Weather';
 import LanguageSelector from './LanguageSelector';
 import { useLanguage } from '@/context/LanguageContext';
@@ -22,9 +21,12 @@ export default function Navbar() {
   const pathname = usePathname();
   const { translate } = useLanguage();
   const [isAccessibilityDropdownOpen, setIsAccessibilityDropdownOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [magnifierEnabled, setMagnifierEnabled] = useState(false);
   const [magnification, setMagnification] = useState(1.5);
   const [selectedOption, setSelectedOption] = useState<AccessibilityOption['id'] | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   const accessibilityOptions: AccessibilityOption[] = [
     {
@@ -45,6 +47,22 @@ export default function Navbar() {
   ];
 
   useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsAccessibilityDropdownOpen(false);
+      }
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+        setIsMobileMenuOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
     if (magnifierEnabled) {
       document.body.style.transform = `scale(${magnification})`;
       document.body.style.transformOrigin = 'top left';
@@ -58,10 +76,11 @@ export default function Navbar() {
     };
   }, [magnifierEnabled, magnification]);
 
-  const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
+  const NavLink = ({ href, children, onClick }: { href: string; children: React.ReactNode; onClick?: () => void }) => (
     <Link
       href={href}
-      className={`nav-link ${pathname === href ? 'text-[var(--panda-red)]' : ''}`}
+      className={`nav-link ${pathname === href ? 'text-[var(--panda-red)]' : ''} hover:text-[var(--panda-red)] transition-colors`}
+      onClick={onClick}
     >
       {children}
     </Link>
@@ -85,13 +104,13 @@ export default function Navbar() {
             <span className="text-xl font-bold">Panda Express</span>
           </Link>
 
-          {/* Navigation Links */}
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             <NavLink href="/menu">{translate('Menu')}</NavLink>
             <NavLink href="/cart">{translate('Cart')}</NavLink>
 
             {/* Accessibility Dropdown */}
-            <div className="relative">
+            <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsAccessibilityDropdownOpen(!isAccessibilityDropdownOpen)}
                 className="nav-link px-4 py-2"
@@ -122,28 +141,65 @@ export default function Navbar() {
 
           {/* Right Side Items */}
           <div className="flex items-center space-x-4">
-            <Weather/>
-            <LanguageSelector />
-            
-            {/* Quick Access Buttons */}
-            <div className="flex items-center space-x-2">
-              <Link
-                href="/admin"
-                className="flex items-center space-x-1 px-3 py-2 bg-[var(--panda-gold)] text-black rounded-md hover:bg-[var(--panda-light-gold)] transition-colors"
-              >
-                <Users size={18} />
-                <span>Manager</span>
-              </Link>
-              <Link
-                href="/cashier"
-                className="flex items-center space-x-1 px-3 py-2 bg-[var(--panda-red)] text-white rounded-md hover:bg-[var(--panda-dark-red)] transition-colors"
-              >
-                <Calculator size={18} />
-                <span>Cashier</span>
-              </Link>
+            <div className="hidden sm:block">
+              <Weather/>
             </div>
+            <LanguageSelector />
+            {/* <AuthButton /> */}
             
-            <LoginButton />
+            {/* Mobile Menu Button */}
+            <button
+              className="md:hidden p-2 rounded-md hover:bg-gray-100"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        <div
+          ref={mobileMenuRef}
+          className={`md:hidden fixed inset-y-0 right-0 transform ${
+            isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          } w-64 bg-white shadow-lg transition-transform duration-300 ease-in-out z-50`}
+        >
+          <div className="p-4 space-y-4">
+            <div className="flex justify-end">
+              <button
+                className="p-2 rounded-md hover:bg-gray-100"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <NavLink href="/menu" onClick={() => setIsMobileMenuOpen(false)}>{translate('Menu')}</NavLink>
+              <NavLink href="/cart" onClick={() => setIsMobileMenuOpen(false)}>{translate('Cart')}</NavLink>
+              
+              {/* Mobile Accessibility Options */}
+              <div className="space-y-2">
+                <h3 className="font-medium text-gray-900 px-2">{translate('Accessibility')}</h3>
+                {accessibilityOptions.map(option => (
+                  <button
+                    key={option.id}
+                    onClick={() => {
+                      option.action();
+                      setSelectedOption(option.id === selectedOption ? null : option.id);
+                    }}
+                    className={`px-2 py-2 text-left w-full hover:bg-gray-100 ${
+                      selectedOption === option.id ? 'bg-blue-100 text-blue-800' : ''
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+              
+              <div className="sm:hidden pt-4">
+                <Weather />
+              </div>
+            </div>
           </div>
         </div>
 

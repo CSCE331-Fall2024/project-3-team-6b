@@ -69,7 +69,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     return key;
   }, [currentLanguage]);
 
-  const isRTL = currentLanguage === 'ar'; // Add more RTL languages if needed
+  const isRTL = currentLanguage === 'en'; // Add more RTL languages if needed
 
   const setLanguage = useCallback((lang: LanguageCode) => {
     setCurrentLanguage(lang);

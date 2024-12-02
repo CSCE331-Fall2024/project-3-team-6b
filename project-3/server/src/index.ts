@@ -1,9 +1,11 @@
-// server/src/index.ts
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
+import session from 'express-session';
+import passport from 'passport';
 import { db } from './config/db';
 import orderRoutes from './routes/orders';
 import menuRoutes from './routes/menu';
+import authRoutes from './routes/authRoutes'; // Import the auth routes
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -11,8 +13,24 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 app.use(express.json());
+
+// Configure session middleware
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'your-session-secret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+    },
+  })
+);
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Database connection test on startup
 async function initializeDatabase() {
@@ -34,10 +52,7 @@ initializeDatabase();
 // Routes
 app.use('/api/orders', orderRoutes);
 app.use('/api/menu-items', menuRoutes);
-
-//TODO
-
-
+app.use('/auth', authRoutes); // Add the auth routes
 
 // Health check endpoint that includes database status
 app.get('/health', async (req: Request, res: Response) => {
@@ -46,14 +61,14 @@ app.get('/health', async (req: Request, res: Response) => {
     res.json({
       status: 'healthy',
       database: 'connected',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     const err = error as Error;
     res.status(500).json({
       status: 'unhealthy',
       database: 'disconnected',
-      error: err.message || 'Unknown error occurred'
+      error: err.message || 'Unknown error occurred',
     });
   }
 });
@@ -63,7 +78,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error('Unhandled error:', err);
   res.status(500).json({
     error: 'Internal server error',
-    message: process.env.NODE_ENV === 'development' ? err.message : undefined
+    message: process.env.NODE_ENV === 'development' ? err.message : undefined,
   });
 });
 

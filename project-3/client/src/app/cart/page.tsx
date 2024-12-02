@@ -4,6 +4,9 @@ import { MenuItem } from '@/types';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchMenuItems as initialMenuItems } from '@/utils/menuItems';
+
+import { X } from 'lucide-react';
+
 import NutritionPanel from '@/components/menu/NutritionPanel';
 import { Info } from 'lucide-react';
 import {
@@ -13,7 +16,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/cashier/dialog";
-
 
 
 const MenuPage: React.FC = () => {
@@ -28,13 +30,14 @@ const MenuPage: React.FC = () => {
   const [selectedEntrees, setSelectedEntrees] = useState<MenuItem[]>([]);
   const [showSideModal, setShowSideModal] = useState(false);
   const [showEntreeModal, setShowEntreeModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
 
   // Add new state for order processing
   const [selectedTipPercent, setSelectedTipPercent] = useState<number | null>(null);
   const [customTipAmount, setCustomTipAmount] = useState<string>('');
   const [isProcessingOrder, setIsProcessingOrder] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  
 
   useEffect(() => {
     // Call the fetch function and await its result
@@ -42,6 +45,7 @@ const MenuPage: React.FC = () => {
       const items = await initialMenuItems(); // Assuming this fetches the menu items correctly
       setMenuItems(items); // Set the state with the fetched items
       setIsLoading(false); // Turn off loading spinner
+
     };
 
     fetchData(); // Call fetchData to execute the async operation
@@ -331,57 +335,47 @@ const total = Number(subtotal) + Number(tax) + Number(tipAmount);
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filteredItems.map((item) => (
-              <div key={item.id} className="relative bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full">
-                {/* Nutrition Info Button */}
-                <div className="absolute top-2 right-2 z-10">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <button
-                        className="p-2 rounded-full bg-white/90 hover:bg-white transition-all shadow-md"
-                        aria-label="Nutrition Information"
-                      >
-                        <Info className="h-5 w-5 text-gray-600 hover:text-[var(--panda-red)]" />
-                      </button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px] bg-white border border-white shadow-lg rounded-lg">
-                      <DialogHeader>
-                        <DialogTitle>Nutrition Information - {item.name}</DialogTitle>
-                      </DialogHeader>
-                      <NutritionPanel itemName={item.name} />
-                    </DialogContent>
-                  </Dialog>
+
+
+          {isLoading ? (
+          <div className="flex justify-right items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--panda-red)]"></div>
+          </div>
+        ) : (
+          filteredItems.map(item => (
+            <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full">
+              <img src={item.imageUrl} alt={item.name} className="w-full h-48 object-cover" />
+              <div className="p-4 flex flex-col flex-grow justify-between">
+                <div className="min-h-[100px]"> {/* Adjust min height as needed */}
+                  <h3 className="text font-bold">{item.name}</h3>
+                  <p className="text-red-500 mb-2">{item.description}</p> {/* Full text shown */}
                 </div>
-                {/* Menu Item Image */}
-                <img src={item.imageUrl} alt={item.name} className="w-full h-48 object-cover" />
-                <div className="p-4 flex flex-col flex-grow justify-between">
-                  <div className="min-h-[100px]">
-                    <h3 className="text font-bold">{item.name}</h3>
-                    <p className="text-red-500 mb-2">{item.description}</p>
-                  </div>
-                  <div>
-                    <p className="text-[var(--panda-red)] font-bold">${Number(item.price).toFixed(2)}</p>
-                    <button
-                      className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md mt-2 w-full"
-                      onClick={() => {
-                        if (item.name === 'Bowl') {
-                          orderBowl();
-                        } else if (item.name === 'Plate') {
-                          orderPlate();
-                        } else if (item.name === 'Bigger Plate') {
-                          orderBiggerPlate();
-                        } else {
-                          addToCart(item);
-                        }
-                      }}
-                    >
-                      {item.category === 'combo' ? 'Create' : 'Add to Cart'}
-                    </button>
-                  </div>
+                <div>
+                  <p className="text-[var(--panda-red)] font-bold">${Number(item.price).toFixed(2)}</p>
+                  {/* <p className="text-[var(--panda-red)] font-bold">${item.price}</p> */}
+                  <button
+                    className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md mt-2 w-full"
+                    onClick={() => {
+                      if (item.name === 'Bowl') {
+                        orderBowl();
+                      } else if (item.name === 'Plate') {
+                        orderPlate();
+                      } else if (item.name === 'Bigger Plate') {
+                        orderBiggerPlate();
+                      } else {
+                        addToCart(item);
+                      }
+                    }}
+                  >
+                    {item.category === 'combo' ? 'Create' : 'Add to Cart'}
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))
+        )}
+ 
+</div>
 
 
 
@@ -414,61 +408,61 @@ const total = Number(subtotal) + Number(tax) + Number(tipAmount);
                   ))}
                 </ul>
 
-{/* Cart Totals Section */}
-<div className="border-t pt-4">
-  <div className="flex justify-between mb-2">
-    <span>Subtotal</span>
-    <span>${Number(subtotal).toFixed(2)}</span>
-  </div>
-  <div className="flex justify-between mb-2">
-    <span>Tax (8.25%)</span>
-    <span>${Number(tax).toFixed(2)}</span>
-  </div>
 
-      {/* Tip Selection */}
-      <div className="mb-4">
-        <p className="text-sm font-medium mb-2">Add Tip</p>
-        <div className="flex gap-2 mb-2">
-          {[15, 18, 20].map((percent) => (
-            <button
-              key={percent}
-              onClick={() => {
-                setSelectedTipPercent(percent);
-                setCustomTipAmount('');
-              }}
-              className={`flex-1 py-1 px-2 rounded text-sm ${
-                selectedTipPercent === percent
-                  ? 'bg-[var(--panda-red)] text-white'
-                  : 'bg-gray-100 hover:bg-gray-200'
-              }`}
-            >
-              {percent}%
-            </button>
-          ))}
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm">$</span>
-          <input
-            type="number"
-            value={customTipAmount}
-            onChange={(e) => {
-              setCustomTipAmount(e.target.value);
-              setSelectedTipPercent(null);
-            }}
-            placeholder="Custom amount"
-            className="w-full p-2 border rounded text-sm"
-            min="0"
-            step="0.01"
-          />
-        </div>
-      </div>
+                <div className="border-t pt-4">
+                  <div className="flex justify-between mb-2">
+                    <span>Subtotal</span>
+                    <span>${Number(subtotal).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between mb-2">
+                    <span>Tax (8.25%)</span>
+                    <span>${Number(tax).toFixed(2)}</span>
+                  </div>
 
-      {/* Total */}
-      <div className="flex justify-between font-bold text-lg border-t pt-4">
-    <span>Total</span>
-    <span>${Number(total).toFixed(2)}</span>
-  </div>
-</div>
+                  {/* Tip Selection */}
+                  <div className="mb-4">
+                    <p className="text-sm font-medium mb-2">Add Tip</p>
+                    <div className="flex gap-2 mb-2">
+                      {[15, 18, 20].map((percent) => (
+                        <button
+                          key={percent}
+                          onClick={() => {
+                            setSelectedTipPercent(percent);
+                            setCustomTipAmount('');
+                          }}
+                          className={`flex-1 py-1 px-2 rounded text-sm ${
+                            selectedTipPercent === percent
+                              ? 'bg-[var(--panda-red)] text-white'
+                              : 'bg-gray-100 hover:bg-gray-200'
+                          }`}
+                        >
+                          {percent}%
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">$</span>
+                      <input
+                        type="number"
+                        value={customTipAmount}
+                        onChange={(e) => {
+                          setCustomTipAmount(e.target.value);
+                          setSelectedTipPercent(null);
+                        }}
+                        placeholder="Custom amount"
+                        className="w-full p-2 border rounded text-sm"
+                        min="0"
+                        step="0.01"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between font-bold text-lg border-t pt-4">
+                    <span>Total</span>
+                    <span>${Number(total).toFixed(2)}</span>
+                  </div>
+                </div>
+
 
                 <button
                   onClick={handleCheckout}
@@ -490,125 +484,129 @@ const total = Number(subtotal) + Number(tax) + Number(tipAmount);
       
       {/* Modal for bowl, plate, and bigger plate orders */}
       {showModal && modalItem && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75 z-50">
-          <div className="bg-white rounded-lg shadow-md p-8 max-w-md w-full">
-            <h2 className="text-lg font-bold mb-4">{modalItem.name}</h2>
-            <p className="text-gray-500 mb-4">{modalItem.description}</p>
-            <p className="text-[var(--panda-red)] font-bold mb-8">${modalItem.price.toFixed(2)}</p>
-            
-            
+  <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75 z-50 overflow-y-auto p-4">
+    <div className="bg-white rounded-lg shadow-md p-8 max-w-md w-full relative max-h-[90vh] overflow-y-auto">
+      {/* X Button */}
+      <button 
+        className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+        onClick={closeModal}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
 
-            {/* Selected Side Section */}
-            <div className="mb-6">
-                <div className="flex justify-between items-center mb-3">
-                  <h4 className="text-lg font-semibold">Side</h4>
-                  {!selectedSide && (
-                    <button
-                      className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md text-sm"
-                      onClick={() => setShowSideModal(true)}
-                    >
-                      Choose Side
-                    </button>
-                  )}
-                </div>
-                {selectedSide ? (
-                  <div className="bg-gray-50 rounded-lg p-4 flex items-center">
-                    <img 
-                      src={selectedSide.imageUrl} 
-                      alt={selectedSide.name} 
-                      className="w-24 h-24 object-cover rounded-md"
-                    />
-                    <div className="ml-4 flex-grow">
-                      <h5 className="font-semibold">{selectedSide.name}</h5>
-                      <p className="text-gray-600 text-sm">{selectedSide.description}</p>
-                    </div>
-                    <button
-                      className="text-[var(--panda-white)] hover:text-red-700 text-sm"
-                      onClick={() => {
-                        setSelectedSide(null);
-                        setShowSideModal(true);
-                      }}
-                    >
-                      Change
-                    </button>
-                  </div>
-                ) : (
-                  <div className="bg-gray-50 rounded-lg p-4 text-gray-500 text-center">
-                    No side selected
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <div className="flex justify-between items-center mb-3">
-                  <h4 className="text-lg font-semibold">
-                    Entrees ({selectedEntrees.length}/
-                    {modalItem.name === 'Bowl' ? '1' : 
-                     modalItem.name === 'Plate' ? '2' : '3'})
-                  </h4>
-                  {selectedEntrees.length < (
-                    modalItem.name === 'Bowl' ? 1 : 
-                    modalItem.name === 'Plate' ? 2 : 3
-                  ) && (
-                    <button
-                      className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md text-sm"
-                      onClick={() => setShowEntreeModal(true)}
-                    >
-                      {selectedEntrees.length === 0 ? 'Choose Entrees' : 'Add Another Entree'}
-                    </button>
-                  )}
-                </div>
-                <div className="space-y-3">
-                  {selectedEntrees.length > 0 ? (
-                    selectedEntrees.map((entree, index) => (
-                      <div key={index} className="bg-gray-50 rounded-lg p-4 flex items-center">
-                        <img 
-                          src={entree.imageUrl} 
-                          alt={entree.name} 
-                          className="w-24 h-24 object-cover rounded-md"
-                        />
-                        <div className="ml-4 flex-grow">
-                          <h5 className="font-semibold">{entree.name}</h5>
-                          <p className="text-gray-600 text-sm">{entree.description}</p>
-                        </div>
-                        <button
-                          className="text-[var(--panda-white)] hover:text-red-700 text-sm"
-                          onClick={() => {
-                            setSelectedEntrees(selectedEntrees.filter((_, i) => i !== index));
-                            setShowEntreeModal(true);
-                          }}
-                        >
-                          Change
-                        </button>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="bg-gray-50 rounded-lg p-4 text-gray-500 text-center">
-                      No entrees selected
-                    </div>
-                  )}
-                </div>
-              </div>
-            
-
-            {/* Confirm/Cancel */}
-            <div className="flex justify-between mt-4">
-              <button
-                className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md"
-                onClick={() => {
-                  addToCart(modalItem);
-                  closeModal();
-                }}
-              >
-                Add to Cart
-              </button>
-              <button className="text-[var(--panda-white)] hover:text-r-600" onClick={closeModal}>
-                Cancel
-              </button>
-            </div>
-          </div>
+      <h2 className="text-lg font-bold mb-4">{modalItem.name}</h2>
+      <p className="text-gray-500 mb-4">{modalItem.description}</p>
+      <p className="text-[var(--panda-red)] font-bold mb-8">${Number(modalItem.price).toFixed(2)}</p>
+      
+      {/* Rest of the existing modal content remains the same */}
+      {/* Side Section */}
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-3">
+          <h4 className="text-lg font-semibold">Side</h4>
+          
+          <button
+            className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md text-sm"
+            onClick={() => setShowSideModal(true)}
+          >
+            Choose Side
+          </button>
         </div>
-      )}
+        {selectedSide ? (
+          <div className="bg-gray-50 rounded-lg p-4 flex items-center">
+            <img 
+              src={selectedSide.imageUrl} 
+              alt={selectedSide.name} 
+              className="w-24 h-24 object-cover rounded-md"
+            />
+            <div className="ml-4 flex-grow">
+              <h5 className="font-semibold">{selectedSide.name}</h5>
+              <p className="text-gray-600 text-sm">{selectedSide.description}</p>
+            </div>
+            <button
+              className="text-[var(--panda-white)] hover:text-red-700 text-sm"
+              onClick={() => {
+                setSelectedSide(null);
+                setShowSideModal(true);
+              }}
+            >
+              Change
+            </button>
+          </div>
+        ) : (
+          <div className="bg-gray-50 rounded-lg p-4 text-gray-500 text-center">
+            No side selected
+          </div>
+        )}
+      </div>
+
+      {/* Entrees Section */}
+      <div>
+        <div className="flex justify-between items-center mb-3">
+          <h4 className="text-lg font-semibold">
+            Entrees ({selectedEntrees.length}/
+            {modalItem.name === 'Bowl' ? '1' : 
+             modalItem.name === 'Plate' ? '2' : '3'})
+          </h4>
+          
+          <button
+            className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md text-sm"
+            onClick={() => setShowEntreeModal(true)}
+          >
+            {'Choose Entrees'}
+          </button>
+        </div>
+        <div className="space-y-3">
+          {selectedEntrees.length > 0 ? (
+            selectedEntrees.map((entree, index) => (
+              <div key={index} className="bg-gray-50 rounded-lg p-4 flex items-center">
+                <img 
+                  src={entree.imageUrl} 
+                  alt={entree.name} 
+                  className="w-24 h-24 object-cover rounded-md"
+                />
+                <div className="ml-4 flex-grow">
+                  <h5 className="font-semibold">{entree.name}</h5>
+                  <p className="text-gray-600 text-sm">{entree.description}</p>
+                </div>
+                <button
+                  className="text-[var(--panda-white)] hover:text-red-700 text-sm"
+                  onClick={() => {
+                    setSelectedEntrees(selectedEntrees.filter((_, i) => i !== index));
+                    setShowEntreeModal(true);
+                  }}
+                >
+                  Change
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className="bg-gray-50 rounded-lg p-4 text-gray-500 text-center">
+              No entrees selected
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Confirm/Cancel */}
+      <div className="flex justify-between mt-4">
+        <button
+          className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md"
+          onClick={() => {
+            addToCart(modalItem);
+            closeModal();
+          }}
+        >
+          Add to Cart
+        </button>
+        <button className="text-[var(--panda-white)] hover:text-r-600" onClick={closeModal}>
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
 {showSideModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75 z-50">

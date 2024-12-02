@@ -10,7 +10,11 @@ import { Users } from 'lucide-react';
 import { Calculator } from 'lucide-react';
 import LanguageSelector from './LanguageSelector';
 import { useLanguage } from '@/context/LanguageContext';
+
+import { Users, Calculator, ChevronDown , Accessibility } from 'lucide-react'; // Import icons
+import { Search } from 'lucide-react'; // Import the magnifier icon
 import ScreenMagnifier from '../ScreenMagnifier';
+
 
 interface AccessibilityOption {
   id: 'high-contrast' | 'text-lg' | 'magnifier';
@@ -90,54 +94,87 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 bg-white shadow-lg border-b-4 border-[var(--panda-red)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3">
-            <div className="relative w-10 h-10">
-              <Image
-                src="/images/panda-logo.png"
-                alt="Panda Express"
-                fill
-                className="object-contain rounded-full"
-                priority
-              />
-            </div>
-            <span className="text-xl font-bold">Panda Express</span>
-          </Link>
+        <div className="flex justify-between h-20 items-center">
+          {/* Logo Section */}
+          <div className="flex items-center">
+            <Link href="/" className="flex items-center space-x-3">
+              <div className="relative w-10 h-10">
+                <Image
+                  src="/images/panda-logo.png"
+                  alt="Panda Express"
+                  fill
+                  className="object-contain rounded-full"
+                />
+              </div>
+              <span className="text-xl font-bold">Panda Express</span>
+            </Link>
+          </div>
 
-          {/* Desktop Navigation */}
+          {/* Navigation Links */}
+
           <div className="hidden md:flex items-center space-x-8">
             <NavLink href="/menu">{translate('Menu')}</NavLink>
             <NavLink href="/cart">{translate('Cart')}</NavLink>
 
             {/* Accessibility Dropdown */}
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setIsAccessibilityDropdownOpen(!isAccessibilityDropdownOpen)}
-                className="nav-link px-4 py-2"
-              >
-                {translate('Accessibility')}
-              </button>
 
-              {isAccessibilityDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-50">
-                  {accessibilityOptions.map(option => (
-                    <button
-                      key={option.id}
-                      onClick={() => {
-                        option.action();
-                        setSelectedOption(option.id === selectedOption ? null : option.id);
-                      }}
-                      className={`px-4 py-2 text-left w-full hover:bg-gray-100 ${
-                        selectedOption === option.id ? 'bg-blue-100 text-blue-800' : ''
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            
+    <div className="relative">
+      <button
+        type="button"
+        onClick={toggleAccessibilityDropdown}
+        className="nav-link px-4 py-2 text-[var(--panda-black)]"
+        aria-expanded={isAccessibilityDropdownOpen}
+      >
+         <Accessibility size={60}  color="red" strokeWidth={2.5}/>
+      </button>
+      
+
+      {/* Dropdown Menu */}
+      {isAccessibilityDropdownOpen && (
+        <div
+          className="absolute right-0 mt-2 w-48 bg-white shadow-lg border rounded-md py-2 z-50"
+          style={{ zIndex: 50 }}
+        >
+          <button
+            onClick={() => {
+              document.documentElement.classList.toggle('high-contrast');
+              setSelectedOption((prev) => (prev === 'high-contrast' ? null : 'high-contrast'));
+            }}
+            className={`px-4 py-2 text-left w-full hover:bg-gray-100 focus:outline-none ${
+              selectedOption === 'high-contrast' ? 'bg-blue-100 text-blue-800' : ''
+            }`}
+          >
+            {translate('High Contrast')}
+          </button>
+          <button
+            onClick={() => {
+              document.documentElement.classList.toggle('text-lg');
+              setSelectedOption((prev) => (prev === 'text-lg' ? null : 'text-lg'));
+            }}
+            className={`px-4 py-2 text-left w-full hover:bg-gray-100 focus:outline-none ${
+              selectedOption === 'text-lg' ? 'bg-blue-100 text-blue-800' : ''
+            }`}
+          >
+            {translate('Increase Text Size')}
+          </button>
+          <button
+            onClick={() => {
+              setMagnifierEnabled((prev) => !prev);
+              setSelectedOption((prev) => (prev === 'magnifier' ? null : 'magnifier'));
+            }}
+            className={`px-4 py-2 text-left w-full hover:bg-gray-100 focus:outline-none ${
+              selectedOption === 'magnifier' && magnifierEnabled ? 'bg-blue-100 text-blue-800' : ''
+            }`}
+          >
+            {translate('Magnifier')}
+          </button>
+          
+        </div>
+      )}
+    </div>
+
+
           </div>
 
           {/* Right Side Items */}

@@ -4,6 +4,17 @@ import { MenuItem } from '@/types';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchMenuItems as initialMenuItems } from '@/utils/menuItems';
+import NutritionPanel from '@/components/menu/NutritionPanel';
+import { Info } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/cashier/dialog";
+
+
 
 const MenuPage: React.FC = () => {
   const router = useRouter();
@@ -320,38 +331,58 @@ const MenuPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-  {filteredItems.map(item => (
-    <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full">
-      <img src={item.imageUrl} alt={item.name} className="w-full h-48 object-cover" />
-      <div className="p-4 flex flex-col flex-grow justify-between">
-        <div className="min-h-[100px]"> {/* Adjust min height as needed */}
-          <h3 className="text font-bold">{item.name}</h3>
-          <p className="text-red-500 mb-2">{item.description}</p> {/* Full text shown */}
-        </div>
-        <div>
-          <p className="text-[var(--panda-red)] font-bold">${Number(item.price).toFixed(2)}</p>
-          {/* <p className="text-[var(--panda-red)] font-bold">${item.price}</p> */}
-          <button
-            className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md mt-2 w-full"
-            onClick={() => {
-              if (item.name === 'Bowl') {
-                orderBowl();
-              } else if (item.name === 'Plate') {
-                orderPlate();
-              } else if (item.name === 'Bigger Plate') {
-                orderBiggerPlate();
-              } else {
-                addToCart(item);
-              }
-            }}
-          >
-            {item.category === 'combo' ? 'Create' : 'Add to Cart'}
-          </button>
-        </div>
-      </div>
-    </div>
-  ))}
-</div>
+            {filteredItems.map((item) => (
+              <div key={item.id} className="relative bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full">
+                {/* Nutrition Info Button */}
+                <div className="absolute top-2 right-2 z-10">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <button
+                        className="p-2 rounded-full bg-white/90 hover:bg-white transition-all shadow-md"
+                        aria-label="Nutrition Information"
+                      >
+                        <Info className="h-5 w-5 text-gray-600 hover:text-[var(--panda-red)]" />
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px] bg-white border border-white shadow-lg rounded-lg">
+                      <DialogHeader>
+                        <DialogTitle>Nutrition Information - {item.name}</DialogTitle>
+                      </DialogHeader>
+                      <NutritionPanel itemName={item.name} />
+                    </DialogContent>
+                  </Dialog>
+                </div>
+                {/* Menu Item Image */}
+                <img src={item.imageUrl} alt={item.name} className="w-full h-48 object-cover" />
+                <div className="p-4 flex flex-col flex-grow justify-between">
+                  <div className="min-h-[100px]">
+                    <h3 className="text font-bold">{item.name}</h3>
+                    <p className="text-red-500 mb-2">{item.description}</p>
+                  </div>
+                  <div>
+                    <p className="text-[var(--panda-red)] font-bold">${Number(item.price).toFixed(2)}</p>
+                    <button
+                      className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md mt-2 w-full"
+                      onClick={() => {
+                        if (item.name === 'Bowl') {
+                          orderBowl();
+                        } else if (item.name === 'Plate') {
+                          orderPlate();
+                        } else if (item.name === 'Bigger Plate') {
+                          orderBiggerPlate();
+                        } else {
+                          addToCart(item);
+                        }
+                      }}
+                    >
+                      {item.category === 'combo' ? 'Create' : 'Add to Cart'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
 
 
         </div>

@@ -1,10 +1,10 @@
-// server/src/routes/orders.ts
-import { Router } from 'express';
-import { createOrder } from '../controllers/orderController';
+// // server/src/routes/orders.ts
+// import { Router } from 'express';
+// import { createOrder } from '../controllers/orderController';
 
-const router = Router();
+// const router = Router();
 
-// Make sure createOrder is properly imported and defined
-router.post('/', createOrder);
+// // Make sure createOrder is properly imported and defined
+// router.post('/', createOrder);
 
-export default router;
+//  export default router;

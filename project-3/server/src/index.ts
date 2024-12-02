@@ -3,9 +3,10 @@ import cors from 'cors';
 import session from 'express-session';
 import passport from 'passport';
 import { db } from './config/db';
-import orderRoutes from './routes/orders';
+//import orderRoutes from './routes/orders';
 import menuRoutes from './routes/menu';
 import authRoutes from './routes/authRoutes'; // Import the auth routes
+import employeeRoutes from './routes/employees'
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -50,8 +51,9 @@ async function initializeDatabase() {
 initializeDatabase();
 
 // Routes
-app.use('/api/orders', orderRoutes);
+//app.use('/api/orders', orderRoutes);
 app.use('/api/menu-items', menuRoutes);
+app.use('/api/employees', employeeRoutes)
 app.use('/auth', authRoutes); // Add the auth routes
 
 // Health check endpoint that includes database status

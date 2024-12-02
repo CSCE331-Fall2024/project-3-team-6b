@@ -2,11 +2,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import OrderList from '@/components/cashier/OrderList';
+//import OrderList from '@/components/cashier/OrderList';
 import EnhancedCheckout from '@/components/cashier/Checkout';
 import Checkout from '@/components/cashier/Checkout';
 import { MenuItem, Order } from '@/types';
-import api from "@/lib/api";
+import { fetchMenuItems } from '@/utils/menuItems'
+import { api } from '@/lib/api'; // Fixed import path
 
 export default function CashierPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -416,7 +417,9 @@ export default function CashierPage() {
 
         setOrders(ordersRes.data);
         setMenuItems(menuRes.data); */
-        setMenuItems(dummyData);
+        //setMenuItems(dummyData);
+        const items = await fetchMenuItems();
+        setMenuItems(items);
       } catch (error) {
         console.error('Failed to fetch initial data:', error);
       } finally {

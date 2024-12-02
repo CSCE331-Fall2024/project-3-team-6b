@@ -197,7 +197,7 @@ export default function HomePage() {
       </div>
 
       
-      {/* Accessibility Features */}
+      {/* Accessibility Features
   <div className="bg-white py-8">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <button
@@ -241,7 +241,7 @@ export default function HomePage() {
         </div>
       )}
     </div>
-  </div>
+  </div> */}
 
   <ScreenMagnifier enabled={magnifierEnabled} magnification={magnification} />
     </div>

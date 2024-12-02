@@ -127,19 +127,19 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
     const entreeNames = currentComboSelection.entrees.map(e => e.name).join(', ');
     const comboName = `${selectedComboBase.name} (${entreeNames}, ${currentComboSelection.side.name})`;
     
-    setDraftOrders(prev => prev.map(draft => {
-      if (draft.id !== activeDraftId) return draft;
+    // setDraftOrders(prev => prev.map(draft => {
+    //   if (draft.id !== activeDraftId) return draft;
       
-      return {
-        ...draft,
-        items: [...draft.items, {
-          menuItemId: selectedComboBase.id,
-          name: comboName,
-          quantity: 1,
-          price: selectedComboBase.price
-        }]
-      };
-    }));
+    //   return {
+    //     ...draft,
+    //     items: [...draft.items, {
+    //       menuItemId: selectedComboBase.id,
+    //       name: comboName,
+    //       quantity: 1,
+    //       price: selectedComboBase.price
+    //     }]
+    //   };
+    // }));
 
     setIsComboModalOpen(false);
     setCurrentComboSelection({ entrees: [], maxEntrees: 1 });
@@ -154,29 +154,35 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
       handleComboClick(menuItem);
       return;
     }
-
+  
+    // Create new item with proper category
+    const newOrderItem: OrderItem = {
+      menuItemId: menuItem.id,
+      name: menuItem.name,
+      quantity: 1,
+      price: menuItem.price,
+      category: menuItem.category // Include the category from the MenuItem
+    };
+  
     if (!activeDraftId) {
+      // Create new draft with properly typed OrderItem
       const newDraft = {
         id: `draft-${Date.now()}`,
-        items: [{
-          menuItemId: menuItem.id,
-          name: menuItem.name,
-          quantity: 1,
-          price: menuItem.price
-        }],
+        items: [newOrderItem],
         createdAt: new Date(),
       };
       setDraftOrders([newDraft]);
       setActiveDraftId(newDraft.id);
       return;
     }
-
-
+  
+    // Update existing draft orders with proper typing
     setDraftOrders(prev => prev.map(draft => {
       if (draft.id !== activeDraftId) return draft;
       
       const existingItem = draft.items.find(item => item.menuItemId === menuItem.id);
       if (existingItem) {
+        // Update quantity of existing item
         return {
           ...draft,
           items: draft.items.map(item =>
@@ -186,19 +192,14 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
           )
         };
       } else {
+        // Add new item
         return {
           ...draft,
-          items: [...draft.items, {
-            menuItemId: menuItem.id,
-            name: menuItem.name,
-            quantity: 1,
-            price: menuItem.price
-          }]
+          items: [...draft.items, newOrderItem]
         };
       }
     }));
   };
-
   const updateQuantity = (menuItemId: string, quantity: number) => {
     setDraftOrders(prev => prev.map(draft => {
       if (draft.id !== activeDraftId) return draft;
@@ -382,7 +383,7 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
                 }`}
               >
                 <h3 className="font-semibold">{item.name}</h3>
-                <p className="text-sm text-gray-600">${item.price.toFixed(2)}</p>
+                <p className="text-sm text-gray-600">${item.price}</p>
               </button>
             ))}
           </div>
@@ -400,7 +401,7 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
                     <div>
                       <h3 className="font-semibold">{item.name}</h3>
                       <p className="text-sm text-gray-600">
-                        ${item.price.toFixed(2)} each
+                        ${item.price} each
                       </p>
                     </div>
                     <div className="flex items-center space-x-3">

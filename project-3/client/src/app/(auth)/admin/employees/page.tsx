@@ -15,7 +15,7 @@ interface Employee {
     position: string;
   }
 
-export default function UpdateInventoryPage() {
+export default function UpdateEmployeesPage() {
   const [Employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,34 +26,13 @@ export default function UpdateInventoryPage() {
 
  
 
-
-  // Fetch menu items from the backend
-  // useEffect(() => {
-  //   const fetchEmployees = async () => {
-  //     try {
-  //       const response = await fetch('http://localhost:4000/api/menu-items');
-  //       if (!response.ok) {
-  //         throw new Error('Failed to fetch menu items');
-  //       }
-  //       const data: Employee[] = await response.json();
-  //       setEmployees(data);
-  //     } catch (error) {
-  //       setError((error as Error).message);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchEmployees();
-  // }, []);
-
   // Function to fetch the menu items
   const fetchEmployees = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:4000/api/menu-items');
+      const response = await fetch('http://localhost:4000/api/employees');
       if (!response.ok) {
-        throw new Error('Failed to fetch menu items');
+        throw new Error('Failed to fetch employees');
       }
       const data: Employee[] = await response.json();
       setEmployees(data);
@@ -120,20 +99,20 @@ useEffect(() => {
     //     console.log('Price is not a number or is undefined:', data.price); // Log if not a number
     // }
     if (modalAction === 'add') {
-      response = await fetch('http://localhost:4000/api/menu-items', {
-        method: 'POST',
+      response = await fetch('http://localhost:4000/api/employees', {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
     } else if (modalAction === 'update' && selectedItem) {
-      response = await fetch('http://localhost:4000/api/menu-items', {
-        method: 'PUT',
+      response = await fetch('http://localhost:4000/api/employees', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...selectedItem, ...data })
       });
       console.log(JSON.stringify(data));
     } else if (modalAction === 'remove' && selectedItem) {
-      response = await fetch(`http://localhost:4000/api/menu-items`, {
+      response = await fetch(`http://localhost:4000/api/employees`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...selectedItem, ...data })
@@ -150,26 +129,7 @@ useEffect(() => {
     }
   };
   
-  const handleConfirmRemove = async () => {
-    if (!selectedItem) return;
   
-    // Send DELETE request to backend to remove the item by name and category
-    const response = await fetch('http://localhost:4000/api/menu-items', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: selectedItem.name, category: selectedItem.category }), // Send name and category for identification
-    });
-  
-    if (response.ok) {
-      // Remove item locally and refresh list
-      setEmployees((prevItems) => prevItems.filter((item) => item.name !== selectedItem.name));
-    } else {
-      console.error('Failed to remove item');
-    }
-  
-    setModalVisible(false); // Close modal after removing
-    setSelectedItem(null); // Clear selection
-  };
   
   
 
@@ -187,7 +147,7 @@ useEffect(() => {
       <div className="button-group">
         <button className="btn-add" onClick={handleAddItem}>Add Employee</button>
         <button className="btn-update" onClick={handleUpdateItem}>Update Employee</button>
-        <button className="btn-remove" onClick={handleRemoveItem}>Remove Remove</button>
+        <button className="btn-remove" onClick={handleRemoveItem}>Remove Employee</button>
       </div>
 
       {/* Table displaying menu items for the active category */}

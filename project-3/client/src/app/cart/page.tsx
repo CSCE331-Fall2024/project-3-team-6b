@@ -1,14 +1,26 @@
 'use client';
 
-import { menuItems } from '@/utils/menuItems';
 import { MenuItem } from '@/types';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { fetchMenuItems as initialMenuItems } from '@/utils/menuItems';
+import NutritionPanel from '@/components/menu/NutritionPanel';
+import { Info } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/cashier/dialog";
+
+
 
 const MenuPage: React.FC = () => {
   const router = useRouter();
   // Keep your existing state variables
   const [selectedCategory, setSelectedCategory] = useState('combo');
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [cartItems, setCartItems] = useState<MenuItem[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [modalItem, setModalItem] = useState<MenuItem | null>(null);
@@ -16,20 +28,35 @@ const MenuPage: React.FC = () => {
   const [selectedEntrees, setSelectedEntrees] = useState<MenuItem[]>([]);
   const [showSideModal, setShowSideModal] = useState(false);
   const [showEntreeModal, setShowEntreeModal] = useState(false);
+  
 
   // Add new state for order processing
   const [selectedTipPercent, setSelectedTipPercent] = useState<number | null>(null);
   const [customTipAmount, setCustomTipAmount] = useState<string>('');
   const [isProcessingOrder, setIsProcessingOrder] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const TAX_RATE = 0.0825; // 8.25% tax rate
+  useEffect(() => {
+    // Call the fetch function and await its result
+    const fetchData = async () => {
+      const items = await initialMenuItems(); // Assuming this fetches the menu items correctly
+      setMenuItems(items); // Set the state with the fetched items
+      setIsLoading(false); // Turn off loading spinner
+    };
 
-  // Calculate order totals
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price, 0);
-  const tax = subtotal * TAX_RATE;
-  const tipAmount = selectedTipPercent ? (subtotal * selectedTipPercent) / 100 : 
-                   customTipAmount ? parseFloat(customTipAmount) : 0;
-  const total = subtotal + tax + tipAmount;
+    fetchData(); // Call fetchData to execute the async operation
+  }, []);
+
+
+const TAX_RATE = 0.0825;
+
+// Ensure all values are properly converted to numbers and calculated
+const subtotal = cartItems?.reduce((acc, item) => acc + (Number(item?.price) || 0), 0) || 0;
+const tax = Number((subtotal * TAX_RATE).toFixed(2));
+const tipAmount = selectedTipPercent ? Number((subtotal * (selectedTipPercent / 100)).toFixed(2)) : 
+                 (customTipAmount ? Number(customTipAmount) : 0);
+const total = Number(subtotal) + Number(tax) + Number(tipAmount);
+
 
   // Keep your existing filter functions
   const sideItems = menuItems.filter(item => item.category === 'side');
@@ -235,7 +262,10 @@ const MenuPage: React.FC = () => {
         selectedSide,
         selectedEntrees,
       };
+
       setCartItems([...cartItems, comboItem]);
+      
+
     } else {
       setCartItems([...cartItems, item]);
     }
@@ -301,37 +331,58 @@ const MenuPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-  {filteredItems.map(item => (
-    <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full">
-      <img src={item.imageUrl} alt={item.name} className="w-full h-48 object-cover" />
-      <div className="p-4 flex flex-col flex-grow justify-between">
-        <div className="min-h-[100px]"> {/* Adjust min height as needed */}
-          <h3 className="text font-bold">{item.name}</h3>
-          <p className="text-red-500 mb-2">{item.description}</p> {/* Full text shown */}
-        </div>
-        <div>
-          <p className="text-[var(--panda-red)] font-bold">${item.price.toFixed(2)}</p>
-          <button
-            className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md mt-2 w-full"
-            onClick={() => {
-              if (item.name === 'Bowl') {
-                orderBowl();
-              } else if (item.name === 'Plate') {
-                orderPlate();
-              } else if (item.name === 'Bigger Plate') {
-                orderBiggerPlate();
-              } else {
-                addToCart(item);
-              }
-            }}
-          >
-            {item.category === 'combo' ? 'Create' : 'Add to Cart'}
-          </button>
-        </div>
-      </div>
-    </div>
-  ))}
-</div>
+            {filteredItems.map((item) => (
+              <div key={item.id} className="relative bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full">
+                {/* Nutrition Info Button */}
+                <div className="absolute top-2 right-2 z-10">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <button
+                        className="p-2 rounded-full bg-white/90 hover:bg-white transition-all shadow-md"
+                        aria-label="Nutrition Information"
+                      >
+                        <Info className="h-5 w-5 text-gray-600 hover:text-[var(--panda-red)]" />
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px] bg-white border border-white shadow-lg rounded-lg">
+                      <DialogHeader>
+                        <DialogTitle>Nutrition Information - {item.name}</DialogTitle>
+                      </DialogHeader>
+                      <NutritionPanel itemName={item.name} />
+                    </DialogContent>
+                  </Dialog>
+                </div>
+                {/* Menu Item Image */}
+                <img src={item.imageUrl} alt={item.name} className="w-full h-48 object-cover" />
+                <div className="p-4 flex flex-col flex-grow justify-between">
+                  <div className="min-h-[100px]">
+                    <h3 className="text font-bold">{item.name}</h3>
+                    <p className="text-red-500 mb-2">{item.description}</p>
+                  </div>
+                  <div>
+                    <p className="text-[var(--panda-red)] font-bold">${Number(item.price).toFixed(2)}</p>
+                    <button
+                      className="bg-[var(--panda-red)] text-white px-4 py-2 rounded-md mt-2 w-full"
+                      onClick={() => {
+                        if (item.name === 'Bowl') {
+                          orderBowl();
+                        } else if (item.name === 'Plate') {
+                          orderPlate();
+                        } else if (item.name === 'Bigger Plate') {
+                          orderBiggerPlate();
+                        } else {
+                          addToCart(item);
+                        }
+                      }}
+                    >
+                      {item.category === 'combo' ? 'Create' : 'Add to Cart'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
 
 
         </div>
@@ -349,7 +400,8 @@ const MenuPage: React.FC = () => {
                     <li key={item.id} className="py-4 flex justify-between items-start">
                       <div className="flex-1">
                         <h3 className="font-bold">{item.name}</h3>
-                        <p className="text-gray-500">${item.price.toFixed(2)}</p>
+                        <p className="text-gray-500"> ${Number(item.price).toFixed(2)}</p>
+                        {/* <p className="text-gray-500">${item.price}</p> */}
                         {renderCartItemDetails(item)}
                       </div>
                       <button
@@ -362,59 +414,61 @@ const MenuPage: React.FC = () => {
                   ))}
                 </ul>
 
-                <div className="border-t pt-4">
-                  <div className="flex justify-between mb-2">
-                    <span>Subtotal</span>
-                    <span>${subtotal.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between mb-2">
-                    <span>Tax (8.25%)</span>
-                    <span>${tax.toFixed(2)}</span>
-                  </div>
+{/* Cart Totals Section */}
+<div className="border-t pt-4">
+  <div className="flex justify-between mb-2">
+    <span>Subtotal</span>
+    <span>${Number(subtotal).toFixed(2)}</span>
+  </div>
+  <div className="flex justify-between mb-2">
+    <span>Tax (8.25%)</span>
+    <span>${Number(tax).toFixed(2)}</span>
+  </div>
 
-                  {/* Tip Selection */}
-                  <div className="mb-4">
-                    <p className="text-sm font-medium mb-2">Add Tip</p>
-                    <div className="flex gap-2 mb-2">
-                      {[15, 18, 20].map((percent) => (
-                        <button
-                          key={percent}
-                          onClick={() => {
-                            setSelectedTipPercent(percent);
-                            setCustomTipAmount('');
-                          }}
-                          className={`flex-1 py-1 px-2 rounded text-sm ${
-                            selectedTipPercent === percent
-                              ? 'bg-[var(--panda-red)] text-white'
-                              : 'bg-gray-100 hover:bg-gray-200'
-                          }`}
-                        >
-                          {percent}%
-                        </button>
-                      ))}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm">$</span>
-                      <input
-                        type="number"
-                        value={customTipAmount}
-                        onChange={(e) => {
-                          setCustomTipAmount(e.target.value);
-                          setSelectedTipPercent(null);
-                        }}
-                        placeholder="Custom amount"
-                        className="w-full p-2 border rounded text-sm"
-                        min="0"
-                        step="0.01"
-                      />
-                    </div>
-                  </div>
+      {/* Tip Selection */}
+      <div className="mb-4">
+        <p className="text-sm font-medium mb-2">Add Tip</p>
+        <div className="flex gap-2 mb-2">
+          {[15, 18, 20].map((percent) => (
+            <button
+              key={percent}
+              onClick={() => {
+                setSelectedTipPercent(percent);
+                setCustomTipAmount('');
+              }}
+              className={`flex-1 py-1 px-2 rounded text-sm ${
+                selectedTipPercent === percent
+                  ? 'bg-[var(--panda-red)] text-white'
+                  : 'bg-gray-100 hover:bg-gray-200'
+              }`}
+            >
+              {percent}%
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm">$</span>
+          <input
+            type="number"
+            value={customTipAmount}
+            onChange={(e) => {
+              setCustomTipAmount(e.target.value);
+              setSelectedTipPercent(null);
+            }}
+            placeholder="Custom amount"
+            className="w-full p-2 border rounded text-sm"
+            min="0"
+            step="0.01"
+          />
+        </div>
+      </div>
 
-                  <div className="flex justify-between font-bold text-lg border-t pt-4">
-                    <span>Total</span>
-                    <span>${total.toFixed(2)}</span>
-                  </div>
-                </div>
+      {/* Total */}
+      <div className="flex justify-between font-bold text-lg border-t pt-4">
+    <span>Total</span>
+    <span>${Number(total).toFixed(2)}</span>
+  </div>
+</div>
 
                 <button
                   onClick={handleCheckout}

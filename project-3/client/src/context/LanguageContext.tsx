@@ -1,9 +1,7 @@
-// client/src/context/LanguageContext.tsx
 'use client';
 
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo } from 'react';
 
-// Define all supported languages
 export const languages = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
   { code: 'es', name: 'Español', flag: '🇪🇸' },
@@ -11,7 +9,6 @@ export const languages = [
   { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
 ] as const;
 
-// Type definitions
 export type LanguageCode = (typeof languages)[number]['code'];
 
 export interface Translation {
@@ -20,7 +17,6 @@ export interface Translation {
   };
 }
 
-// Basic translations (you can expand this)
 const translations: Translation = {
   'Welcome to Panda Express': {
     en: 'Welcome to Panda Express',
@@ -40,7 +36,6 @@ const translations: Translation = {
     zh: '购物车',
     vi: 'Giỏ hàng',
   },
-  // Add more translations as needed
 };
 
 interface LanguageContextType {
@@ -52,40 +47,33 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-interface LanguageProviderProps {
-  children: React.ReactNode;
-}
-
-export function LanguageProvider({ children }: LanguageProviderProps) {
+export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [currentLanguage, setCurrentLanguage] = useState<LanguageCode>('en');
 
+  const isRTL = useMemo(() => currentLanguage === 'en', [currentLanguage]);
+
   const translate = useCallback((key: string): string => {
-    if (translations[key] && translations[key][currentLanguage]) {
+    if (key in translations && currentLanguage in translations[key]) {
       return translations[key][currentLanguage];
     }
-
-    // If translation not found, return the key itself
-    console.warn(`Translation missing for key: ${key} in language: ${currentLanguage}`);
     return key;
   }, [currentLanguage]);
 
-  const isRTL = currentLanguage === 'en'; // Add more RTL languages if needed
-
-  const setLanguage = useCallback((lang: LanguageCode) => {
+  const handleLanguageChange = useCallback((lang: LanguageCode) => {
     setCurrentLanguage(lang);
     document.documentElement.lang = lang;
     document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
   }, [isRTL]);
 
+  const value = useMemo(() => ({
+    currentLanguage,
+    setLanguage: handleLanguageChange,
+    translate,
+    isRTL
+  }), [currentLanguage, handleLanguageChange, translate, isRTL]);
+
   return (
-    <LanguageContext.Provider 
-      value={{ 
-        currentLanguage, 
-        setLanguage, 
-        translate,
-        isRTL
-      }}
-    >
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
   );
@@ -93,7 +81,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
 export function useLanguage() {
   const context = useContext(LanguageContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
   return context;

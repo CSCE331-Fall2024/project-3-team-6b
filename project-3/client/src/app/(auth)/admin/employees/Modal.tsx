@@ -66,7 +66,7 @@ interface ModalProps {
               <label>Id:</label>
               <input
                 type="text"
-                name="name"
+                name="employee_id"
                 value={formData.employee_id || ''}
                 onChange={handleChange}
                 required
@@ -76,7 +76,7 @@ interface ModalProps {
               <label>Name:</label>
               <input
                 type="text"
-                name="category"
+                name="name"
                 value={formData.name || ''}
                 onChange={handleChange}
                 required
@@ -87,7 +87,7 @@ interface ModalProps {
                 <label>Salary:</label>
                 <input
                     type="number"
-                    name="price"
+                    name="salary"
                     value={formData.salary || 0}
                     onChange={handleChange}
                     required
@@ -98,8 +98,8 @@ interface ModalProps {
             <div>
                 <label>Position:</label>
                 <input
-                    type="number"
-                    name="count"
+                    type="text"
+                    name="position"
                     value={formData.position || ''}
                     onChange={handleChange}
                     required

@@ -6,11 +6,8 @@ import { usePathname } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import AuthButton from '../AuthButton';
 import Weather from './Weather';
-import { Users } from 'lucide-react';
-import { Calculator } from 'lucide-react';
 import LanguageSelector from './LanguageSelector';
 import { useLanguage } from '@/context/LanguageContext';
-
 import { Users, Calculator, ChevronDown , Accessibility } from 'lucide-react'; // Import icons
 import { Search } from 'lucide-react'; // Import the magnifier icon
 import ScreenMagnifier from '../ScreenMagnifier';
@@ -51,6 +48,10 @@ export default function Navbar() {
     }
   ];
 
+  const toggleAccessibilityDropdown = () => {
+    setIsAccessibilityDropdownOpen(!isAccessibilityDropdownOpen);
+  };
+  
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {

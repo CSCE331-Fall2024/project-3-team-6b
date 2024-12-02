@@ -3,9 +3,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import AuthButton from '../AuthButton';
 import Weather from './Weather';
+import { Users } from 'lucide-react';
+import { Calculator } from 'lucide-react';
 import LanguageSelector from './LanguageSelector';
 import { useLanguage } from '@/context/LanguageContext';
 import ScreenMagnifier from '../ScreenMagnifier';
@@ -187,7 +189,7 @@ export default function Navbar() {
             </div>
           </div>
         )}
-      </div>
+      {/* </div> */}
       
       {magnifierEnabled && <ScreenMagnifier enabled={magnifierEnabled} magnification={magnification} />}
     </nav>

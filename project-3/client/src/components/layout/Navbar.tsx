@@ -8,7 +8,7 @@ import LoginButton from './LoginButton';
 import Weather from './Weather';
 import LanguageSelector from './LanguageSelector';
 import { useLanguage } from '@/context/LanguageContext';
-import { Users, Calculator, ChevronDown } from 'lucide-react'; // Import icons
+import { Users, Calculator, ChevronDown , Accessibility } from 'lucide-react'; // Import icons
 import { Search } from 'lucide-react'; // Import the magnifier icon
 import ScreenMagnifier from '../../components/ScreenMagnifier';
 
@@ -69,7 +69,7 @@ export default function Navbar() {
   return (
     <nav className="bg-white shadow-lg border-b-4 border-[var(--panda-red)]" onMouseMove={handleMouseMove}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
+        <div className="flex justify-between h-20 items-center">
           {/* Logo Section */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-3">
@@ -109,8 +109,9 @@ export default function Navbar() {
         className="nav-link px-4 py-2 text-[var(--panda-black)]"
         aria-expanded={isAccessibilityDropdownOpen}
       >
-        {translate('Accessibility')}
+         <Accessibility size={60}  color="red" strokeWidth={2.5}/>
       </button>
+      
 
       {/* Dropdown Menu */}
       {isAccessibilityDropdownOpen && (

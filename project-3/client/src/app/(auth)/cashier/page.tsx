@@ -8,12 +8,27 @@ import Checkout from '@/components/cashier/Checkout';
 import { MenuItem, Order } from '@/types';
 import { fetchMenuItems } from '@/utils/menuItems'
 import { api } from '@/lib/api'; // Fixed import path
+import { useSession, signIn } from "next-auth/react";
 
 export default function CashierPage() {
+  const { data: session, status } = useSession();
   const [orders, setOrders] = useState<Order[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [activeOrder, setActiveOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  if (!session) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <button
+          onClick={() => signIn('google', { redirect: true, callbackUrl: '/' })}
+          className="bg-blue-500 text-white px-6 py-3 rounded shadow"
+        >
+          Sign In
+        </button>
+      </div>
+    );
+  }
 
     // Temporary data for testing
     const dummyData: MenuItem[] = [

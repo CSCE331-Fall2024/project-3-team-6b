@@ -47,15 +47,16 @@ const MenuPage: React.FC = () => {
     fetchData(); // Call fetchData to execute the async operation
   }, []);
 
-  const TAX_RATE = 0.0825; // 8.25% tax rate
 
- // Calculate order totals with safety checks
- const subtotal = cartItems?.reduce((acc, item) => acc + (item?.price || 0), 0) || 0;
- const tax = (subtotal * TAX_RATE) || 0;
- const tipAmount = selectedTipPercent ? ((subtotal * selectedTipPercent) / 100) : 
-                  (customTipAmount ? parseFloat(customTipAmount) || 0 : 0);
- const total = subtotal + tax + tipAmount;
-  
+const TAX_RATE = 0.0825;
+
+// Ensure all values are properly converted to numbers and calculated
+const subtotal = cartItems?.reduce((acc, item) => acc + (Number(item?.price) || 0), 0) || 0;
+const tax = Number((subtotal * TAX_RATE).toFixed(2));
+const tipAmount = selectedTipPercent ? Number((subtotal * (selectedTipPercent / 100)).toFixed(2)) : 
+                 (customTipAmount ? Number(customTipAmount) : 0);
+const total = Number(subtotal) + Number(tax) + Number(tipAmount);
+
 
   // Keep your existing filter functions
   const sideItems = menuItems.filter(item => item.category === 'side');
@@ -413,16 +414,16 @@ const MenuPage: React.FC = () => {
                   ))}
                 </ul>
 
-                {/* Cart Totals Section */}
-    <div className="border-t pt-4">
-      <div className="flex justify-between mb-2">
-        <span>Subtotal</span>
-        <span>${subtotal.toFixed(2)}</span>
-      </div>
-      <div className="flex justify-between mb-2">
-        <span>Tax (8.25%)</span>
-        <span>${tax.toFixed(2)}</span>
-      </div>
+{/* Cart Totals Section */}
+<div className="border-t pt-4">
+  <div className="flex justify-between mb-2">
+    <span>Subtotal</span>
+    <span>${Number(subtotal).toFixed(2)}</span>
+  </div>
+  <div className="flex justify-between mb-2">
+    <span>Tax (8.25%)</span>
+    <span>${Number(tax).toFixed(2)}</span>
+  </div>
 
       {/* Tip Selection */}
       <div className="mb-4">
@@ -464,10 +465,10 @@ const MenuPage: React.FC = () => {
 
       {/* Total */}
       <div className="flex justify-between font-bold text-lg border-t pt-4">
-        <span>Total</span>
-        <span>${total.toFixed(2)}</span>
-      </div>
-    </div>
+    <span>Total</span>
+    <span>${Number(total).toFixed(2)}</span>
+  </div>
+</div>
 
                 <button
                   onClick={handleCheckout}

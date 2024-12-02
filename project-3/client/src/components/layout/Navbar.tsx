@@ -3,9 +3,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect, useRef } from 'react';
-import { Menu, X } from 'lucide-react';
-// import AuthButton from '../AuthButton';
+import { useState, useEffect } from 'react';
+import AuthButton from '../AuthButton';
 import Weather from './Weather';
 import LanguageSelector from './LanguageSelector';
 import { useLanguage } from '@/context/LanguageContext';
@@ -141,67 +140,31 @@ export default function Navbar() {
 
           {/* Right Side Items */}
           <div className="flex items-center space-x-4">
-            <div className="hidden sm:block">
-              <Weather/>
-            </div>
-            <LanguageSelector />
-            {/* <AuthButton /> */}
-            
-            {/* Mobile Menu Button */}
-            <button
-              className="md:hidden p-2 rounded-md hover:bg-gray-100"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            {/* Manager Button */}
+            <Link
+              href="/admin"
+              className="flex items-center space-x-1 px-3 py-2 bg-[var(--panda-gold)] text-black rounded-md hover:bg-[var(--panda-light-gold)] transition-colors"
             >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-        </div>
+              <Users size={18} />
+              <span>Manager</span>
+            </Link>
 
-        {/* Mobile Menu */}
-        <div
-          ref={mobileMenuRef}
-          className={`md:hidden fixed inset-y-0 right-0 transform ${
-            isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-          } w-64 bg-white shadow-lg transition-transform duration-300 ease-in-out z-50`}
-        >
-          <div className="p-4 space-y-4">
-            <div className="flex justify-end">
-              <button
-                className="p-2 rounded-md hover:bg-gray-100"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <X size={24} />
-              </button>
-            </div>
-            <div className="space-y-4">
-              <NavLink href="/menu" onClick={() => setIsMobileMenuOpen(false)}>{translate('Menu')}</NavLink>
-              <NavLink href="/cart" onClick={() => setIsMobileMenuOpen(false)}>{translate('Cart')}</NavLink>
-              
-              {/* Mobile Accessibility Options */}
-              <div className="space-y-2">
-                <h3 className="font-medium text-gray-900 px-2">{translate('Accessibility')}</h3>
-                {accessibilityOptions.map(option => (
-                  <button
-                    key={option.id}
-                    onClick={() => {
-                      option.action();
-                      setSelectedOption(option.id === selectedOption ? null : option.id);
-                    }}
-                    className={`px-2 py-2 text-left w-full hover:bg-gray-100 ${
-                      selectedOption === option.id ? 'bg-blue-100 text-blue-800' : ''
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-              
-              <div className="sm:hidden pt-4">
-                <Weather />
-              </div>
-            </div>
+            {/* Cashier Button */}
+            <Link
+              href="/cashier"
+              className="flex items-center space-x-1 px-3 py-2 bg-[var(--panda-red)] text-white rounded-md hover:bg-[var(--panda-dark-red)] transition-colors"
+            >
+              <Calculator size={18} />
+              <span>Cashier</span>
+            </Link>
+
+            {/* Weather, Language Selector, and Login Button */}
+            <Weather />
+            <LanguageSelector />
+            <AuthButton />
           </div>
         </div>
+      </div>
 
         {/* Magnifier Controls */}
         {magnifierEnabled && (

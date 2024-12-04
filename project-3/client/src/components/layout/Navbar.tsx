@@ -51,6 +51,19 @@ export default function Navbar() {
   const toggleAccessibilityDropdown = () => {
     setIsAccessibilityDropdownOpen(!isAccessibilityDropdownOpen);
   };
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      setIsAccessibilityDropdownOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
   
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -136,6 +149,7 @@ export default function Navbar() {
         <div
           className="absolute right-0 mt-2 w-48 bg-white shadow-lg border rounded-md py-2 z-50"
           style={{ zIndex: 50 }}
+          ref={dropdownRef}
         >
           <button
             onClick={() => {
@@ -229,7 +243,7 @@ export default function Navbar() {
         )}
       {/* </div> */}
       
-      {magnifierEnabled && <ScreenMagnifier enabled={magnifierEnabled} magnification={magnification} />}
+      
     </nav>
   );
 }

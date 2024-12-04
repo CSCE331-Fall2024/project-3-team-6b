@@ -12,6 +12,10 @@ This folder holds the frontend for the manager view update menu items and invent
 
 ## server/src
 
+## /config
+
+This folder hold the database configuration and functions and login information to connect to our SQL database on AWS.
+
 ## /controllers
 
 This folder holds the controllers for menu items and employees.

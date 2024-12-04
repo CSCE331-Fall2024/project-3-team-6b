@@ -1,11 +1,26 @@
-# project-3-team-6b
+# project-3-team-6b Panda Express POS System Repo High Level Details
 
-## Menu Item Management
+## client/src
 
-Test, stuff stuff, Menu Item 
+### /app/menu
 
-## Inventory Item Management
+This folder holds the frontend for the non interactive multidisplay menu board.
 
-## Menu Board
+### /app/(auth)/admin/update-inventory
 
-The non interactive menu board is implemented by pulling all items from the menuItem.ts utils file. In the menuItem.ts file matches them with hardcoded images while fetching the prices from the backend. 
+This folder holds the frontend for the manager view update menu items and inventory functionality.
+
+## server/src
+
+## /controllers
+
+This folder holds the controllers for menu items and employees.
+
+## /middleware
+
+idk what this does, someelse fill it in
+
+## /routes
+
+This folder holds the routing for employee management and items management API endpoints as well as authentication routing.
+

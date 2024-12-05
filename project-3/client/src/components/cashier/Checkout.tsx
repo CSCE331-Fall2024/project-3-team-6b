@@ -80,11 +80,13 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
   };
 
   const handleComboClick = (comboItem: MenuItem) => {
-    const { maxEntrees } = getComboRequirements(comboItem.name);
+    if (!comboItem.name) return;
+    
+    const comboRequirements = getComboRequirements(comboItem.name);
     setSelectedComboBase(comboItem);
     setCurrentComboSelection({
       entrees: [],
-      maxEntrees
+      maxEntrees: comboRequirements.maxEntrees
     });
     setIsComboModalOpen(true);
   };
@@ -120,40 +122,64 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
 
 
   const addComboToOrder = () => {
-    if (!activeDraftId || !selectedComboBase || 
+    if (!selectedComboBase || 
         currentComboSelection.entrees.length !== currentComboSelection.maxEntrees || 
         !currentComboSelection.side) return;
-
+  
     const entreeNames = currentComboSelection.entrees.map(e => e.name).join(', ');
     const comboName = `${selectedComboBase.name} (${entreeNames}, ${currentComboSelection.side.name})`;
     
-    // setDraftOrders(prev => prev.map(draft => {
-    //   if (draft.id !== activeDraftId) return draft;
-      
-    //   return {
-    //     ...draft,
-    //     items: [...draft.items, {
-    //       menuItemId: selectedComboBase.id,
-    //       name: comboName,
-    //       quantity: 1,
-    //       price: selectedComboBase.price
-    //     }]
-    //   };
-    // }));
-
+    // Create the combo order item
+    const comboOrderItem: OrderItem = {
+      menuItemId: selectedComboBase.id,
+      name: comboName,
+      quantity: 1,
+      price: selectedComboBase.price,
+      category: 'combo',
+      // comboDetails: {
+      //   baseItem: selectedComboBase,
+      //   entrees: currentComboSelection.entrees,
+      //   side: currentComboSelection.side
+      // }
+    };
+  
+    if (!activeDraftId) {
+      // Create new draft if none exists
+      const newDraft = {
+        id: `draft-${Date.now()}`,
+        items: [comboOrderItem],
+        createdAt: new Date(),
+      };
+      setDraftOrders([newDraft]);
+      setActiveDraftId(newDraft.id);
+    } else {
+      // Add to existing draft
+      setDraftOrders(prev => prev.map(draft => {
+        if (draft.id !== activeDraftId) return draft;
+        
+        return {
+          ...draft,
+          items: [...draft.items, comboOrderItem]
+        };
+      }));
+    }
+  
     setIsComboModalOpen(false);
     setCurrentComboSelection({ entrees: [], maxEntrees: 1 });
     setSelectedComboBase(null);
   };
-
+  
 
 
 
   const addItem = (menuItem: MenuItem) => {
+    if (!menuItem.category) return;
+  
     if (menuItem.category === 'combo') {
       handleComboClick(menuItem);
       return;
     }
+  
   
     // Create new item with proper category
     const newOrderItem: OrderItem = {
@@ -454,24 +480,7 @@ export default function EnhancedCheckout({ menuItems, onCreateOrder }: CheckoutP
                 </div>
               </div>
 
-              <div className="border-t pt-4 mb-4">
-                <h3 className="font-semibold mb-2">Split Bill</h3>
-                <div className="flex gap-2 mb-3">
-                  {[1, 2, 3, 4].map((num) => (
-                    <button
-                      key={num}
-                      onClick={() => handleSplitSelect(num)}
-                      className={`flex-1 py-2 px-3 rounded-lg text-sm ${
-                        selectedSplit === num
-                          ? 'bg-[var(--panda-red)] text-white'
-                          : 'bg-gray-100 hover:bg-gray-200'
-                      }`}
-                    >
-                      {num}
-                    </button>
-                  ))}
-                </div>
-              </div>
+             
 
               <div className="border-t pt-4 space-y-2">
                 <div className="flex justify-between">

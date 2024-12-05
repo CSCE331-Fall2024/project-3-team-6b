@@ -8,7 +8,7 @@ import AuthButton from '../AuthButton';
 import Weather from './Weather';
 import LanguageSelector from './LanguageSelector';
 import { useLanguage } from '@/context/LanguageContext';
-import { Users, Calculator, ChevronDown , Accessibility } from 'lucide-react'; // Import icons
+import { Users, Calculator, ChevronDown , Accessibility, Info  } from 'lucide-react'; // Import icons
 import { Search } from 'lucide-react'; // Import the magnifier icon
 import ScreenMagnifier from '../ScreenMagnifier';
 
@@ -233,6 +233,7 @@ export default function Navbar() {
 
           {/* Right Side Items */}
           <div className="flex items-center space-x-4">
+            
             {/* Manager Button */}
             <Link
               href="/admin"
@@ -256,8 +257,17 @@ export default function Navbar() {
             <LanguageSelector />
             <AuthButton />
           </div>
+          {/* Wiki/Documentation Link - Now separated and always on far right */}
+    <Link
+      href="/documentation"
+      className="ml-2 p-2 text-[var(--panda-red)] hover:bg-gray-100 rounded-full transition-colors"
+      title="Documentation"
+    >
+      <Info size={16} />
+    </Link>
         </div>
       </div>
+      
 
         {/* Magnifier Controls */}
         {/* Magnifier Controls */}

@@ -19,6 +19,7 @@ app.use(express.json());
 
 // Configure session middleware
 app.use(
+  // @ts-ignore
   session({
     secret: process.env.SESSION_SECRET || 'your-session-secret',
     resave: false,
@@ -30,6 +31,7 @@ app.use(
 );
 
 // Initialize Passport
+// @ts-ignore
 app.use(passport.initialize());
 app.use(passport.session());
 

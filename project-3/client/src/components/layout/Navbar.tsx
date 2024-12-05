@@ -51,6 +51,19 @@ export default function Navbar() {
   const toggleAccessibilityDropdown = () => {
     setIsAccessibilityDropdownOpen(!isAccessibilityDropdownOpen);
   };
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      setIsAccessibilityDropdownOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
   
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -68,19 +81,58 @@ export default function Navbar() {
     };
   }, []);
 
+  // useEffect(() => {
+  //   if (magnifierEnabled) {
+  //     document.body.style.transform = `scale(${magnification})`;
+  //     document.body.style.transformOrigin = 'top left';
+  //     document.body.style.transition = 'transform 0.3s ease';
+  //   } else {
+  //     document.body.style.transform = 'none';
+  //   }
+
+  //   return () => {
+  //     document.body.style.transform = 'none';
+  //   };
+  // }, [magnifierEnabled, magnification]);
+
   useEffect(() => {
     if (magnifierEnabled) {
-      document.body.style.transform = `scale(${magnification})`;
-      document.body.style.transformOrigin = 'top left';
-      document.body.style.transition = 'transform 0.3s ease';
-    } else {
-      document.body.style.transform = 'none';
-    }
+      const content = document.querySelector('main'); // or any other wrapper for your content
+      const navbar = document.querySelector('#navbar'); 
+      
+      if (navbar) {
+        const navbarElement = navbar as HTMLElement;
 
+        navbarElement.style.position = 'fixed';
+        navbarElement.style.top = '0';
+        navbarElement.style.left = '0';
+        navbarElement.style.right = '0';
+        navbarElement.style.zIndex = '10';  // Ensure the navbar is above other content
+        navbarElement.style.width = '100%'; // Ensure navbar stretches across the entire width
+        navbarElement.style.boxSizing = 'border-box';// Include padding and borders in width calculation
+      }
+      if (content) {
+        content.style.transform = `scale(${magnification})`;
+        content.style.transformOrigin = 'top left';
+        content.style.transition = 'transform 0.3s ease';
+        content.style.marginTop = `${(1 - magnification) * -100}px`; // Adjust the margin to prevent overlap
+        content.style.transition = 'margin-top 0.3s ease';
+      }
+    } else {
+      const content = document.querySelector('main');
+      if (content) {
+        content.style.transform = 'none';
+      }
+    }
+  
     return () => {
-      document.body.style.transform = 'none';
+      const content = document.querySelector('main');
+      if (content) {
+        content.style.transform = 'none';
+      }
     };
   }, [magnifierEnabled, magnification]);
+  
 
   const NavLink = ({ href, children, onClick }: { href: string; children: React.ReactNode; onClick?: () => void }) => (
     <Link
@@ -93,7 +145,7 @@ export default function Navbar() {
   );
 
   return (
-    <nav className="sticky top-0 z-50 bg-white shadow-lg border-b-4 border-[var(--panda-red)]">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-lg border-b-4 border-[var(--panda-red)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
           {/* Logo Section */}
@@ -136,6 +188,7 @@ export default function Navbar() {
         <div
           className="absolute right-0 mt-2 w-48 bg-white shadow-lg border rounded-md py-2 z-50"
           style={{ zIndex: 50 }}
+          ref={dropdownRef}
         >
           <button
             onClick={() => {
@@ -207,29 +260,41 @@ export default function Navbar() {
       </div>
 
         {/* Magnifier Controls */}
-        {magnifierEnabled && (
-          <div className="absolute left-0 right-0 bg-white border-t px-4 py-2">
-            <div className="flex items-center space-x-4 max-w-7xl mx-auto">
-              <label htmlFor="magnification" className="text-sm font-medium">
-                {translate('Magnification Level')}:
-              </label>
-              <input
-                type="range"
-                id="magnification"
-                min="1.5"
-                max="4"
-                step="0.5"
-                value={magnification}
-                onChange={(e) => setMagnification(Number(e.target.value))}
-                className="w-32"
-              />
-              <span className="text-sm">{magnification}x</span>
-            </div>
-          </div>
-        )}
+        {/* Magnifier Controls */}
+{magnifierEnabled && (
+  <div className="fixed bottom-0 left-0 right-0 bg-[var(--panda-red)] text-white p-6 shadow-2xl z-[100]">
+    <div className="max-w-7xl mx-auto flex items-center justify-center space-x-8">
+      <label 
+        htmlFor="magnification" 
+        className="text-2xl font-bold tracking-wide"
+      >
+        {translate('Magnification Level')}
+      </label>
+      <div className="flex items-center space-x-6">
+        <input
+          type="range"
+          id="magnification"
+          min="1.5"
+          max="4"
+          step="0.5"
+          value={magnification}
+          onChange={(e) => setMagnification(Number(e.target.value))}
+          className="w-96 h-4 bg-white appearance-none cursor-pointer rounded-full 
+            [&::-webkit-slider-thumb]:appearance-none 
+            [&::-webkit-slider-thumb]:w-12 
+            [&::-webkit-slider-thumb]:h-12 
+            [&::-webkit-slider-thumb]:bg-white 
+            [&::-webkit-slider-thumb]:rounded-full 
+            [&::-webkit-slider-thumb]:shadow-lg"
+        />
+        <span className="text-4xl font-bold">{magnification}x</span>
+      </div>
+    </div>
+  </div>
+)}
       {/* </div> */}
       
-      {magnifierEnabled && <ScreenMagnifier enabled={magnifierEnabled} magnification={magnification} />}
+      
     </nav>
   );
 }

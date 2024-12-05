@@ -10,6 +10,22 @@ This folder holds the frontend for the non interactive multidisplay menu board.
 
 This folder holds the frontend for the manager view update menu items and inventory functionality.
 
+### /app/(auth)/admin/cashier
+
+This folder holds the overall frontend for the interactive cashier view
+
+### /components/cashier
+
+This folder holds the frontend components for the cashier page: Checkout, OrderList
+
+### /components/menu
+
+This folder holds the nutrition info for the non interactive multidisplay menu board
+
+### /context
+
+This folder holds the language translation functionality
+
 ## server/src
 
 ## /config

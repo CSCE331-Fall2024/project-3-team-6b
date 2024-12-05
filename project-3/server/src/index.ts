@@ -8,6 +8,7 @@ import menuRoutes from './routes/menu';
 import authRoutes from './routes/authRoutes'; // Import the auth routes
 import employeeRoutes from './routes/employees'
 import dotenv from 'dotenv';
+import { startAIChatServer } from './aiChatServer'; // We'll create this file
 
 dotenv.config();
 
@@ -89,8 +90,11 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 const PORT = process.env.PORT || 4000;
 
 const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Main server running on port ${PORT}`);
+  // Start AI Chat server
+  startAIChatServer();
 });
+
 
 // Handle uncaught exceptions
 process.on('uncaughtException', async (error) => {

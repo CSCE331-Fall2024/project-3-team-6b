@@ -1,5 +1,15 @@
 # project-3-team-6b Panda Express POS System Repo High Level Details
 
+## To run the code locally: 
+
+1. Clone the repo
+2. cd into the project-3 directory
+3. Run npm install
+4. Run npm run dev
+
+## Framework
+
+***************************Talk about framework stuff here**************************
 ## client/src
 
 ### /app/menu

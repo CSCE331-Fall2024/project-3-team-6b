@@ -179,7 +179,7 @@ export default function Navbar() {
         className="nav-link px-4 py-2 text-[var(--panda-black)]"
         aria-expanded={isAccessibilityDropdownOpen}
       >
-         <Accessibility size={60}  color="red" strokeWidth={2.5}/>
+         <Accessibility size={60}  color="black" strokeWidth={2.5}/>
       </button>
       
 

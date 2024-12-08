@@ -4,7 +4,7 @@
 
 1. Clone the repo
 2. cd into the project-3 directory
-3. Run npm install
+3. Run npm install (will put node modules into both server and client)
 4. Run npm run dev
 
 ## Framework
@@ -45,10 +45,6 @@ This folder hold the database configuration and functions and login information 
 ## /controllers
 
 This folder holds the controllers for menu items and employees.
-
-## /middleware
-
-idk what this does, someelse fill it in
 
 ## /routes
 

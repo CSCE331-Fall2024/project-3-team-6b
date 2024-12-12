@@ -9,9 +9,10 @@
 
 ## Framework
 
-***************************Talk about framework stuff here**************************
-## client/src
+We used Next.js with React.js, Langchain with JavaScript, TailwindCSS, and PostgreSQL to create this application
 
+## client/src
+This folder holds the files containing all of the front-end .tsx, .jsx, .js, .ts codes
 ### /app/menu
 
 This folder holds the frontend for the non interactive multidisplay menu board.
@@ -37,6 +38,7 @@ This folder holds the nutrition info for the non interactive multidisplay menu b
 This folder holds the language translation functionality
 
 ## server/src
+This file contains the source code for the back-end and database interaction 
 
 ## /config
 
